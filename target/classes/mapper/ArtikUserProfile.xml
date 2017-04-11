@@ -1,0 +1,40 @@
+<!DOCTYPE mapper   
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ArtikUserProfile">
+
+	<insert id="insertArtikUserProfile" parameterType="HashMap">
+		INSERT INTO
+		ARTIK_USER_PROFILE (uId, id, name, email, fullName,
+		saIdentity,accountType, createdOn,modifiedOn )
+		VALUES
+		(#{uId}, #{id},
+		#{name}, #{email}, #{fullName}, #{saIdentity},#{accountType},
+		#{createdOn}, #{modifiedOn});
+	</insert>
+
+	<update id="updateArtikUserProfile" parameterType="HashMap">
+		UPDATE
+		ARTIK_USER_PROFILE
+		SET
+		id = #{id}, name = #{name}, email = #{email},
+		fullName = #{fullName},
+		saIdentity = #{saIdentity}, accountType =
+		#{accountType}, createdOn =
+		#{createdOn}, modifiedOn = #{modifiedOn}
+		WHERE uId LIKE #{uId};
+	</update>
+
+	<select id="getUserIdById" parameterType="HashMap" resultType="String">
+		SELECT id
+		FROM ARTIK_USER_PROFILE
+		WHERE uId LIKE #{uId}
+	</select>
+
+	<select id="artikUserCheck" parameterType="HashMap" resultType="Integer">
+		SELECT count(*)
+		FROM ARTIK_USER_PROFILE
+		WHERE uId LIKE #{uId}
+	</select>
+</mapper>

@@ -1,0 +1,19 @@
+<!DOCTYPE mapper   
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ConnectedCompany">
+
+	<!-- resutlMap : to get List result -->
+	<resultMap id="ConnectedCompanyResult" type="com.icontrols.test.domain.ConnectedCompany">
+		<result property="cmpCode" column="cmpCode" javaType="java.lang.Integer" />
+		<result property="cmpName" column="cmpName" javaType="java.lang.String" />
+	</resultMap>
+
+	<!-- resultMap -->
+	<select id="getConnectedCompany" parameterType="HashMap" resultMap="ConnectedCompanyResult">
+		SELECT cmpCode, cmpName
+		FROM connected_company
+	</select>
+
+</mapper>

@@ -1,0 +1,31 @@
+<!DOCTYPE mapper   
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="User">
+
+<!-- resutlMap : to get List result -->
+	<resultMap id="userResult" type="com.icontrols.test.domain.User">
+		<result property="uId" column="uId" javaType="java.lang.String" />
+		<result property="uPwd" column="uPwd" javaType="java.lang.String" />
+		<result property="uPhone" column="uPhone" javaType="java.lang.String" />
+	</resultMap>
+
+	<insert id="insertUser" parameterType="HashMap">
+		INSERT INTO user
+		(uId,uPwd,uEmail) VALUES (#{uId}, #{uPwd}, #{uEmail});
+	</insert>
+
+	<select id="loginCheck" parameterType="HashMap" resultType="Integer">
+		SELECT count(*)
+		FROM user
+		WHERE uId LIKE #{uId} AND uPwd LIKE #{uPwd};
+	</select>
+
+<!-- resultMap -->
+	<select id="getUserList" resultMap="userResult">
+		SELECT uId, uPwd, uEmail
+		FROM user
+	</select>
+
+</mapper>

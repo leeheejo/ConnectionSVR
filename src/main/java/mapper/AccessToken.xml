@@ -1,0 +1,32 @@
+<!DOCTYPE mapper   
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="AccessToken">
+
+	<insert id="insertAccessToken" parameterType="HashMap">
+		INSERT INTO
+			ARTIK_ACCESS_TOKEN (uId, accessToken, tokenType,expiresIn,refreshToken)
+		VALUES
+			(#{uId}, #{accessToken}, #{tokenType},#{expiresIn}, #{refreshToken});
+	</insert>
+
+	<select id="tokenCheck" parameterType="HashMap" resultType="Integer">
+		SELECT count(*)
+		FROM ARTIK_ACCESS_TOKEN
+		WHERE uId LIKE #{uId}
+	</select>
+
+	<update id="updateAccessToken" parameterType="HashMap">
+		UPDATE ARTIK_ACCESS_TOKEN
+		SET accessToken= #{accessToken}, tokenType = #{tokenType}, expiresIn = #{expiresIn}, refreshToken = #{refreshToken}
+		WHERE uId LIKE #{uId};
+	</update>
+	
+	<select id="getAccessTokenById" parameterType="HashMap" resultType="String">
+		SELECT accessToken
+		FROM ARTIK_ACCESS_TOKEN
+		WHERE uId LIKE #{uId}
+	</select>
+
+</mapper>
