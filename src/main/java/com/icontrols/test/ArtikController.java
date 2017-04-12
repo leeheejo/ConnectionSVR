@@ -3,6 +3,7 @@ package com.icontrols.test;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
 import java.util.HashMap;
@@ -14,6 +15,8 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.codec.binary.Base64;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -282,6 +285,49 @@ public class ArtikController {
 		return "redirect:/success";
 	}
 
+	@RequestMapping("/addNewDevice")
+	public String addNewDevice(HttpSession session, @RequestParam(value = "dtId") String dtId,
+			@RequestParam(value = "name") String name) throws Exception {
+		
+		// HttpPost 통신
+		URL url = new URL("https://api.artik.cloud/v1.1/devices");
+		HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+		con.setRequestMethod("POST");
+		con.setDoInput(true);
+		con.setDoOutput(true);
+
+		String accessToken = session.getAttribute("ACCESS_TOKEN").toString();
+		// Header
+		String authorizationHeader = "bearer " + accessToken;
+		con.setRequestProperty("Authorization", authorizationHeader);
+		con.setRequestProperty("Content-Type", "application/json");
+
+		int manifestVersion = getManifestVersion(session, dtId);
+		// Param
+		String param = "{\"uid\": \"" + session.getAttribute("ARTIK_USER_ID").toString() + "\",\"dtid\": \"" + dtId
+				+ "\",  \"name\": \"" + name + "\",\"manifestVersion\":" + manifestVersion
+				+ ",\"manifestVersionPolicy\": \"LATEST\"}";
+
+		logger.info("[addNewDevice] PARAM : {}", param);
+
+		OutputStream os = con.getOutputStream();
+		os.write(param.getBytes());
+		os.flush();
+		os.close();
+
+		// Response Code
+		int responseCode = con.getResponseCode();
+		logger.info("[addNewDevice] responseCode : {}", responseCode + con.getResponseMessage());
+
+		// Response Data
+		BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+		String responseData = br.readLine();
+		logger.info("[addNewDevice] responseData : {}", responseData);
+		br.close();
+
+		return "deviceList";
+	}
+
 	public void getArtikUserInfo(HttpSession session) throws Exception {
 
 		logger.info("[getArtikUserInfo]");
@@ -463,4 +509,40 @@ public class ArtikController {
 
 	}
 
+	public int getManifestVersion(HttpSession session, String dtId) throws Exception {
+		int result = 0;
+
+		// HttpPost 통신
+		URL url = new URL("https://api.artik.cloud/v1.1/devicetypes/"+ dtId +"/availablemanifestversions");
+		HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+		con.setRequestMethod("GET");
+		con.setDoInput(true);
+		con.setDoOutput(true);
+
+		// Header
+		String accessToken = session.getAttribute("ACCESS_TOKEN").toString();
+		String authorizationHeader = "bearer " + accessToken;
+		con.setRequestProperty("Authorization", authorizationHeader);
+		con.setRequestProperty("Content-Type", "application/json");
+
+		// Response Code
+		int responseCode = con.getResponseCode();
+		logger.info("[getManifestVersion] responseCode : {}", responseCode + con.getResponseMessage());
+
+		// Response Data
+		BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+		String responseData = br.readLine();
+		logger.info("[getManifestVersion] responseData : {}", responseData);
+		br.close();
+
+		JSONObject obj = new JSONObject(responseData);
+		logger.info("[getManifestVersion] obj : {}", obj);
+		JSONObject data = obj.getJSONObject("data");
+		JSONArray devices = data.getJSONArray("versions");
+		logger.info("[getManifestVersion] devices : {}", devices.get(0));
+		
+		result = Integer.parseInt(devices.get(0).toString());
+		
+		return result;
+	}
 }
