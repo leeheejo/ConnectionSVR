@@ -6,7 +6,6 @@ import org.springframework.stereotype.Repository;
 
 import com.icontrols.test.domain.ConnectedCompany;
 
-@Repository(value="ConnectedCompany")
 public interface ConnectedCompanyDao {
 	
 	public List<ConnectedCompany> getConnectedCompany();

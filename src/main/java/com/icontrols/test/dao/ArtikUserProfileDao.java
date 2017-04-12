@@ -4,7 +4,6 @@ import java.util.HashMap;
 
 import org.springframework.stereotype.Repository;
 
-@Repository(value="ArtikUserProfile")
 public interface ArtikUserProfileDao {
 	
 	public void insertArtikUserProfile(HashMap<String, Object> hashmap);

@@ -16,7 +16,6 @@ public class Device {
 		this.uId = uId;
 		this.dId = dId;
 		this.name = name;
-		this.state = state;
 		this.dtId = dtId;
 	}
 
@@ -34,6 +33,16 @@ public class Device {
 		this.name = name;
 		this.state = state;
 	}
+	
+	public Device(String uId, String dId, String name, Integer state, String dtId) {
+		super();
+		this.uId = uId;
+		this.dId = dId;
+		this.name = name;
+		this.state = state;
+		this.dtId = dtId;
+	}
+
 
 	public Device(String dId, String name) {
 		super();

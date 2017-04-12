@@ -120,8 +120,12 @@ public class HomeController {
 	@RequestMapping("success")
 	public ModelAndView success(HttpSession session, Model model) throws Exception {
 		logger.info("[success]");
+		
 		ModelAndView mav = new ModelAndView();
+		mav.setViewName("success");
+		
 		List<Device> deviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
+		
 		for (Device d : deviceList) {
 			String dtId = deviceService.getDeviceTypeId(d.getdId(), session.getAttribute("userLoginInfo").toString());
 			Integer state = ArtikUtils.getDeviceState(session, d.getdId(), dtId);
@@ -131,7 +135,7 @@ public class HomeController {
 			}
 		}
 		model.addAttribute("deviceList", deviceList);
-		mav.setViewName("success");
+		
 		return mav;
 	}
 

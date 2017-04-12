@@ -22,12 +22,10 @@ public class ArtikUtils {
 
 	private static final Logger logger = LoggerFactory.getLogger(ArtikUtils.class);
 
-
 	// get Device State
 	public static Integer getDeviceState(HttpSession session, String dId, String dtId) throws Exception {
 
-		logger.info("[getDeviceState]");
-		
+		logger.info("[getDeviceState] {} :", dId);
 
 		Integer result = 0;
 
@@ -47,12 +45,12 @@ public class ArtikUtils {
 
 		// Response Code
 		int responseCode = con.getResponseCode();
-		logger.info("[messages] responseCode2 : {}", responseCode + con.getResponseMessage());
+		logger.info("[messages] responseCode : {}", responseCode + con.getResponseMessage());
 
 		// Response Data
 		BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
 		String responseData = br.readLine();
-		logger.info("[messages] responseData 2: {}", responseData);
+		logger.info("[messages] responseData : {}", responseData);
 		br.close();
 
 		// JSON Parsing
@@ -79,7 +77,11 @@ public class ArtikUtils {
 
 			}
 		}
-		logger.info("[getDeviceState] result : {}", result);
+		if (result == 0) {
+			logger.info("[getDeviceState] result : off");
+		} else if (result == 1) {
+			logger.info("[getDeviceState] result : on");
+		}
 
 		return result;
 	}

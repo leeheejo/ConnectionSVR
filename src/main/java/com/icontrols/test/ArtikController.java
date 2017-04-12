@@ -3,9 +3,7 @@ package com.icontrols.test;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -37,9 +35,6 @@ import com.icontrols.test.service.DeviceListService;
 import com.icontrols.test.service.DeviceService;
 import com.icontrols.test.service.SendTestLogService;
 import com.icontrols.test.util.*;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 /*
  * restAPI reference
@@ -175,14 +170,14 @@ public class ArtikController {
 		logger.info("[getArtikDeviceList] ACCESS_TOKEN : {}, ARTIK_USER_ID : {}", accessToken, userId);
 
 		// httpGET 통신
-		URL url = new URL("https://api.artik.cloud/v1.1/users/" + userId + "/devices?count=100&includeProperties=false");
+		URL url = new URL(
+				"https://api.artik.cloud/v1.1/users/" + userId + "/devices?count=100&includeProperties=false");
 		HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
 		con.setRequestMethod("GET");
 		// Header
 		String authorizationHeader = "bearer " + accessToken;
 		con.setRequestProperty("Authorization", authorizationHeader);
 		con.setRequestProperty("Content-Type", "application/json");
-
 
 		// response Code
 		int responseCode = con.getResponseCode();
@@ -208,9 +203,9 @@ public class ArtikController {
 
 		return "deviceList";
 	}
-	
+
 	/*
-	 * send Action 
+	 * send Action
 	 * 
 	 * @RequestParam dId (String) device's ID
 	 * 
@@ -218,20 +213,33 @@ public class ArtikController {
 	 * 
 	 * @return String "redirect:/success"
 	 */
-	
-	
+
 	@RequestMapping("/sendActionTest")
 	public String sendActionTest(HttpSession session, @RequestParam(value = "dId") String dId,
-			@RequestParam(value = "state") int currentState) throws Exception {
+			@RequestParam(value = "state") int currentState, @RequestParam(value = "R", required = false) String R,
+			@RequestParam(value = "G", required = false) String G,
+			@RequestParam(value = "B", required = false) String B) throws Exception {
 
 		logger.info("[sendActionTest]");
+		if (!R.equals("") || !G.equals("") || !B.equals("")) {
+			if (R.equals("") || Integer.parseInt(R) > 255) {
+				R = "0";
+			}
+			if (G.equals("") || Integer.parseInt(G) > 255) {
+				G = "0";
+			}
+			if (B.equals("") || Integer.parseInt(B) > 255) {
+				B = "0";
+			}
+			sendActionForColor(session, dId, Integer.parseInt(R), Integer.parseInt(G), Integer.parseInt(B));
+		}
 		sendAction(session, currentState, dId);
 
 		return "redirect:/success";
 	}
 
 	/*
-	 * Insert Device 
+	 * Insert Device
 	 * 
 	 * @RequestParam dId (String) device's ID
 	 * 
@@ -241,11 +249,10 @@ public class ArtikController {
 	 * 
 	 * @return String "redirect:/success"
 	 */
-	
+
 	@RequestMapping("/insertDevice")
 	public String insertDevice(HttpSession session, @RequestParam(value = "dId") String dId,
-			@RequestParam(value = "name") String name,
-			@RequestParam(value = "dtId") String dtId) throws Exception {
+			@RequestParam(value = "name") String name, @RequestParam(value = "dtId") String dtId) throws Exception {
 
 		Device device = new Device(session.getAttribute("userLoginInfo").toString(), dId, name, dtId);
 		deviceService.insertDevice(device);
@@ -257,7 +264,7 @@ public class ArtikController {
 
 	@RequestMapping("/allOff")
 	public String allOff(HttpSession session) throws Exception {
-		
+
 		List<Device> deviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
 		for (Device d : deviceList) {
 			sendAction(session, 1, d.getdId());
@@ -271,7 +278,7 @@ public class ArtikController {
 		for (Device d : deviceList) {
 			sendAction(session, 0, d.getdId());
 		}
-		
+
 		return "redirect:/success";
 	}
 
@@ -328,9 +335,8 @@ public class ArtikController {
 		session.setAttribute("ARTIK_USER_ID", userData.get("id").toString());
 	}
 
-	
 	/*
-	 *Send Action Method 
+	 * Send Action Method
 	 * 
 	 * @RequestParam flag (int) setOn = 0, setOff = 1
 	 * 
@@ -362,7 +368,7 @@ public class ArtikController {
 		} else { // currentState == 0 Device Off
 			action = "setOn";
 		}
-		
+
 		// Action : setOn
 		String param = "{\"ddid\": \"" + dId + "\",\"ts\":" + System.currentTimeMillis()
 				+ ",\"type\": \"action\",\"data\": {\"actions\": [{\"name\": \"" + action + "\",\"parameters\": {}}]}}";
@@ -399,10 +405,62 @@ public class ArtikController {
 		HashMap<String, Object> userData = (HashMap<String, Object>) data.get("data");
 		logger.info("data : {}", userData.get("mid").toString());
 
-		// get Current Device State
-		String dtId = deviceService.getDeviceTypeId(dId, session.getAttribute("userLoginInfo").toString());
-		Integer state = ArtikUtils.getDeviceState(session, dId, dtId);
-		deviceService.updateDeviceState(state, dId);
+	}
+
+	public void sendActionForColor(HttpSession session, String dId, int R, int G, int B) throws Exception {
+		logger.info("[sendActionTest]");
+		String accessToken = (String) session.getAttribute("ACCESS_TOKEN");
+		logger.info("[sendActionTest] ACCESS_TOKEN : {}", accessToken);
+
+		// HttpPost 통신
+		URL url = new URL("https://api.artik.cloud/v1.1/messages");
+		HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+		con.setRequestMethod("POST");
+		con.setDoInput(true);
+		con.setDoOutput(true);
+
+		// Header
+		String authorizationHeader = "bearer " + accessToken;
+		con.setRequestProperty("Authorization", authorizationHeader);
+		con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+
+		// Action : setOn
+		String param = "{\"ddid\": \"" + dId + "\",\"ts\":" + System.currentTimeMillis()
+				+ ",\"type\": \"action\",\"data\": {\"actions\": [{\"name\": \"setColorRGB\",\"parameters\": {\"colorRGB\":{\"blue\":"
+				+ B + ",\"green\":" + G + ",\"red\":" + R + "}}}]}}";
+
+		logger.info("[sendActionTest] PARAM : {}", param);
+
+		OutputStream os = con.getOutputStream();
+		os.write(param.getBytes());
+		os.flush();
+		os.close();
+
+		// Response Code
+		int responseCode = con.getResponseCode();
+		logger.info("[sendActionTest] responseCode : {}", responseCode + con.getResponseMessage());
+
+		// Response Data
+		BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+		String responseData = br.readLine();
+		logger.info("[sendActionTest] responseData : {}", responseData);
+		br.close();
+
+		// Insert sendTestLog
+		SendTestLog sendTestLog = new SendTestLog(session.getAttribute("userLoginInfo").toString(), 1, dId, param,
+				responseCode + con.getResponseMessage(), new Date(System.currentTimeMillis()));
+		sendTestLogService.insertSendTestLog(sendTestLog);
+		logger.info("[sendActionTest] insert SEND_TEST_LOG");
+
+		// Json Mapping
+		ObjectMapper mapper = new ObjectMapper();
+		@SuppressWarnings("unchecked")
+		HashMap<String, Object> data = mapper.readValue(responseData, HashMap.class);
+		logger.info("data : {}", data.get("data"));
+		@SuppressWarnings("unchecked")
+		HashMap<String, Object> userData = (HashMap<String, Object>) data.get("data");
+		logger.info("data : {}", userData.get("mid").toString());
+
 	}
 
 }

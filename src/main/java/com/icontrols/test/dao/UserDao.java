@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
-@Repository(value="User")
 public interface UserDao {
 	
 	public void insertUser(HashMap<String, Object> map);
