@@ -24,6 +24,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.icontrols.test.domain.AccessToken;
@@ -224,19 +225,26 @@ public class ArtikController {
 			@RequestParam(value = "B", required = false) String B) throws Exception {
 
 		logger.info("[sendActionTest]");
-		if (!R.equals("") || !G.equals("") || !B.equals("")) {
-			if (R.equals("") || Integer.parseInt(R) > 255) {
+		String dtId = deviceService.getDeviceTypeId(dId, session.getAttribute("userLoginInfo").toString());
+
+		if (dtId.equals(ArtikDeviceType.PHILIPS_HUE_COLOR_LAMP) && (!R.equals("") || !G.equals("") || !B.equals(""))) {
+			if (R.equals("") || Integer.parseInt(R) > 255)
 				R = "0";
-			}
-			if (G.equals("") || Integer.parseInt(G) > 255) {
+			if (G.equals("") || Integer.parseInt(G) > 255)
 				G = "0";
-			}
-			if (B.equals("") || Integer.parseInt(B) > 255) {
+			if (B.equals("") || Integer.parseInt(B) > 255)
 				B = "0";
+			Action(session, dId, "setColorRGB", R + ";" + G + ";" + B);
+
+		} else {
+			if (currentState == 0) {
+				Action(session, dId, "setOn", "");
+			} else {
+				Action(session, dId, "setOff", "");
 			}
-			sendActionForColor(session, dId, Integer.parseInt(R), Integer.parseInt(G), Integer.parseInt(B));
 		}
-		sendAction(session, currentState, dId);
+
+		Thread.sleep(5000);
 
 		return "redirect:/success";
 	}
@@ -270,7 +278,8 @@ public class ArtikController {
 
 		List<Device> deviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
 		for (Device d : deviceList) {
-			sendAction(session, 1, d.getdId());
+			logger.info("{}", d.getName());
+			Action(session, d.getdId(), "setOff", "");
 		}
 		return "redirect:/success";
 	}
@@ -279,7 +288,24 @@ public class ArtikController {
 	public String allOn(HttpSession session) throws Exception {
 		List<Device> deviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
 		for (Device d : deviceList) {
-			sendAction(session, 0, d.getdId());
+			logger.info("{}", d.getName());
+			Action(session, d.getdId(), "setOn", "");
+			Thread.sleep(1000);
+		}
+
+		return "redirect:/success";
+	}
+
+	@RequestMapping("/colorLoop")
+	public String colorLoop(HttpSession session) throws Exception {
+		logger.info("[colorloop]");
+		List<Device> deviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
+		for (Device d : deviceList) {
+			if (d.getDtId().equals(ArtikDeviceType.PHILIPS_HUE_COLOR_LAMP)) {
+				logger.info("{}", d.getName());
+				Action(session, d.getdId(), "setEffect", "");
+				Thread.sleep(2000);
+			}
 		}
 
 		return "redirect:/success";
@@ -288,7 +314,7 @@ public class ArtikController {
 	@RequestMapping("/addNewDevice")
 	public String addNewDevice(HttpSession session, @RequestParam(value = "dtId") String dtId,
 			@RequestParam(value = "name") String name) throws Exception {
-		
+
 		// HttpPost 통신
 		URL url = new URL("https://api.artik.cloud/v1.1/devices");
 		HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
@@ -384,18 +410,18 @@ public class ArtikController {
 	/*
 	 * Send Action Method
 	 * 
-	 * @RequestParam flag (int) setOn = 0, setOff = 1
+	 * @RequestParam action (String) setOn, setOff, setColorRGB, setEffect
 	 * 
-	 * @RequestParamu Pwd (String) destination device ID
+	 * @RequestParam dId (String) device ID
+	 * 
+	 * @RequestParam rgb (String) rgbColor for setColorRGB
 	 * 
 	 * @return void
 	 */
-	public void sendAction(HttpSession session, int flag, String dId) throws Exception {
-		logger.info("[sendActionTest]");
-		String accessToken = (String) session.getAttribute("ACCESS_TOKEN");
-		logger.info("[sendActionTest] ACCESS_TOKEN : {}", accessToken);
 
-		// HttpPost 통신
+	public void Action(HttpSession session, String dId, String action, String rgb) throws Exception {
+		logger.info("[ACTION]");
+
 		URL url = new URL("https://api.artik.cloud/v1.1/messages");
 		HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
 		con.setRequestMethod("POST");
@@ -403,24 +429,40 @@ public class ArtikController {
 		con.setDoOutput(true);
 
 		// Header
-		String authorizationHeader = "bearer " + accessToken;
+		String authorizationHeader = "bearer " + session.getAttribute("ACCESS_TOKEN").toString();
 		con.setRequestProperty("Authorization", authorizationHeader);
 		con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+		String param = "";
 
-		String action = "";
-		// Parameter
-		if (flag == 1) { // Device On
-			action = "setOff";
-		} else { // currentState == 0 Device Off
-			action = "setOn";
+		if (action.equals("setOn")) {
+			logger.info("[Action] : setOn");
+			param = "{\"ddid\": \"" + dId + "\",\"ts\":" + System.currentTimeMillis()
+					+ ",\"type\": \"action\",\"data\": {\"actions\": [{\"name\": \"setOn\",\"parameters\": {}}]}}";
+
+		} else if (action.equals("setOff")) {
+			logger.info("[Action] setOff");
+			param = "{\"ddid\": \"" + dId + "\",\"ts\":" + System.currentTimeMillis()
+					+ ",\"type\": \"action\",\"data\": {\"actions\": [{\"name\": \"setOff\",\"parameters\": {}}]}}";
+
+		} else if (action.equals("setColorRGB")) {
+			logger.info("[Action] setColorRGB");
+			int R = Integer.parseInt(rgb.split(";")[0]);
+			int G = Integer.parseInt(rgb.split(";")[1]);
+			int B = Integer.parseInt(rgb.split(";")[2]);
+
+			param = "{\"ddid\": \"" + dId + "\",\"ts\":" + System.currentTimeMillis()
+					+ ",\"type\": \"action\",\"data\": {\"actions\": [{\"name\": \"setColorRGB\",\"parameters\": {\"colorRGB\":{\"blue\":"
+					+ B + ",\"green\":" + G + ",\"red\":" + R + "}}}]}}";
+
+		} else if (action.equals("setEffect")) {
+			logger.info("[Action] setEffect");
+			logger.info("[Action] dId : {}", dId);
+			param = "{ \"data\": {\"actions\": [{\"name\": \"setEffect\",\"parameters\": { \"effect\": \"colorloop\"}}]},\"ddid\": \""
+					+ dId + "\",\"ts\": " + System.currentTimeMillis() + ",\"type\": \"action\"}";
+			logger.info("[Action] {}", param);
+
 		}
 
-		// Action : setOn
-		String param = "{\"ddid\": \"" + dId + "\",\"ts\":" + System.currentTimeMillis()
-				+ ",\"type\": \"action\",\"data\": {\"actions\": [{\"name\": \"" + action + "\",\"parameters\": {}}]}}";
-
-		logger.info("[sendActionTest] PARAM : {}", param);
-
 		OutputStream os = con.getOutputStream();
 		os.write(param.getBytes());
 		os.flush();
@@ -428,92 +470,29 @@ public class ArtikController {
 
 		// Response Code
 		int responseCode = con.getResponseCode();
-		logger.info("[sendActionTest] responseCode : {}", responseCode + con.getResponseMessage());
+		logger.info("[Action] responseCode : {}", responseCode + con.getResponseMessage());
 
 		// Response Data
 		BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
 		String responseData = br.readLine();
-		logger.info("[sendActionTest] responseData : {}", responseData);
+		logger.info("[Action] responseData : {}", responseData);
 		br.close();
 
 		// Insert sendTestLog
 		SendTestLog sendTestLog = new SendTestLog(session.getAttribute("userLoginInfo").toString(), 1, dId, param,
 				responseCode + con.getResponseMessage(), new Date(System.currentTimeMillis()));
 		sendTestLogService.insertSendTestLog(sendTestLog);
-		logger.info("[sendActionTest] insert SEND_TEST_LOG");
+		logger.info("[Action] insert SEND_TEST_LOG");
 
-		// Json Mapping
-		ObjectMapper mapper = new ObjectMapper();
-		@SuppressWarnings("unchecked")
-		HashMap<String, Object> data = mapper.readValue(responseData, HashMap.class);
-		logger.info("data : {}", data.get("data"));
-		@SuppressWarnings("unchecked")
-		HashMap<String, Object> userData = (HashMap<String, Object>) data.get("data");
-		logger.info("data : {}", userData.get("mid").toString());
-
-	}
-
-	public void sendActionForColor(HttpSession session, String dId, int R, int G, int B) throws Exception {
-		logger.info("[sendActionTest]");
-		String accessToken = (String) session.getAttribute("ACCESS_TOKEN");
-		logger.info("[sendActionTest] ACCESS_TOKEN : {}", accessToken);
-
-		// HttpPost 통신
-		URL url = new URL("https://api.artik.cloud/v1.1/messages");
-		HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
-		con.setRequestMethod("POST");
-		con.setDoInput(true);
-		con.setDoOutput(true);
-
-		// Header
-		String authorizationHeader = "bearer " + accessToken;
-		con.setRequestProperty("Authorization", authorizationHeader);
-		con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-
-		// Action : setOn
-		String param = "{\"ddid\": \"" + dId + "\",\"ts\":" + System.currentTimeMillis()
-				+ ",\"type\": \"action\",\"data\": {\"actions\": [{\"name\": \"setColorRGB\",\"parameters\": {\"colorRGB\":{\"blue\":"
-				+ B + ",\"green\":" + G + ",\"red\":" + R + "}}}]}}";
-
-		logger.info("[sendActionTest] PARAM : {}", param);
-
-		OutputStream os = con.getOutputStream();
-		os.write(param.getBytes());
-		os.flush();
-		os.close();
-
-		// Response Code
-		int responseCode = con.getResponseCode();
-		logger.info("[sendActionTest] responseCode : {}", responseCode + con.getResponseMessage());
-
-		// Response Data
-		BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
-		String responseData = br.readLine();
-		logger.info("[sendActionTest] responseData : {}", responseData);
-		br.close();
-
-		// Insert sendTestLog
-		SendTestLog sendTestLog = new SendTestLog(session.getAttribute("userLoginInfo").toString(), 1, dId, param,
-				responseCode + con.getResponseMessage(), new Date(System.currentTimeMillis()));
-		sendTestLogService.insertSendTestLog(sendTestLog);
-		logger.info("[sendActionTest] insert SEND_TEST_LOG");
-
-		// Json Mapping
-		ObjectMapper mapper = new ObjectMapper();
-		@SuppressWarnings("unchecked")
-		HashMap<String, Object> data = mapper.readValue(responseData, HashMap.class);
-		logger.info("data : {}", data.get("data"));
-		@SuppressWarnings("unchecked")
-		HashMap<String, Object> userData = (HashMap<String, Object>) data.get("data");
-		logger.info("data : {}", userData.get("mid").toString());
-
+		Thread.sleep(500);
 	}
 
 	public int getManifestVersion(HttpSession session, String dtId) throws Exception {
+
 		int result = 0;
 
 		// HttpPost 통신
-		URL url = new URL("https://api.artik.cloud/v1.1/devicetypes/"+ dtId +"/availablemanifestversions");
+		URL url = new URL("https://api.artik.cloud/v1.1/subscriptions/");
 		HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
 		con.setRequestMethod("GET");
 		con.setDoInput(true);
@@ -540,9 +519,10 @@ public class ArtikController {
 		JSONObject data = obj.getJSONObject("data");
 		JSONArray devices = data.getJSONArray("versions");
 		logger.info("[getManifestVersion] devices : {}", devices.get(0));
-		
-		result = Integer.parseInt(devices.get(0).toString());
-		
+
+		result = Integer.parseInt(devices.get(devices.length() - 1).toString());
+
 		return result;
 	}
+
 }

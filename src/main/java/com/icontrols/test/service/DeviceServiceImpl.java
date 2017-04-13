@@ -37,11 +37,12 @@ public class DeviceServiceImpl implements DeviceService {
 	}
 
 	@Override
-	public void updateDeviceState(Integer state, String dId) {
+	public void updateDeviceState(Integer state, String dId, String uId) {
 		// TODO Auto-generated method stub
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		map.put("state", state);
 		map.put("dId", dId);
+		map.put("uId", uId);
 
 		deviceDao.updateDeviceState(map);
 	}

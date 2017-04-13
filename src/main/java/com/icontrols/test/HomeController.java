@@ -108,7 +108,7 @@ public class HomeController {
 		mav.setViewName("deviceList");
 		return mav;
 	}
-	
+
 	@RequestMapping("refresh")
 	public String refresh() {
 		logger.info("[refresh]");
@@ -120,22 +120,24 @@ public class HomeController {
 	@RequestMapping("success")
 	public ModelAndView success(HttpSession session, Model model) throws Exception {
 		logger.info("[success]");
-		
+
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("success");
-		
+
 		List<Device> deviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
-		
-		for (Device d : deviceList) {
-			String dtId = deviceService.getDeviceTypeId(d.getdId(), session.getAttribute("userLoginInfo").toString());
-			Integer state = ArtikUtils.getDeviceState(session, d.getdId(), dtId);
-			if (state != null) {
+		if (session.getAttribute("ACCESS_TOKEN") != null) {
+			for (Device d : deviceList) {
+				String dtId = deviceService.getDeviceTypeId(d.getdId(),
+						session.getAttribute("userLoginInfo").toString());
+				int state = ArtikUtils.getDeviceState(session, d.getdId(), dtId);
+				logger.info("[success] name {}", d.getName());
 				logger.info("[success] state {}", state);
-				deviceService.updateDeviceState(state, d.getdId());
+				deviceService.updateDeviceState(state, d.getdId(), session.getAttribute("userLoginInfo").toString());
+				d.setState(state);
 			}
 		}
 		model.addAttribute("deviceList", deviceList);
-		
+
 		return mav;
 	}
 
@@ -185,7 +187,7 @@ public class HomeController {
 						artikUserProfileService.getUserIdById(session.getAttribute("userLoginInfo").toString()));
 				logger.info("[login] get ACCESS_TOKEN : {}", accessTokenService.getAccessTokenById(uId));
 			}
-			return "success";
+			return "redirect:/success";
 		} else {
 			logger.info("[LOGIN FAIL]");
 			return "redirect:/";

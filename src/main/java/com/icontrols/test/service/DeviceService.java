@@ -8,6 +8,6 @@ import com.icontrols.test.domain.Device;
 public interface DeviceService {
 	public List<Device> getDeviceById(String uId);
 	public void insertDevice(Device device);
-	public void updateDeviceState(Integer state, String dId);
+	public void updateDeviceState(Integer state, String dId, String uId);
 	public String getDeviceTypeId(String dId, String uId);
 }

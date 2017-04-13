@@ -57,6 +57,8 @@
 					onClick="location.href='allOff'">ø‹√‚</button>
 				<button type="button" class="btn btn-info btn-sm "
 					onClick="location.href='allOn'">±Õ∞°</button>
+				<button type="button" class="btn btn-info btn-sm "
+					onClick="location.href='colorLoop'">colorLoop</button>
 				<br> <br>
 			</div>
 			<table class="table" tyle="width: 300px">
@@ -135,6 +137,5 @@
 		onClick="location.href='tcpIpTest'">
 		<span class="glyphicon glyphicon-arrow-right"></span>
 	</button>
-
 </body>
 </html>

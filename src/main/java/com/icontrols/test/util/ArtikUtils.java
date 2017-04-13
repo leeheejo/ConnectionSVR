@@ -23,7 +23,7 @@ public class ArtikUtils {
 	private static final Logger logger = LoggerFactory.getLogger(ArtikUtils.class);
 
 	// get Device State
-	public static Integer getDeviceState(HttpSession session, String dId, String dtId) throws Exception {
+	public static int getDeviceState(HttpSession session, String dId, String dtId) throws Exception {
 
 		logger.info("[getDeviceState] {} :", dId);
 
@@ -33,7 +33,14 @@ public class ArtikUtils {
 
 		String authorizationHeader = "bearer " + AccessToken;
 
-		URL url = new URL("https://api.artik.cloud/v1.1/messages/last?count=1&fieldPresence=state&sdids=" + dId);
+		URL url;
+
+		if (dtId.equals(ArtikDeviceType.SAMSUNG_SMARTHOME_AIRPURIFIER)) {
+			url = new URL("https://api.artik.cloud/v1.1/messages/last?count=1&sdids=" + dId);
+		} else {
+			url = new URL("https://api.artik.cloud/v1.1/messages/last?count=1&fieldPresence=state&sdids=" + dId);
+		}
+
 		HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
 		con.setRequestMethod("GET");
 		con.setDoInput(true);
@@ -53,36 +60,45 @@ public class ArtikUtils {
 		logger.info("[messages] responseData : {}", responseData);
 		br.close();
 
-		// JSON Parsing
-		JSONObject obj = new JSONObject(responseData);
-		logger.info("[messages] obj : {}", obj);
-		JSONArray devices = obj.getJSONArray("data");
-		logger.info("[messages] devices : {}", devices);
-		if (devices.length() != 0) {
-			JSONObject device = devices.getJSONObject(0);
-			logger.info("[messages] device : {}", device);
-			JSONObject state = device.getJSONObject("data");
-			if (dtId.equals(ArtikDeviceType.AMULATOR)) {
-				if (state.getBoolean("state") == false) {
-					result = 0;
-				} else {
-					result = 1;
-				}
-			} else if (dtId.equals(ArtikDeviceType.PHILIPS_HUE_COLOR_LAMP)) {
-				if (state.getString("state").equals("off")) {
-					result = 0;
-				} else {
-					result = 1;
-				}
+		result = stateParser(dtId, responseData);
+		
+		return result;
+	}
 
+	public static int stateParser(String dtId, String responseData) {
+
+		int result = 0;
+		JSONObject obj = new JSONObject(responseData);
+		String power = "";
+
+		if (dtId.equals(ArtikDeviceType.SAMSUNG_SMARTHOME_AIRPURIFIER)) {
+			JSONArray object = obj.getJSONArray("data");
+			JSONObject data = object.getJSONObject(0);
+			JSONObject data2 = data.getJSONObject("data");
+			JSONObject operation = data2.getJSONObject("Operation");
+			power = operation.get("power").toString();
+			
+		} else {
+			JSONArray devices = obj.getJSONArray("data");
+
+			if (devices.length() != 0) {
+
+				JSONObject device = devices.getJSONObject(0);
+				JSONObject state = device.getJSONObject("data");
+
+				if (dtId.equals(ArtikDeviceType.AMULATOR)) {
+					power = state.getBoolean("state") + "";
+				} else if (dtId.equals(ArtikDeviceType.PHILIPS_HUE_COLOR_LAMP)) {
+					power = state.getString("state");
+				}
 			}
 		}
-		if (result == 0) {
-			logger.info("[getDeviceState] result : off");
-		} else if (result == 1) {
-			logger.info("[getDeviceState] result : on");
-		}
 
+		if (power.equals("off") || power.equals("false") || power.equals("Off"))
+			result = 0;
+		else
+			result = 1;
+		
 		return result;
 	}
 
