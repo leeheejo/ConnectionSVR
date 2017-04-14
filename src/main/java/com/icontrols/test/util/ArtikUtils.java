@@ -15,32 +15,31 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.icontrols.test.domain.Device;
 import com.icontrols.test.domain.DeviceList;
 import com.icontrols.test.service.DeviceService;
 
 public class ArtikUtils {
 
 	private static final Logger logger = LoggerFactory.getLogger(ArtikUtils.class);
+	public static int stateChangeFlag;
 
 	// get Device State
-	public static int getDeviceState(HttpSession session, String dId, String dtId) throws Exception {
+	public static List<Device> getDeviceState(HttpSession session, List<Device> deviceList) throws Exception {
 
-		logger.info("[getDeviceState] {} :", dId);
-
-		Integer result = 0;
-
+		stateChangeFlag = 0;
+		List<Device> result = null;
 		String AccessToken = session.getAttribute("ACCESS_TOKEN").toString();
-
 		String authorizationHeader = "bearer " + AccessToken;
-
-		URL url;
-
-		if (dtId.equals(ArtikDeviceType.SAMSUNG_SMARTHOME_AIRPURIFIER)) {
-			url = new URL("https://api.artik.cloud/v1.1/messages/last?count=1&sdids=" + dId);
-		} else {
-			url = new URL("https://api.artik.cloud/v1.1/messages/last?count=1&fieldPresence=state&sdids=" + dId);
+		String dIds = "";
+		for (Device d : deviceList) {
+			dIds += d.getdId();
+			if (deviceList.indexOf(d) != deviceList.size() - 1) {
+				dIds += ",";
+			}
 		}
 
+		URL url = new URL("https://api.artik.cloud/v1.1/messages/last?count=1&sdids=" + dIds);
 		HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
 		con.setRequestMethod("GET");
 		con.setDoInput(true);
@@ -60,45 +59,54 @@ public class ArtikUtils {
 		logger.info("[messages] responseData : {}", responseData);
 		br.close();
 
-		result = stateParser(dtId, responseData);
-		
+		result = stateParser(session.getAttribute("userLoginInfo").toString(), responseData, deviceList);
+
 		return result;
 	}
 
-	public static int stateParser(String dtId, String responseData) {
+	public static List<Device> stateParser(String uId, String responseData, List<Device> deviceList) {
 
-		int result = 0;
+		List<Device> result = deviceList;
 		JSONObject obj = new JSONObject(responseData);
-		String power = "";
+		JSONArray object = obj.getJSONArray("data");
 
-		if (dtId.equals(ArtikDeviceType.SAMSUNG_SMARTHOME_AIRPURIFIER)) {
-			JSONArray object = obj.getJSONArray("data");
-			JSONObject data = object.getJSONObject(0);
-			JSONObject data2 = data.getJSONObject("data");
-			JSONObject operation = data2.getJSONObject("Operation");
-			power = operation.get("power").toString();
-			
-		} else {
-			JSONArray devices = obj.getJSONArray("data");
+		for (int i = 0; i < object.length(); i++) {
 
-			if (devices.length() != 0) {
+			String power = "";
+			JSONObject data = object.getJSONObject(i);
+			String dtId = data.getString("sdtid");
+			String dId = data.getString("sdid");
+			JSONObject data1 = data.getJSONObject("data");
+			int state = 0;
 
-				JSONObject device = devices.getJSONObject(0);
-				JSONObject state = device.getJSONObject("data");
+			if (dtId.equals(ArtikDeviceType.SAMSUNG_SMARTHOME_AIRPURIFIER)) {
+				JSONObject operation = data1.getJSONObject("Operation");
+				power = operation.get("power").toString();
+			} else {
+				JSONArray devices = obj.getJSONArray("data");
+				if (devices.length() != 0) {
+					if (dtId.equals(ArtikDeviceType.AMULATOR)) {
+						power = data1.getBoolean("state") + "";
+					} else if (dtId.equals(ArtikDeviceType.PHILIPS_HUE_COLOR_LAMP)) {
+						power = data1.getString("state");
+					}
+				}
+			}
 
-				if (dtId.equals(ArtikDeviceType.AMULATOR)) {
-					power = state.getBoolean("state") + "";
-				} else if (dtId.equals(ArtikDeviceType.PHILIPS_HUE_COLOR_LAMP)) {
-					power = state.getString("state");
+			if (power.equals("off") || power.equals("Off") || power.equals("false"))
+				state = 0;
+			else
+				state = 1;
+			for (Device d : result) {
+				if (d.getdId().equals(dId)) {
+					if (d.getState() != state) {
+						stateChangeFlag = 1;
+						d.setState(state);
+					}
 				}
 			}
 		}
 
-		if (power.equals("off") || power.equals("false") || power.equals("Off"))
-			result = 0;
-		else
-			result = 1;
-		
 		return result;
 	}
 

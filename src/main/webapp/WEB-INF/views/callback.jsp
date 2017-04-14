@@ -6,6 +6,9 @@
 <script type="text/javascript"
 	src="http://code.jquery.com/jquery-1.9.1.js"></script>
 <script type="text/javascript">
-	$(opener.document).find("#LoginForm").submit();
+	var doc = window.opener.document;
+	var theForm = doc.getElementById("LoginForm");
 	self.close();
+	theForm.submit();
+	
 </script>

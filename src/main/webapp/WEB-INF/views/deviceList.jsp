@@ -3,10 +3,12 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ page session="true"%>
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
 <html>
-<meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
+<meta http-equiv="Content-Type" content="text/html; charset=EUC-KR"
+	charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet"
 	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -17,9 +19,7 @@
 	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script type="text/javascript"
 	src="http://code.jquery.com/jquery-1.9.1.js"></script>
-<script type="text/javascript">
-	
-</script>
+
 <script type="text/javascript">
 
 	<c:set var="oauthUrl" value="${oauthUrl}"></c:set>
@@ -95,8 +95,7 @@
 							<h4 class="modal-title">새 기기 추가</h4>
 						</div>
 
-						<form name="addNewDevice" method="post" action="addNewDevice"
-							>
+						<form name="addNewDevice" method="post" action="addNewDevice">
 							<div class="modal-body">
 
 								<!-- <form method="get"> -->

@@ -125,15 +125,13 @@ public class HomeController {
 		mav.setViewName("success");
 
 		List<Device> deviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
-		if (session.getAttribute("ACCESS_TOKEN") != null) {
-			for (Device d : deviceList) {
-				String dtId = deviceService.getDeviceTypeId(d.getdId(),
-						session.getAttribute("userLoginInfo").toString());
-				int state = ArtikUtils.getDeviceState(session, d.getdId(), dtId);
-				logger.info("[success] name {}", d.getName());
-				logger.info("[success] state {}", state);
-				deviceService.updateDeviceState(state, d.getdId(), session.getAttribute("userLoginInfo").toString());
-				d.setState(state);
+		if (session.getAttribute("ACCESS_TOKEN") != null && deviceList != null) {
+			List<Device> result = ArtikUtils.getDeviceState(session, deviceList);
+			if (ArtikUtils.stateChangeFlag == 1) {
+				for (Device d : result) {
+					deviceService.updateDeviceState(d.getState(), d.getdId(),
+							session.getAttribute("userLoginInfo").toString());
+				}
 			}
 		}
 		model.addAttribute("deviceList", deviceList);

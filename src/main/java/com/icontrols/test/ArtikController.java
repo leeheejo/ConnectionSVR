@@ -244,8 +244,6 @@ public class ArtikController {
 			}
 		}
 
-		Thread.sleep(5000);
-
 		return "redirect:/success";
 	}
 
@@ -288,9 +286,11 @@ public class ArtikController {
 	public String allOn(HttpSession session) throws Exception {
 		List<Device> deviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
 		for (Device d : deviceList) {
-			logger.info("{}", d.getName());
-			Action(session, d.getdId(), "setOn", "");
-			Thread.sleep(1000);
+			if (!d.getDtId().equals(ArtikDeviceType.SAMSUNG_SMARTHOME_AIRPURIFIER)) { //¿¹Á¦¿ë
+				logger.info("{}", d.getName());
+				Action(session, d.getdId(), "setOn", "");
+				Thread.sleep(1000);
+			}
 		}
 
 		return "redirect:/success";
@@ -459,10 +459,9 @@ public class ArtikController {
 			logger.info("[Action] dId : {}", dId);
 			param = "{ \"data\": {\"actions\": [{\"name\": \"setEffect\",\"parameters\": { \"effect\": \"colorloop\"}}]},\"ddid\": \""
 					+ dId + "\",\"ts\": " + System.currentTimeMillis() + ",\"type\": \"action\"}";
-			logger.info("[Action] {}", param);
 
 		}
-
+		logger.info("[Action] {}", param);
 		OutputStream os = con.getOutputStream();
 		os.write(param.getBytes());
 		os.flush();
