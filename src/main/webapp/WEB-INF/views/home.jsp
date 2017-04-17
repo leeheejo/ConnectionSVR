@@ -23,8 +23,8 @@
 </script>
 <body>
 	<center>
-	<br>
-	<h2>LOGIN</h2>
+		<br>
+		<h2>LOGIN</h2>
 		<br>
 		<div class="container">
 			<form name="LoginForm" method="post" action="login"

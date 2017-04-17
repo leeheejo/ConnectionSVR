@@ -10,4 +10,5 @@ public interface DeviceService {
 	public void insertDevice(Device device);
 	public void updateDeviceState(Integer state, String dId, String uId);
 	public String getDeviceTypeId(String dId, String uId);
+	public void deleteDevice(String uId, String dId);
 }

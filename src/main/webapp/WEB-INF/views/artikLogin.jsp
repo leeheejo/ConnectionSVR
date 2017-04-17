@@ -17,6 +17,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
 </head>
 <body>
-	<form name="LoginForm1" action="${pageContext.request.contextPath}/deviceList" method="post"></form>
+	<form name="LoginForm1"
+		action="${pageContext.request.contextPath}/deviceList" method="post"></form>
 </body>
 </html>

@@ -41,10 +41,20 @@
 </script>
 
 <body>
-	<br>
+	<div class="container" align="right">
+		<button type="button" class="btn btn-default btn-xs "
+			onClick="location.href='success'">
+			<span class="glyphicon glyphicon-home"></span>
+		</button>
+		<button type="button" class="btn btn-default btn-xs "
+			onClick="location.href='logout'">
+			<span class="glyphicon glyphicon-off"></span>
+		</button>
+	</div>
 	<br>
 	<center>
 		<div class="container">
+
 			<h2>
 				<%=session.getAttribute("userLoginInfo")%>'s Devices
 				<button type="button" class="btn btn-info "
@@ -57,8 +67,10 @@
 					onClick="location.href='allOff'">ø‹√‚</button>
 				<button type="button" class="btn btn-info btn-sm "
 					onClick="location.href='allOn'">±Õ∞°</button>
+				<!--
 				<button type="button" class="btn btn-info btn-sm "
 					onClick="location.href='colorLoop'">colorLoop</button>
+					 -->
 				<br> <br>
 			</div>
 			<table class="table" tyle="width: 300px">
@@ -68,7 +80,7 @@
 				<thead>
 					<tr>
 						<th>name</th>
-						<th>dId</th>
+						<!--  <th>dId</th>  -->
 						<th>state
 							<button type="button" class="btn btn-default btn-sm"
 								onClick="location.href='refresh'">
@@ -76,6 +88,7 @@
 							</button>
 						</th>
 						<th>sendAction</th>
+						<th>delete</th>
 					</tr>
 				</thead>
 				<c:choose>
@@ -84,7 +97,7 @@
 							<tr>
 								<form action="sendActionTest" method="GET">
 									<td>${row.name}</td>
-									<td>${row.dId}</td>
+									<!--  <td>${row.dId}</td>  -->
 									<c:set value="${row.state}" var="state" />
 									<c:choose>
 										<c:when test="${state == 0}">
@@ -99,7 +112,7 @@
 										type="hidden" name="dId" value='${row.dId}' />
 									<td><input type="submit" class="btn btn-success"
 										value="send"> <!-- for philips hue color change --> <c:set
-											value="${row.dtId}" var="dtId" /> <c:choose>
+											value="${row.dtId}" var="dtId" /> <!-- <c:choose>
 											<c:when
 												test="${dtId eq 'dt6f79b9b4aa3b4a80b7b76c2190016c61'}">
 												<table>
@@ -116,10 +129,21 @@
 													</tr>
 												</table>
 											</c:when>
-										</c:choose></td>
+										</c:choose>--></td>
 
 								</form>
+								<td>
+									<form action="deleteDevice" method="GET">
+										<input type="hidden" name="dId" value='${row.dId}' />
+										<button type="submit" class="btn btn-danger btn-sm"
+											onClick="location.href='deleteDevice'">
+											<span class="glyphicon glyphicon-trash"></span>
+										</button>
+								</td>
+								</form>
 							</tr>
+
+
 						</c:forEach>
 					</c:when>
 					<c:otherwise>
@@ -132,10 +156,5 @@
 			</table>
 		</div>
 	</center>
-
-	<button type="button" class="btn btn-warning"
-		onClick="location.href='tcpIpTest'">
-		<span class="glyphicon glyphicon-arrow-right"></span>
-	</button>
 </body>
 </html>

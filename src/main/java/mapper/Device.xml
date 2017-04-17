@@ -34,11 +34,16 @@
 		WHERE dId LIKE #{dId} AND uId LIKE #{uId};
 	</update>
 
-
 	<select id="getDeviceTypeId" parameterType="HashMap" resultType="String">
 		SELECT dtId
 		FROM DEVICE
 		WHERE dId LIKE #{dId} AND uId LIKE #{uId};
 	</select>
+
+	<delete id="deleteDevice" parameterType="HashMap">
+		delete from DEVICE
+		WHERE dId LIKE #{dId} AND uId LIKE #{uId};
+	</delete>
+
 
 </mapper>

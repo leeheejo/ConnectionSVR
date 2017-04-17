@@ -1,5 +1,6 @@
 package com.icontrols.test;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -23,6 +24,7 @@ import com.icontrols.test.service.ConnectedCompanyService;
 import com.icontrols.test.service.DeviceService;
 import com.icontrols.test.service.UserService;
 import com.icontrols.test.util.ArtikUtils;
+import com.icontrols.test.util.IparkUtils;
 
 /**
  * Handles requests for the application home page.
@@ -92,6 +94,9 @@ public class HomeController {
 		map.put("uPwd", uPwd);
 		map.put("uEmail", uEmail);
 
+		Device defaultDevice = IparkUtils.getIparkInfo(uId);
+
+		deviceService.insertDevice(defaultDevice);
 		UserService.insertUser(map);
 		return mav;
 	}
@@ -123,18 +128,34 @@ public class HomeController {
 
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("success");
+		String uId = session.getAttribute("userLoginInfo").toString();
 
 		List<Device> deviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
-		if (session.getAttribute("ACCESS_TOKEN") != null && deviceList != null) {
-			List<Device> result = ArtikUtils.getDeviceState(session, deviceList);
-			if (ArtikUtils.stateChangeFlag == 1) {
-				for (Device d : result) {
-					deviceService.updateDeviceState(d.getState(), d.getdId(),
-							session.getAttribute("userLoginInfo").toString());
+		List<Device> artikDevice = new ArrayList<Device>();
+		List<Device> finalDevice = new ArrayList<Device>();
+		for (Device d : deviceList) {
+			if (d.getDtId().equals("main_light")) {
+				int state = IparkUtils.getState(d);
+				if (IparkUtils.stateChangeFlag == 1) {
+					logger.info("[success] stateChangeFlag {} :", IparkUtils.stateChangeFlag);
+					deviceService.updateDeviceState(state, d.getdId(), uId);
 				}
+				finalDevice.add(d);
+			} else {
+				artikDevice.add(d);
 			}
 		}
-		model.addAttribute("deviceList", deviceList);
+		if (session.getAttribute("ACCESS_TOKEN") != null && deviceList != null) {
+			List<Device> result = ArtikUtils.getDeviceState(session, artikDevice);
+			if (ArtikUtils.stateChangeFlag == 1) {
+				for (Device d : result) {
+					deviceService.updateDeviceState(d.getState(), d.getdId(), uId);
+				}
+			}
+			finalDevice.addAll(result);
+		}
+
+		model.addAttribute("deviceList", finalDevice);
 
 		return mav;
 	}
@@ -147,6 +168,14 @@ public class HomeController {
 		model.addAttribute("connectedCompanyList", connectedCompnayList);
 		mav.setViewName("addDevice");
 		return mav;
+	}
+
+	@RequestMapping("deleteDevice")
+	public String deleteDevice(HttpSession session, @RequestParam(value = "dId") String dId) {
+		logger.info("[deleteDevice]");
+		deviceService.deleteDevice(session.getAttribute("userLoginInfo").toString(), dId);
+
+		return "redirect:/success";
 	}
 
 	/*
@@ -179,7 +208,8 @@ public class HomeController {
 			model.addAttribute("deviceList", deviceList);
 
 			// AccessToken을 이미 받은 경우 ACCESS_TOKEN 과 ARTIK_USER_ID 을 세션에 저장
-			if (accessTokenService.getAccessTokenById(uId) != null) {
+			if (accessTokenService.getAccessTokenById(uId) != null
+					&& !accessTokenService.getAccessTokenById(uId).equals("")) {
 				session.setAttribute("ACCESS_TOKEN", accessTokenService.getAccessTokenById(uId));
 				session.setAttribute("ARTIK_USER_ID",
 						artikUserProfileService.getUserIdById(session.getAttribute("userLoginInfo").toString()));
@@ -192,6 +222,14 @@ public class HomeController {
 
 		}
 
+	}
+
+	@RequestMapping("logout")
+	public ModelAndView logout(HttpSession session, Model model) {
+		ModelAndView mv = new ModelAndView("home","error_message","로그인 후 이용바랍니다:D");
+		session.invalidate();
+		
+		return mv;
 	}
 
 }

@@ -57,5 +57,16 @@ public class DeviceServiceImpl implements DeviceService {
 		return deviceDao.getDeviceTypeId(map);
 	}
 
+	@Override
+	public void deleteDevice(String uId, String dId) {
+		// TODO Auto-generated method stub
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("dId", dId);
+		map.put("uId", uId);
+		
+		deviceDao.deleteDevice(map);
+		
+	}
+
 
 }

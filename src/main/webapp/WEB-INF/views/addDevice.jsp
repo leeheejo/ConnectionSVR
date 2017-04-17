@@ -23,8 +23,17 @@
 <meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
 </head>
 <body>
-<br>
-<br>
+	<div class="container" align="right">
+		<button type="button" class="btn btn-default btn-xs "
+			onClick="location.href='success'">
+			<span class="glyphicon glyphicon-home"></span>
+		</button>
+		<button type="button" class="btn btn-default btn-xs "
+			onClick="location.href='logout'">
+			<span class="glyphicon glyphicon-off"></span>
+		</button>
+	</div>
+	<br>
 	<center>
 		<div class="container">
 			<h2>Connected Company</h2>
@@ -33,7 +42,8 @@
 					<c:when test="${fn:length(connectedCompanyList) > 0}">
 						<c:forEach items="${connectedCompanyList}" var="row">
 							<tr align="center">
-								<td align="center"><button class="btn btn-default btn-lg btn-block"
+								<td align="center"><button
+										class="btn btn-default btn-lg btn-block"
 										onClick="location.href='artikLogin'">${row.cmpName}</button></td>
 							</tr>
 						</c:forEach>

@@ -12,4 +12,5 @@ public interface DeviceDao {
 	public void insertDevice(HashMap<String, Object> map);
 	public void updateDeviceState(HashMap<String, Object> map);
 	public String getDeviceTypeId(HashMap<String, Object> map);
+	public void deleteDevice(HashMap<String, Object> map);
 }

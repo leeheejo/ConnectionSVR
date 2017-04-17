@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -56,7 +57,7 @@ public class ArtikController {
 	private static String clientId = "cbd3e38e12344b22a8c76cd3789b0e0e";
 	private static String clientSecret = "fafe61a1191940989a86d9e69e1e3d66";
 
-	private static String callbackUrl = "http://localhost:8080/test/callback";
+	private static String callbackUrl = "https://localhost:8443/test/callback";
 
 	private static final Logger logger = LoggerFactory.getLogger(ArtikController.class);
 
@@ -195,7 +196,22 @@ public class ArtikController {
 		// parsing response Data
 		List<DeviceList> artikDeviceList = ArtikUtils.parsinDeviceList(responseData,
 				session.getAttribute("userLoginInfo").toString());
-		model.addAttribute("artikDeviceList", artikDeviceList);
+		List<Device> userDeviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
+		List<DeviceList> newDeviceList = new ArrayList();
+
+		for (DeviceList dl : artikDeviceList) {
+			int flag = 0;
+			for (Device d : userDeviceList) {
+				if (dl.getId().equals(d.getdId())) {
+					flag = 1;
+				}
+			}
+			if (flag == 0) {
+				newDeviceList.add(dl);
+			}
+
+		}
+		model.addAttribute("artikDeviceList", newDeviceList);
 
 		// //insert deviceList
 		// for (int i = 0; i < artikDeviceList.size(); i++) {
@@ -218,33 +234,60 @@ public class ArtikController {
 	 * @return String "redirect:/success"
 	 */
 
+	// @RequestMapping("/sendActionTest")
+	// public String sendActionTest(HttpSession session, @RequestParam(value =
+	// "dId") String dId,
+	// @RequestParam(value = "state") int currentState, @RequestParam(value =
+	// "R", required = false) String R,
+	// @RequestParam(value = "G", required = false) String G,
+	// @RequestParam(value = "B", required = false) String B) throws Exception {
 	@RequestMapping("/sendActionTest")
 	public String sendActionTest(HttpSession session, @RequestParam(value = "dId") String dId,
-			@RequestParam(value = "state") int currentState, @RequestParam(value = "R", required = false) String R,
-			@RequestParam(value = "G", required = false) String G,
-			@RequestParam(value = "B", required = false) String B) throws Exception {
-
+			@RequestParam(value = "state") int currentState) throws Exception {
 		logger.info("[sendActionTest]");
 		String dtId = deviceService.getDeviceTypeId(dId, session.getAttribute("userLoginInfo").toString());
 
-		if (dtId.equals(ArtikDeviceType.PHILIPS_HUE_COLOR_LAMP) && (!R.equals("") || !G.equals("") || !B.equals(""))) {
-			if (R.equals("") || Integer.parseInt(R) > 255)
-				R = "0";
-			if (G.equals("") || Integer.parseInt(G) > 255)
-				G = "0";
-			if (B.equals("") || Integer.parseInt(B) > 255)
-				B = "0";
-			Action(session, dId, "setColorRGB", R + ";" + G + ";" + B);
-
-		} else {
-			if (currentState == 0) {
-				Action(session, dId, "setOn", "");
+		if (!dtId.equals("main_light")) {
+			// if (dtId.equals(ArtikDeviceType.PHILIPS_HUE_COLOR_LAMP)
+			// && (!R.equals("") || !G.equals("") || !B.equals(""))) {
+			// if (R.equals("") || Integer.parseInt(R) > 255)
+			// R = "0";
+			// if (G.equals("") || Integer.parseInt(G) > 255)
+			// G = "0";
+			// if (B.equals("") || Integer.parseInt(B) > 255)
+			// B = "0";
+			// Action(session, dId, "setColorRGB", R + ";" + G + ";" + B);
+			//
+			// } else
+			if (dtId.equals("main_light")) {
+				String action = "";
+				if (currentState == 0) {
+					action = "setOn";
+				} else {
+					action = "setOff";
+				}
+				IparkUtils.Action("control", action, dId, session.getAttribute("userLoginInfo").toString());
 			} else {
-				Action(session, dId, "setOff", "");
+				String action = "";
+				if (currentState == 0) {
+					action = "setOn";
+				} else {
+					action = "setOff";
+				}
+				Action(session, dId, action, "");
 			}
+		} else {
+			String action = "";
+			if (currentState == 0) {
+				action = "setOn";
+			} else {
+				action = "setOff";
+			}
+			IparkUtils.sendAction(action, session.getAttribute("userLoginInfo").toString(), dId);
 		}
 
 		return "redirect:/success";
+
 	}
 
 	/*
@@ -277,7 +320,12 @@ public class ArtikController {
 		List<Device> deviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
 		for (Device d : deviceList) {
 			logger.info("{}", d.getName());
-			Action(session, d.getdId(), "setOff", "");
+			if (d.getDtId().equals("main_light")) {
+				IparkUtils.sendAction("setOff", session.getAttribute("userLoginInfo").toString(), d.getdId());
+			} else {
+				Action(session, d.getdId(), "setOff", "");
+			}
+			Thread.sleep(4000);
 		}
 		return "redirect:/success";
 	}
@@ -285,12 +333,15 @@ public class ArtikController {
 	@RequestMapping("/allOn")
 	public String allOn(HttpSession session) throws Exception {
 		List<Device> deviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
+
 		for (Device d : deviceList) {
-			if (!d.getDtId().equals(ArtikDeviceType.SAMSUNG_SMARTHOME_AIRPURIFIER)) { //예제용
-				logger.info("{}", d.getName());
+			logger.info("{}", d.getName());
+			if (d.getDtId().equals("main_light")) {
+				IparkUtils.sendAction("setOn", session.getAttribute("userLoginInfo").toString(), d.getdId());
+			} else {
 				Action(session, d.getdId(), "setOn", "");
-				Thread.sleep(1000);
 			}
+			Thread.sleep(4000);
 		}
 
 		return "redirect:/success";
@@ -349,6 +400,46 @@ public class ArtikController {
 		BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
 		String responseData = br.readLine();
 		logger.info("[addNewDevice] responseData : {}", responseData);
+		br.close();
+
+		return "deviceList";
+	}
+
+	@RequestMapping("/createSubscription")
+	public String createSubscription(HttpSession session) throws Exception {
+
+		// HttpPost 통신
+		URL url = new URL("https://api.artik.cloud/v1.1/subscriptions");
+		HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+		con.setRequestMethod("POST");
+		con.setDoInput(true);
+		con.setDoOutput(true);
+
+		String accessToken = session.getAttribute("ACCESS_TOKEN").toString();
+		// Header
+		String authorizationHeader = "bearer " + accessToken;
+		con.setRequestProperty("Authorization", authorizationHeader);
+		con.setRequestProperty("Content-Type", "application/json");
+
+		// Param
+		String param = "{\"uid\": \"" + session.getAttribute("ARTIK_USER_ID").toString() + "\",\"callbackUrl\": \""
+				+ callbackUrl + "\",  \"messageType\": \"message\"}";
+
+		logger.info("[createSubscription] PARAM : {}", param);
+
+		OutputStream os = con.getOutputStream();
+		os.write(param.getBytes());
+		os.flush();
+		os.close();
+
+		// Response Code
+		int responseCode = con.getResponseCode();
+		logger.info("[createSubscription] responseCode : {}", responseCode + con.getResponseMessage());
+
+		// Response Data
+		BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+		String responseData = br.readLine();
+		logger.info("[createSubscription] responseData : {}", responseData);
 		br.close();
 
 		return "deviceList";
@@ -483,7 +574,6 @@ public class ArtikController {
 		sendTestLogService.insertSendTestLog(sendTestLog);
 		logger.info("[Action] insert SEND_TEST_LOG");
 
-		Thread.sleep(500);
 	}
 
 	public int getManifestVersion(HttpSession session, String dtId) throws Exception {

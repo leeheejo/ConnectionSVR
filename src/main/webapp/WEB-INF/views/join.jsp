@@ -37,6 +37,7 @@
 					<input type="text" name="uEmail" class="form-control"
 						placeholder="Email">
 				</div>
+				
 				<div>
 					<button type="submit" class="btn btn-primary">submit</button>
 				</div>

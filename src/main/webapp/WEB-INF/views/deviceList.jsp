@@ -32,7 +32,16 @@
 </script>
 
 <body>
-	<br>
+	<div class="container" align="right">
+		<button type="button" class="btn btn-default btn-xs "
+			onClick="location.href='success'">
+			<span class="glyphicon glyphicon-home"></span>
+		</button>
+		<button type="button" class="btn btn-default btn-xs "
+			onClick="location.href='logout'">
+			<span class="glyphicon glyphicon-off"></span>
+		</button>
+	</div>
 	<br>
 	<center>
 		<div class="container">
@@ -42,13 +51,17 @@
 					onClick="location.href='getArtikDeviceList'">
 					<span class="glyphicon glyphicon-download-alt"></span>
 				</button>
+				<!--  <button type="button" class="btn btn-info"
+					onClick="location.href='createSubscription'">
+					<span class="glyphicon glyphicon-heart"></span>
+				</button>-->
 			</h2>
-			<table class="table" tyle="width: 300px" align="center">
+			<table class="table" style="width: 100%" align="center">
 				<thead>
 					<tr>
 						<th>name</th>
-						<th>dId</th>
-						<th>select</th>
+						<!-- <th>dId</th> -->
+						<th style="width: 10%">select</th>
 					</tr>
 				</thead>
 				<c:choose>
@@ -56,7 +69,7 @@
 						<c:forEach items="${artikDeviceList}" var="row">
 							<tr>
 								<td>${row.name}</td>
-								<td>${row.id}</td>
+								<!--  <td>${row.id}</td>  -->
 								<td><form action="insertDevice" method="GET">
 										<input type="hidden" name="dtId" value='${row.dtid}' /> <input
 											type="hidden" name="name" value='${row.name}' /> <input
@@ -72,7 +85,7 @@
 						</tr>
 					</c:otherwise>
 				</c:choose>
-
+				<!-- 
 				<tr align="right">
 					<td colspan="3">
 						<button type="button" class="btn btn-info " data-toggle="modal"
@@ -81,6 +94,7 @@
 						</button>
 					</td>
 				</tr>
+				-->
 			</table>
 
 
