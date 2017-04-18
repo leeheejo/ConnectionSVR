@@ -1,5 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=EUC-KR"
-	pageEncoding="EUC-KR"%>
+<%@ page language="java" contentType="text/html; charset=utf-8"
+	pageEncoding="utf-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ page session="true"%>
@@ -23,6 +23,7 @@
 <script type="text/javascript">
 
 	<c:set var="oauthUrl" value="${oauthUrl}"></c:set>
+
 		<c:if test="${!empty oauthUrl and empty sessionScope.ACCESS_TOKEN}">
 			window.open('${oauthUrl}',"artikLogin", "width=500, height=1000, scrollbars=yes, resizable=yes");
 		</c:if>
@@ -32,36 +33,25 @@
 </script>
 
 <body>
-	<div class="container" align="right">
-		<button type="button" class="btn btn-default btn-xs "
-			onClick="location.href='success'">
-			<span class="glyphicon glyphicon-home"></span>
-		</button>
-		<button type="button" class="btn btn-default btn-xs "
-			onClick="location.href='logout'">
-			<span class="glyphicon glyphicon-off"></span>
-		</button>
-	</div>
-	<br>
 	<center>
+		<br>
+		<div class="container" align="center">
+			<img src="<c:url value="/resources/logo.png"/>" height="32"
+				width="78%" alt="" onClick="location.href='success'" />
+			<button type="button" class="btn btn-default btn-sm "
+				onClick="location.href='logout'">
+				<span class="glyphicon glyphicon-off"></span>
+			</button>
+		</div>
+		<br>
 		<div class="container">
-			<h2>
-				Device List
-				<button type="button" class="btn btn-info"
-					onClick="location.href='getArtikDeviceList'">
-					<span class="glyphicon glyphicon-download-alt"></span>
-				</button>
-				<!--  <button type="button" class="btn btn-info"
-					onClick="location.href='createSubscription'">
-					<span class="glyphicon glyphicon-heart"></span>
-				</button>-->
-			</h2>
+
 			<table class="table" style="width: 100%" align="center">
 				<thead>
 					<tr>
-						<th>name</th>
+						<th>Í∏∞Í∏∞Î™Ö</th>
 						<!-- <th>dId</th> -->
-						<th style="width: 10%">select</th>
+						<th style="width: 10%"></th>
 					</tr>
 				</thead>
 				<c:choose>
@@ -74,14 +64,22 @@
 										<input type="hidden" name="dtId" value='${row.dtid}' /> <input
 											type="hidden" name="name" value='${row.name}' /> <input
 											type="hidden" name="dId" value='${row.id}' /> <input
-											type="submit" class="btn btn-success" value="select">
+											type="submit" class="btn btn-success" value="Ï∂îÍ∞Ä">
 									</form></td>
 							</tr>
 						</c:forEach>
 					</c:when>
 					<c:otherwise>
 						<tr align="center">
-							<td colspan="3">¡∂»∏µ» ∞·∞˙∞° æ¯Ω¿¥œ¥Ÿ.</td>
+							<td colspan="3">
+								<div class="container" align="center">
+									<small>Í∏∞Í∏∞ Î™©Î°ù Í∞ÄÏ†∏Ïò§Í∏∞</small>
+									<button type="button" class="btn btn-info"
+										onClick="location.href='getArtikDeviceList'">
+										<span class="glyphicon glyphicon-download-alt"></span>
+									</button>
+								</div>
+							</td>
 						</tr>
 					</c:otherwise>
 				</c:choose>
@@ -106,7 +104,7 @@
 					<div class="modal-content">
 						<div class="modal-header">
 							<button type="button" class="close" data-dismiss="modal">&times;</button>
-							<h4 class="modal-title">ªı ±‚±‚ √ﬂ∞°</h4>
+							<h4 class="modal-title">ÏÉà Í∏∞Í∏∞ Ï∂îÍ∞Ä</h4>
 						</div>
 
 						<form name="addNewDevice" method="post" action="addNewDevice">

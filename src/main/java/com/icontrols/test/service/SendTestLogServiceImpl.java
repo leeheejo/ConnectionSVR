@@ -1,6 +1,7 @@
 package com.icontrols.test.service;
 
 import java.util.HashMap;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,16 @@ public class SendTestLogServiceImpl implements SendTestLogService{
 		map.put("sendDt", sendTestLog.getSendDt());
 		
 		sendTestLogDao.insertSendTestLog(map);
+	}
+
+	@Override
+	public List<SendTestLog> getSendTestLog(String uId) {
+		// TODO Auto-generated method stub
+		HashMap<String, Object> map = new HashMap<String, Object>();
+
+		map.put("uId", uId);
+		
+		return sendTestLogDao.getSendTestLog(map);
 	}
 
 }

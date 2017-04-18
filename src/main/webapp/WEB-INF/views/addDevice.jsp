@@ -23,28 +23,32 @@
 <meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
 </head>
 <body>
-	<div class="container" align="right">
-		<button type="button" class="btn btn-default btn-xs "
-			onClick="location.href='success'">
-			<span class="glyphicon glyphicon-home"></span>
-		</button>
-		<button type="button" class="btn btn-default btn-xs "
-			onClick="location.href='logout'">
-			<span class="glyphicon glyphicon-off"></span>
-		</button>
-	</div>
 	<br>
 	<center>
+		<div class="container" align="center">
+			<img src="<c:url value="/resources/logo.png"/>" height="32"
+				width="78%" alt="" onClick="location.href='success'"  />
+			<button type="button" class="btn btn-default btn-sm "
+				onClick="location.href='logout'">
+				<span class="glyphicon glyphicon-off"></span>
+			</button>
+		</div>
+		<br>
 		<div class="container">
-			<h2>Connected Company</h2>
-			<table class="table" tyle="width: 300px" align="center">
+			<div class="input-group">
+				<span class="input-group-addon"><i
+					class="glyphicon glyphicon-search"></i></span> <input id="search"
+					type="text" class="form-control" name="search" placeholder="Search">
+			</div>
+			<br>
+			<table style="width: 100%" align="center">
 				<c:choose>
 					<c:when test="${fn:length(connectedCompanyList) > 0}">
 						<c:forEach items="${connectedCompanyList}" var="row">
 							<tr align="center">
 								<td align="center"><button
 										class="btn btn-default btn-lg btn-block"
-										onClick="location.href='artikLogin'">${row.cmpName}</button></td>
+										onClick="location.href='artikLogin'" style="width: 100%">${row.cmpName}</button></td>
 							</tr>
 						</c:forEach>
 					</c:when>

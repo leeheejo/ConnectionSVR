@@ -21,34 +21,45 @@
 			document.LoginForm.submit();
 	}
 </script>
+<style type="text/css">
+#center {
+	position: absolute;
+	top: 30%;
+	width: 100%;
+}
+</style>
+
 <body>
 	<center>
-		<br>
-		<h2>LOGIN</h2>
-		<br>
-		<div class="container">
-			<form name="LoginForm" method="post" action="login"
-				style="width: 300px">
-				<div class="form-group">
-					<input type="text" class="form-control" id="uId" name="uId"
-						placeholder="ID" />
-				</div>
-				<div class="form-group">
-					<input type="password" class="form-control" id="uPwd" name="uPwd"
-						placeholder="Password" />
-				</div>
-				<br>
-				<div>
-					<input type="button" class="btn btn-primary"
-						class="btn btn-primary" class="btn btn-default" onclick="erchk()"
-						value="login"> <input type="button"
-						class="btn btn-default" value="join"
-						onClick="location.href='joinPage'">
-				</div>
-			</form>
-		</div>
+		<div id="center">
+			<div>
+				<img src="<c:url value="/resources/logo.png"/>" height="42"
+					width="90%" alt="" />
+			</div>
+			<br>
+			<div class="container">
+				<form name="LoginForm" method="post" action="login"
+					style="width: 100%">
+					<div class="form-group">
+						<input type="text" class="form-control" id="uId" name="uId"
+							placeholder="ID" />
+					</div>
+					<div class="form-group">
+						<input type="password" class="form-control" id="uPwd" name="uPwd"
+							placeholder="Password" />
+					</div>
+					<br>
+					<div>
+						<input type="button" class="btn btn-primary"
+							class="btn btn-primary" class="btn btn-default" onclick="erchk()"
+							value="LOGIN" style="width: 49%"> <input type="button"
+							class="btn btn-default" value="JOIN"
+							onClick="location.href='joinPage'" style="width: 49%">
+					</div>
+				</form>
+			</div>
 	</center>
-
+	</div>
 </body>
 
 </html>

@@ -39,56 +39,38 @@
 			return false;
 	}
 </script>
-
 <body>
-	<div class="container" align="right">
-		<button type="button" class="btn btn-default btn-xs "
-			onClick="location.href='success'">
-			<span class="glyphicon glyphicon-home"></span>
-		</button>
-		<button type="button" class="btn btn-default btn-xs "
-			onClick="location.href='logout'">
-			<span class="glyphicon glyphicon-off"></span>
-		</button>
-	</div>
-	<br>
 	<center>
+		<br>
+		<div class="container" align="center">
+			<img src="<c:url value="/resources/logo.png"/>" height="32"
+				width="78%" alt="" onClick="location.href='success'" />
+			<button type="button" class="btn btn-default btn-sm "
+				onClick="location.href='logout'">
+				<span class="glyphicon glyphicon-off"></span>
+			</button>
+		</div>
+		<br>
 		<div class="container">
-
-			<h2>
-				<%=session.getAttribute("userLoginInfo")%>'s Devices
-				<button type="button" class="btn btn-info "
-					onClick="location.href='addDevice'">
-					<span class="glyphicon glyphicon-plus"></span>
-				</button>
-			</h2>
-			<div class="container">
-				<button type="button" class="btn btn-info btn-sm"
-					onClick="location.href='allOff'">외출</button>
-				<button type="button" class="btn btn-info btn-sm "
-					onClick="location.href='allOn'">귀가</button>
+			<div class="container" style="width: 100%">
+				<button type="button" class="btn btn-info"
+					onClick="location.href='allOff'" style="width: 49%">외출</button>
+				<button type="button" class="btn btn-info"
+					onClick="location.href='allOn'" style="width: 49%">귀가</button>
 				<!--
 				<button type="button" class="btn btn-info btn-sm "
 					onClick="location.href='colorLoop'">colorLoop</button>
 					 -->
 				<br> <br>
 			</div>
-			<table class="table" tyle="width: 300px">
-				<tr>
-				</tr>
-
+			<table class="table" style="width: 100%; margin: auto;">
 				<thead>
 					<tr>
-						<th>name</th>
+						<th style="width: 50%">기기명</th>
 						<!--  <th>dId</th>  -->
-						<th>state
-							<button type="button" class="btn btn-default btn-sm"
-								onClick="location.href='refresh'">
-								<span class="glyphicon glyphicon-refresh"></span>
-							</button>
-						</th>
-						<th>sendAction</th>
-						<th>delete</th>
+						<th>상태</th>
+						<th>제어</th>
+						<th>삭제</th>
 					</tr>
 				</thead>
 				<c:choose>
@@ -110,9 +92,9 @@
 									</c:choose>
 									<input type="hidden" name="state" value='${row.state}' /> <input
 										type="hidden" name="dId" value='${row.dId}' />
-									<td><input type="submit" class="btn btn-success"
-										value="send"> <!-- for philips hue color change --> <c:set
-											value="${row.dtId}" var="dtId" /> <!-- <c:choose>
+									<!-- for philips hue color change -->
+									<c:set value="${row.dtId}" var="dtId" />
+									<!-- <c:choose>
 											<c:when
 												test="${dtId eq 'dt6f79b9b4aa3b4a80b7b76c2190016c61'}">
 												<table>
@@ -129,9 +111,14 @@
 													</tr>
 												</table>
 											</c:when>
-										</c:choose>--></td>
+										</c:choose>-->
+									<td><button type="submit" class="btn btn-success btn-sm"
+											value="send">
+											<span class="glyphicon glyphicon-send"></span>
+										</button></td>
 
 								</form>
+
 								<td>
 									<form action="deleteDevice" method="GET">
 										<input type="hidden" name="dId" value='${row.dId}' />
@@ -139,8 +126,9 @@
 											onClick="location.href='deleteDevice'">
 											<span class="glyphicon glyphicon-trash"></span>
 										</button>
+									</form>
 								</td>
-								</form>
+
 							</tr>
 
 
@@ -154,6 +142,16 @@
 				</c:choose>
 
 			</table>
+		</div>
+		<div class="container" align="right">
+			<button type="button" class="btn btn-default btn-md"
+				onClick="location.href='refresh'">
+				<span class="glyphicon glyphicon-refresh"></span>
+			</button>
+			<button type="button" class="btn btn-info btn-md"
+				onClick="location.href='addDevice'">
+				<span class="glyphicon glyphicon-plus"></span>
+			</button>
 		</div>
 	</center>
 </body>

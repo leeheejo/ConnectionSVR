@@ -57,7 +57,8 @@ public class ArtikController {
 	private static String clientId = "cbd3e38e12344b22a8c76cd3789b0e0e";
 	private static String clientSecret = "fafe61a1191940989a86d9e69e1e3d66";
 
-	private static String callbackUrl = "https://localhost:8443/test/callback";
+//	private static String callbackUrl = "https://localhost:8443/test/callback";
+	private static String callbackUrl = "http://192.168.101.24:8080/test/callback";
 
 	private static final Logger logger = LoggerFactory.getLogger(ArtikController.class);
 
@@ -266,7 +267,7 @@ public class ArtikController {
 				} else {
 					action = "setOff";
 				}
-				IparkUtils.Action("control", action, dId, session.getAttribute("userLoginInfo").toString());
+				IparkUtils.sendAction(action, session.getAttribute("userLoginInfo").toString(), dId);
 			} else {
 				String action = "";
 				if (currentState == 0) {
@@ -323,9 +324,10 @@ public class ArtikController {
 			if (d.getDtId().equals("main_light")) {
 				IparkUtils.sendAction("setOff", session.getAttribute("userLoginInfo").toString(), d.getdId());
 			} else {
+//				if(!d.getDtId().equals(ArtikDeviceType.SAMSUNG_SMARTHOME_AIRPURIFIER))
 				Action(session, d.getdId(), "setOff", "");
 			}
-			Thread.sleep(4000);
+//			Thread.sleep(5000);
 		}
 		return "redirect:/success";
 	}
@@ -339,9 +341,10 @@ public class ArtikController {
 			if (d.getDtId().equals("main_light")) {
 				IparkUtils.sendAction("setOn", session.getAttribute("userLoginInfo").toString(), d.getdId());
 			} else {
+//				if(!d.getDtId().equals(ArtikDeviceType.SAMSUNG_SMARTHOME_AIRPURIFIER))
 				Action(session, d.getdId(), "setOn", "");
 			}
-			Thread.sleep(4000);
+//			Thread.sleep(5000);
 		}
 
 		return "redirect:/success";

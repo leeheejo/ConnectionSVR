@@ -11,6 +11,13 @@
 		VALUES
 			(#{uId}, #{cmpCode}, #{ddid}, #{data}, #{response}, #{sendDt});
 	</insert>
+	
+	<insert id="getSendTestLog" parameterType="HashMap">
+		SELECT *
+		FROM SEND_TEST_LOG
+		WHERE
+			1=1;
+	</insert>
 
 
 </mapper>

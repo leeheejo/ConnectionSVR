@@ -18,10 +18,12 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.icontrols.test.domain.ConnectedCompany;
 import com.icontrols.test.domain.Device;
+import com.icontrols.test.domain.SendTestLog;
 import com.icontrols.test.service.AccessTokenService;
 import com.icontrols.test.service.ArtikUserProfileService;
 import com.icontrols.test.service.ConnectedCompanyService;
 import com.icontrols.test.service.DeviceService;
+import com.icontrols.test.service.SendTestLogService;
 import com.icontrols.test.service.UserService;
 import com.icontrols.test.util.ArtikUtils;
 import com.icontrols.test.util.IparkUtils;
@@ -82,7 +84,7 @@ public class HomeController {
 	 */
 	@RequestMapping("join")
 	public ModelAndView join(@RequestParam(value = "uId") String uId, @RequestParam(value = "uPwd") String uPwd,
-			@RequestParam(value = "uEmail") String uEmail) {
+			@RequestParam(value = "uEmail") String uEmail) throws Exception {
 
 		logger.info("[join]");
 
@@ -216,6 +218,7 @@ public class HomeController {
 				logger.info("[login] get ACCESS_TOKEN : {}", accessTokenService.getAccessTokenById(uId));
 			}
 			return "redirect:/success";
+
 		} else {
 			logger.info("[LOGIN FAIL]");
 			return "redirect:/";
@@ -226,9 +229,9 @@ public class HomeController {
 
 	@RequestMapping("logout")
 	public ModelAndView logout(HttpSession session, Model model) {
-		ModelAndView mv = new ModelAndView("home","error_message","로그인 후 이용바랍니다:D");
+		ModelAndView mv = new ModelAndView("home", "error_message", "로그인 후 이용바랍니다:D");
 		session.invalidate();
-		
+
 		return mv;
 	}
 
