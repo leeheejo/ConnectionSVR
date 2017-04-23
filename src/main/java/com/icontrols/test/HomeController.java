@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.icontrols.test.domain.AccessToken;
 import com.icontrols.test.domain.ConnectedCompany;
 import com.icontrols.test.domain.Device;
 import com.icontrols.test.domain.SendTestLog;
@@ -45,18 +46,32 @@ public class HomeController {
 	@Autowired
 	ArtikUserProfileService artikUserProfileService;
 
+
 	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
 
 	/**
 	 * Simply selects the home view to render by returning its name.
 	 */
 	@RequestMapping(value = "/", method = RequestMethod.GET)
-	public String home(Locale locale, Model model) {
+	public String start(Locale locale, Model model) {
 
+
+		List<AccessToken> accessTokenList = accessTokenService.getAllAccessToken();
+		
+		logger.info("[HOME] {}" , accessTokenList.size());
+		
 		logger.info("[HOME]");
 
 		return "home";
 	}
+	
+	@RequestMapping(value = "home")
+	public String home(Locale locale, Model model) {
+
+
+		return "home";
+	}
+
 
 	/*
 	 * move to join.jsp
@@ -91,15 +106,9 @@ public class HomeController {
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("home");
 
-		HashMap<String, Object> map = new HashMap<String, Object>();
-		map.put("uId", uId);
-		map.put("uPwd", uPwd);
-		map.put("uEmail", uEmail);
-
 		Device defaultDevice = IparkUtils.getIparkInfo(uId);
-
 		deviceService.insertDevice(defaultDevice);
-		UserService.insertUser(map);
+		UserService.insertUser(uId, uPwd, uEmail);
 		return mav;
 	}
 
@@ -131,32 +140,35 @@ public class HomeController {
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("success");
 		String uId = session.getAttribute("userLoginInfo").toString();
-
+		logger.info("[success]userLoginInfo : {}",session.getAttribute("userLoginInfo").toString());
+		
+		
 		List<Device> deviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
 		List<Device> artikDevice = new ArrayList<Device>();
 		List<Device> finalDevice = new ArrayList<Device>();
-		for (Device d : deviceList) {
-			if (d.getDtId().equals("main_light")) {
-				int state = IparkUtils.getState(d);
-				if (IparkUtils.stateChangeFlag == 1) {
-					logger.info("[success] stateChangeFlag {} :", IparkUtils.stateChangeFlag);
-					deviceService.updateDeviceState(state, d.getdId(), uId);
-				}
-				finalDevice.add(d);
-			} else {
-				artikDevice.add(d);
-			}
-		}
-		if (session.getAttribute("ACCESS_TOKEN") != null && deviceList != null) {
-			List<Device> result = ArtikUtils.getDeviceState(session, artikDevice);
-			if (ArtikUtils.stateChangeFlag == 1) {
-				for (Device d : result) {
-					deviceService.updateDeviceState(d.getState(), d.getdId(), uId);
+		if (deviceList.size() != 0) {
+			for (Device d : deviceList) {
+				if (d.getDtId().equals("main_light")) {
+					int state = IparkUtils.getState(d);
+					if (IparkUtils.stateChangeFlag == 1) {
+						logger.info("[success] stateChangeFlag {} :", IparkUtils.stateChangeFlag);
+						deviceService.updateDeviceState(state, d.getdId(), uId);
+					}
+					finalDevice.add(d);
+				} else {
+					artikDevice.add(d);
 				}
 			}
-			finalDevice.addAll(result);
+			if (session.getAttribute("ACCESS_TOKEN") != null && deviceList != null) {
+				List<Device> result = ArtikUtils.getDeviceState(session, artikDevice);
+				if (ArtikUtils.stateChangeFlag == 1) {
+					for (Device d : result) {
+						deviceService.updateDeviceState(d.getState(), d.getdId(), uId);
+					}
+				}
+				finalDevice.addAll(result);
+			}
 		}
-
 		model.addAttribute("deviceList", finalDevice);
 
 		return mav;
@@ -206,6 +218,8 @@ public class HomeController {
 		int loginCheck = UserService.loginCheck(map);
 		if (loginCheck == 1) {
 			session.setAttribute("userLoginInfo", uId);
+			logger.info("[login]userLoginInfo : {}",session.getAttribute("userLoginInfo").toString());
+			
 			List<Device> deviceList = deviceService.getDeviceById(uId);
 			model.addAttribute("deviceList", deviceList);
 

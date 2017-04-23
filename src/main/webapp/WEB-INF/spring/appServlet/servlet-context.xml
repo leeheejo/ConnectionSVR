@@ -22,7 +22,6 @@
 	</beans:bean>
 	
 	<context:component-scan base-package="com.icontrols.*" />
-	
-	
-	
+
+    <context:annotation-config />
 </beans:beans>

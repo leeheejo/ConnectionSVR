@@ -10,14 +10,18 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.URL;
+import java.util.Date;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.icontrols.test.HomeController;
 import com.icontrols.test.domain.Device;
+import com.icontrols.test.domain.SendTestLog;
+import com.icontrols.test.service.SendTestLogService;
 
 public class IparkUtils {
 
@@ -26,7 +30,9 @@ public class IparkUtils {
 	public static int stateChangeFlag;
 
 	public static Device getIparkInfo(String uId) throws Exception {
-
+		
+		logger.info("[getIparkInfo]");
+		
 		String dId = "";
 		String name = "";
 		String dtId = "";
@@ -35,7 +41,8 @@ public class IparkUtils {
 		URL url = new URL(IparkSvrURL + "/join?id=" + uId);
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
 		con.setRequestMethod("GET");
-
+		
+		con.setRequestProperty("id", uId);
 		// response Code
 		int responseCode = con.getResponseCode();
 		logger.info("[getIparkInfo] responseCode : {}", responseCode);
@@ -54,12 +61,15 @@ public class IparkUtils {
 		return device;
 	}
 
-	public static void sendAction(String action, String uId, String dId) throws Exception {
+	public static SendTestLog sendAction(String action, String uId, String dId) throws Exception {
+		
+		logger.info("[sendAction]");
 		// httpGET 통신
-		URL url = new URL(IparkSvrURL + "/control?id=" + uId + "&dId=" + dId + "&action=" + action);
+		URL url = new URL(IparkSvrURL + "/control?dId=" + dId + "&action=" + action);
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
 		con.setRequestMethod("GET");
-
+		
+		con.setRequestProperty("id", uId);
 		// response Code
 		int responseCode = con.getResponseCode();
 		logger.info("[sendAction] responseCode : {}", responseCode);
@@ -69,15 +79,27 @@ public class IparkUtils {
 		String responseData = br.readLine();
 		logger.info("[sendAction] responseData : {}", responseData);
 
+		// Insert sendTestLog
+		SendTestLog sendTestLog = new SendTestLog(uId, 0, dId, action, responseCode + "",
+				new Date(System.currentTimeMillis()));
+
+		return sendTestLog;
 	}
 
-	public static int getState(Device d) throws Exception{
+	public static int getState(Device d) throws Exception {
+		
+		logger.info("[getState]");
+		
 		stateChangeFlag = 0;
-		int result = -1;
+		int result = 0;
 		// httpGET 통신
-		URL url = new URL(IparkSvrURL + "/state?id=" + d.getuId() + "&dId=" + d.getdId());
+		URL url = new URL(IparkSvrURL + "/state?dId=" + d.getdId());
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
 		con.setRequestMethod("GET");
+
+		// HEADER
+		con.setRequestProperty("id", d.getuId());
+//		con.setRequestProperty("id", "hi");
 
 		// response Code
 		int responseCode = con.getResponseCode();
@@ -88,16 +110,17 @@ public class IparkUtils {
 		String responseData = br.readLine();
 		JSONObject obj = new JSONObject(responseData);
 		String state = obj.getString("state");
+		logger.info("[getState] responseData : {}", responseData);
 
 		if (state.equals("on")) {
 			result = 1;
 		} else if (state.equals("off")) {
 			result = 0;
-		}
+		} 
 
 		if (d.getState() != result) {
 			stateChangeFlag = 1;
-			logger.info("[getState-Ipark] stateChange");
+			logger.info("[getState] stateChange");
 
 		}
 

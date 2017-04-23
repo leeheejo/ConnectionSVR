@@ -6,6 +6,7 @@ public class AccessToken {
 	private String token_type;
 	private String expires_in;
 	private String refresh_token;
+	private String issuedTime;
 
 	public String getuId() {
 		return uId;
@@ -45,6 +46,14 @@ public class AccessToken {
 
 	public void setRefresh_token(String refresh_token) {
 		this.refresh_token = refresh_token;
+	}
+
+	public String getIssuedTime() {
+		return issuedTime;
+	}
+
+	public void setIssuedTime(String issuedTime) {
+		this.issuedTime = issuedTime;
 	}
 
 	@Override

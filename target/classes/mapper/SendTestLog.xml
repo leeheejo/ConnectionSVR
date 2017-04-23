@@ -18,6 +18,5 @@
 		WHERE
 			1=1;
 	</insert>
-
-
+	
 </mapper>

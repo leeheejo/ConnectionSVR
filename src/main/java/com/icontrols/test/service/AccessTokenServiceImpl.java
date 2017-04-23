@@ -1,6 +1,7 @@
 package com.icontrols.test.service;
 
 import java.util.HashMap;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,7 @@ public class AccessTokenServiceImpl implements AccessTokenService {
 		map.put("tokenType", accessToken.getToken_type());
 		map.put("expiresIn", accessToken.getExpires_in());
 		map.put("refreshToken", accessToken.getRefresh_token());
-
+		map.put("issuedTime", System.currentTimeMillis()+"");
 		accessTokenDao.insertAccessToken(map);
 
 	}
@@ -47,6 +48,7 @@ public class AccessTokenServiceImpl implements AccessTokenService {
 		map.put("tokenType", accessToken.getToken_type());
 		map.put("expiresIn", accessToken.getExpires_in());
 		map.put("refreshToken", accessToken.getRefresh_token());
+		map.put("issuedTime", System.currentTimeMillis());
 
 		accessTokenDao.updateAccessToken(map);
 	}
@@ -59,6 +61,12 @@ public class AccessTokenServiceImpl implements AccessTokenService {
 		map.put("uId", uId);
 
 		return accessTokenDao.getAccessTokenById(map);
+	}
+
+	@Override
+	public List<AccessToken> getAllAccessToken() {
+		// TODO Auto-generated method stub
+		return accessTokenDao.getAllAccessToken();
 	}
 
 }

@@ -30,7 +30,7 @@
 		<servlet-name>appServlet</servlet-name>
 		<url-pattern>/</url-pattern>
 	</servlet-mapping>
-	
+
 	<servlet-mapping>
 		<servlet-name>default</servlet-name>
 		<url-pattern>*.png</url-pattern>
@@ -50,4 +50,8 @@
 		</user-data-constraint>
 	</security-constraint>
 
+	<error-page>
+		<error-code>500</error-code>
+		<location>/WEB-INF/views/error/error500.jsp</location>
+	</error-page>
 </web-app>

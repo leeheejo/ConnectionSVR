@@ -8,25 +8,11 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet"
-	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
-<script
-	src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
-<script
-	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-<script type="text/javascript"
-	src="http://code.jquery.com/jquery-1.9.1.js"></script>
-<script type="text/javascript">
-	
-</script>
-<c:set var="oauthUrl" value="${oauthUrl}"></c:set>
-<c:if test="${!empty oauthUrl and empty sessionScope.ACCESS_TOKEN}">
-			window.open('${oauthUrl}',"artikLogin", "width=500, height=1000, scrollbars=yes, resizable=yes");
-		</c:if>
-<c:if test="${!empty oauthUrl and !empty sessionScope.ACCESS_TOKEN}">
-			alert('already done');
-		</c:if>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
 
 <title>Main Page</title>
 </head>
@@ -43,20 +29,16 @@
 	<center>
 		<br>
 		<div class="container" align="center">
-			<img src="<c:url value="/resources/logo.png"/>" height="32"
-				width="78%" alt="" onClick="location.href='success'" />
-			<button type="button" class="btn btn-default btn-sm "
-				onClick="location.href='logout'">
+			<img src="<c:url value="/resources/logo.png"/>" height="32" width="78%" alt="" onClick="location.href='success'" />
+			<button type="button" class="btn btn-default btn-sm " onClick="location.href='logout'">
 				<span class="glyphicon glyphicon-off"></span>
 			</button>
 		</div>
 		<br>
 		<div class="container">
 			<div class="container" style="width: 100%">
-				<button type="button" class="btn btn-info"
-					onClick="location.href='allOff'" style="width: 49%">외출</button>
-				<button type="button" class="btn btn-info"
-					onClick="location.href='allOn'" style="width: 49%">귀가</button>
+				<button type="button" class="btn btn-info" onClick="location.href='allOff'" style="width: 49%">외출</button>
+				<button type="button" class="btn btn-info" onClick="location.href='allOn'" style="width: 49%">귀가</button>
 				<!--
 				<button type="button" class="btn btn-info btn-sm "
 					onClick="location.href='colorLoop'">colorLoop</button>
@@ -84,19 +66,21 @@
 									<c:choose>
 										<c:when test="${state == 0}">
 											<td><span class="label label-default">OFF</span></td>
-
 										</c:when>
 										<c:when test="${state == 1}">
 											<td><span class="label label-primary">ON</span></td>
 										</c:when>
 									</c:choose>
-									<input type="hidden" name="state" value='${row.state}' /> <input
-										type="hidden" name="dId" value='${row.dId}' />
-									<!-- for philips hue color change -->
-									<c:set value="${row.dtId}" var="dtId" />
-									<!-- <c:choose>
-											<c:when
-												test="${dtId eq 'dt6f79b9b4aa3b4a80b7b76c2190016c61'}">
+									<input type="hidden" name="state" value='${row.state}' /> 
+									<input type="hidden" name="dId" value='${row.dId}' />
+									<td>
+										<button type="submit" class="btn btn-success btn-sm" value="send">
+											<span class="glyphicon glyphicon-send"></span>
+										</button> <!-- for philips hue color change -->
+										<c:set value="${row.dtId}" var="dtId" /> 
+										<!-- 
+										<c:choose>
+											<c:when test="${dtId eq 'dt6f79b9b4aa3b4a80b7b76c2190016c61'}">
 												<table>
 													<tr>
 														<td><input type="text" id="R" name="R"
@@ -111,45 +95,36 @@
 													</tr>
 												</table>
 											</c:when>
-										</c:choose>-->
-									<td><button type="submit" class="btn btn-success btn-sm"
-											value="send">
-											<span class="glyphicon glyphicon-send"></span>
-										</button></td>
-
+										</c:choose>
+										 -->
+									</td>
 								</form>
 
 								<td>
 									<form action="deleteDevice" method="GET">
 										<input type="hidden" name="dId" value='${row.dId}' />
-										<button type="submit" class="btn btn-danger btn-sm"
-											onClick="location.href='deleteDevice'">
+										<button type="submit" class="btn btn-danger btn-sm" onClick="location.href='deleteDevice'">
 											<span class="glyphicon glyphicon-trash"></span>
 										</button>
 									</form>
 								</td>
-
 							</tr>
-
-
 						</c:forEach>
 					</c:when>
 					<c:otherwise>
-						<tr>
+						<tr align="center">
 							<td colspan="4">조회된 결과가 없습니다.</td>
 						</tr>
 					</c:otherwise>
 				</c:choose>
-
 			</table>
 		</div>
+		<!--  -->
 		<div class="container" align="right">
-			<button type="button" class="btn btn-default btn-md"
-				onClick="location.href='refresh'">
+			<button type="button" class="btn btn-default btn-md" onClick="location.href='refresh'" id="refresh" name="refresh">
 				<span class="glyphicon glyphicon-refresh"></span>
 			</button>
-			<button type="button" class="btn btn-info btn-md"
-				onClick="location.href='addDevice'">
+			<button type="button" class="btn btn-info btn-md" onClick="location.href='addDevice'">
 				<span class="glyphicon glyphicon-plus"></span>
 			</button>
 		</div>

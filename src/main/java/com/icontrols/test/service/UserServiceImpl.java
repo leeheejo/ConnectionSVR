@@ -14,8 +14,13 @@ public class UserServiceImpl implements UserService{
 	@Autowired
 	private UserDao userDao;
 	@Override
-	public void insertUser(HashMap<String, Object> map) {
+	public void insertUser(String uId, String uPwd, String uEmail) {
 		// TODO Auto-generated method stub
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("uId", uId);
+		map.put("uPwd", uPwd);
+		map.put("uEmail", uEmail);
+		
 		userDao.insertUser(map);
 	}
 	@Override
