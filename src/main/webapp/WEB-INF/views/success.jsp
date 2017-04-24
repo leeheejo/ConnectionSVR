@@ -60,7 +60,7 @@
 						<c:forEach items="${deviceList}" var="row">
 							<tr>
 								<form action="sendActionTest" method="GET">
-									<td>${row.name}</td>
+									<td>${row.cmpCode} : ${row.name}</td>
 									<!--  <td>${row.dId}</td>  -->
 									<c:set value="${row.state}" var="state" />
 									<c:choose>
@@ -73,6 +73,7 @@
 									</c:choose>
 									<input type="hidden" name="state" value='${row.state}' /> 
 									<input type="hidden" name="dId" value='${row.dId}' />
+									<input type="hidden" name="cmpCode" value='${row.cmpCode}' />
 									<td>
 										<button type="submit" class="btn btn-success btn-sm" value="send">
 											<span class="glyphicon glyphicon-send"></span>

@@ -10,21 +10,22 @@
 		<result property="dId" column="dId" javaType="java.lang.String" />
 		<result property="name" column="name" javaType="java.lang.String" />
 		<result property="state" column="state" javaType="java.lang.Integer" />
+		<result property="cmpCode" column="cmpCode" javaType="java.lang.Integer" />
 		<result property="dtId" column="dtId" javaType="java.lang.String" />
 	</resultMap>
 
 	<!-- resultMap -->
 	<select id="getDeviceById" parameterType="HashMap" resultMap="DeviceResult">
-		SELECT uId, dId, name, state, dtId
+		SELECT uId, dId, name, state, dtId, cmpCode
 		FROM DEVICE
 		WHERE uId LIKE #{uId}
 	</select>
 
 	<insert id="insertDevice" parameterType="HashMap">
 		INSERT INTO DEVICE
-		(dId,uId, name, uptDt, state, dtId)
+		(dId,uId, name, uptDt, state, dtId, cmpCode)
 		VALUES (#{dId}, #{uId}, #{name},
-		NOW(), 0, #{dtId});
+		NOW(), 0, #{dtId}, #{cmpCode});
 	</insert>
 
 	<update id="updateDeviceState" parameterType="HashMap">

@@ -128,7 +128,7 @@ public class ArtikUtils {
 		return artikUserProfile;
 	}
 
-	public static List<DeviceList> getArtikDeviceList(HttpSession session) throws Exception {
+	public static List<Device> getArtikDeviceList(HttpSession session) throws Exception {
 
 		logger.info("[getArtikDeviceList]");
 
@@ -156,7 +156,7 @@ public class ArtikUtils {
 		logger.info("[getArtikDeviceList] responseData : {}", responseData);
 		br.close();
 		// parsing response Data
-		List<DeviceList> artikDeviceList = parsingDeviceList(responseData,
+		List<Device> artikDeviceList = parsingDeviceList(responseData,
 				session.getAttribute("userLoginInfo").toString());
 
 		return artikDeviceList;
@@ -489,9 +489,9 @@ public class ArtikUtils {
 	}
 
 	// Parsing DeviceList(Json)
-	public static List<DeviceList> parsingDeviceList(String jsonMsg, String uId) {
+	public static List<Device> parsingDeviceList(String jsonMsg, String uId) {
 
-		List<DeviceList> deviceList = new ArrayList<DeviceList>();
+		List<Device> deviceList = new ArrayList<Device>();
 
 		JSONObject obj = new JSONObject(jsonMsg);
 
@@ -502,77 +502,24 @@ public class ArtikUtils {
 
 		for (int i = 0; i < devices.length(); i++) {
 			JSONObject device = devices.getJSONObject(i);
-			DeviceList dl = new DeviceList();
 
 			String id = "";
 			String dtid = "";
 			String name = "";
-			Integer manifestVersion = 0;
-			String manifestVersionPolicy = "";
-			Boolean needProviderAuth = false;
-			String cloudAuthorization = "";
-			String createdOn = "";
-			Boolean connected = false;
-			Boolean sharedWithOthers = false;
-			String sharedWithMe = "";
-
-			dl.setuId(uId);
 
 			if (device.keySet().contains("id")) {
 				id = device.getString("id");
 			}
-			dl.setId(id);
 
 			if (device.keySet().contains("dtid")) {
 				dtid = device.getString("dtid");
 			}
-			dl.setDtid(dtid);
 
 			if (device.keySet().contains("name")) {
 				name = device.getString("name");
 			}
-			dl.setName(name);
 
-			if (device.keySet().contains("manifestVersion")) {
-				manifestVersion = device.getInt("manifestVersion");
-			}
-			dl.setManifestVersion(manifestVersion);
-
-			if (device.keySet().contains("manifestVersionPolicy")) {
-				manifestVersionPolicy = device.getString("manifestVersionPolicy");
-			}
-			dl.setManifestVersionPolicy(manifestVersionPolicy);
-
-			if (device.keySet().contains("needProviderAuth")) {
-				needProviderAuth = device.getBoolean("needProviderAuth");
-			}
-			dl.setNeedProviderAuth(needProviderAuth);
-
-			if (device.keySet().contains("id")) {
-				cloudAuthorization = device.getString("cloudAuthorization");
-			}
-			dl.setCloudAuthorization(cloudAuthorization);
-
-			if (device.keySet().contains("createdOn")) {
-				createdOn = device.getInt("createdOn") + "";
-			}
-			dl.setCreatedOn(createdOn);
-
-			if (device.keySet().contains("connected")) {
-				connected = device.getBoolean("connected");
-			}
-			dl.setConnected(connected);
-
-			if (device.keySet().contains("sharedWithOthers")) {
-				sharedWithOthers = device.getBoolean("sharedWithOthers");
-			}
-			dl.setSharedWithOthers(sharedWithOthers);
-
-			if (device.keySet().contains("sharedWithMe")) {
-				sharedWithMe = device.getString("sharedWithMe");
-			}
-			dl.setSharedWithMe(sharedWithMe);
-
+			Device dl = new Device(uId, id, name, dtid, 1);
 			deviceList.add(dl);
 		}
 

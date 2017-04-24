@@ -45,9 +45,10 @@
 							<tr>
 								<td>${row.name}</td>
 								<td><form action="insertDevice" method="GET">
-										<input type="hidden" name="dtId" value='${row.dtid}' />
+										<input type="hidden" name="dtId" value='${row.dtId}' />
 										<input type="hidden" name="name" value='${row.name}' /> 
-										<input type="hidden" name="dId" value='${row.id}' /> 
+										<input type="hidden" name="dId" value='${row.dId}' /> 
+										<input type="hidden" name="cmpCode" value='${row.cmpCode}' /> 
 										<input type="submit" class="btn btn-success" value="추가"/>
 									</form>
 								</td>

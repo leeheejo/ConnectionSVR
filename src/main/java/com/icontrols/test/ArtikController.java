@@ -126,18 +126,19 @@ public class ArtikController {
 
 		logger.info("[getArtikDeviceList]");
 
-		List<DeviceList> artikDeviceList = ArtikUtils.getArtikDeviceList(session);
+		List<Device> artikDeviceList = ArtikUtils.getArtikDeviceList(session);
 		List<Device> userDeviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
-		List<DeviceList> newDeviceList = new ArrayList();
+		List<Device> newDeviceList = new ArrayList();
 
-		for (DeviceList dl : artikDeviceList) {
+		for (Device dl : artikDeviceList) {
 			int flag = 0;
 			for (Device d : userDeviceList) {
-				if (dl.getId().equals(d.getdId())) {
+				if (dl.getdId().equals(d.getdId())) {
 					flag = 1;
 				}
 			}
 			if (flag == 0) {
+
 				newDeviceList.add(dl);
 			}
 
@@ -221,10 +222,11 @@ public class ArtikController {
 
 	@RequestMapping("/sendActionTest")
 	public String sendActionTest(HttpSession session, @RequestParam(value = "dId") String dId,
-			@RequestParam(value = "state") int currentState) throws Exception {
+			@RequestParam(value = "state") int currentState, @RequestParam(value = "cmpCode") int cmpCode)
+			throws Exception {
 		logger.info("[sendActionTest]");
 		String dtId = deviceService.getDeviceTypeId(dId, session.getAttribute("userLoginInfo").toString());
-		SendTestLog sendTestLog;
+		SendTestLog sendTestLog = null;
 		String action = "";
 		if (currentState == 0) {
 			action = "setOn";
@@ -232,10 +234,12 @@ public class ArtikController {
 			action = "setOff";
 		}
 
-		if (!dtId.equals("main_light")) {
+		if (cmpCode == 1) {
 			sendTestLog = ArtikUtils.Action(session, dId, action, "");
-		} else {
+		} else if (cmpCode == 0) {
 			sendTestLog = IparkUtils.sendAction(action, session.getAttribute("userLoginInfo").toString(), dId);
+		} else if (cmpCode == 2) {
+			sendTestLog = PhilipsHueUtils.sendAction(action, session.getAttribute("userLoginInfo").toString(), dId);
 		}
 
 		sendTestLogService.insertSendTestLog(sendTestLog);
@@ -258,10 +262,11 @@ public class ArtikController {
 
 	@RequestMapping("/insertDevice")
 	public String insertDevice(HttpSession session, @RequestParam(value = "dId") String dId,
-			@RequestParam(value = "name") String name, @RequestParam(value = "dtId") String dtId) throws Exception {
+			@RequestParam(value = "name") String name, @RequestParam(value = "dtId") String dtId,
+			@RequestParam(value = "cmpCode") int cmpCode) throws Exception {
 
 		logger.info("[insertDevice]");
-		Device device = new Device(session.getAttribute("userLoginInfo").toString(), dId, name, dtId);
+		Device device = new Device(session.getAttribute("userLoginInfo").toString(), dId, name, dtId, cmpCode);
 		deviceService.insertDevice(device);
 
 		logger.info("[insertDevice] dId : {}, name : {}", dId, name);
@@ -273,14 +278,24 @@ public class ArtikController {
 	public String allOff(HttpSession session) throws Exception {
 
 		List<Device> deviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
+		String uId = session.getAttribute("userLoginInfo").toString();
 		for (Device d : deviceList) {
 			logger.info("{}", d.getName());
-			if (d.getState() != 0) {
-				if (d.getDtId().equals("main_light")) {
-					IparkUtils.sendAction("setOff", session.getAttribute("userLoginInfo").toString(), d.getdId());
-				} else {
-					ArtikUtils.Action(session, d.getdId(), "setOff", "");
+			if (d.getState() != 1) {
+
+				switch (d.getCmpCode()) {
+				case 0:
+					IparkUtils.sendAction("setOn", uId, d.getdId());
+					break;
+				case 1:
+					ArtikUtils.Action(session, d.getdId(), "setOn", "");
+					break;
+
+				case 2:
+					PhilipsHueUtils.sendAction("setOn", uId, d.getdId());
+					break;
 				}
+
 			}
 		}
 		return "redirect:/success";
@@ -289,15 +304,24 @@ public class ArtikController {
 	@RequestMapping("/allOn")
 	public String allOn(HttpSession session) throws Exception {
 		List<Device> deviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
-
+		String uId = session.getAttribute("userLoginInfo").toString();
 		for (Device d : deviceList) {
 			logger.info("{}", d.getName());
 			if (d.getState() != 1) {
-				if (d.getDtId().equals("main_light")) {
-					IparkUtils.sendAction("setOn", session.getAttribute("userLoginInfo").toString(), d.getdId());
-				} else {
+
+				switch (d.getCmpCode()) {
+				case 0:
+					IparkUtils.sendAction("setOn", uId, d.getdId());
+					break;
+				case 1:
 					ArtikUtils.Action(session, d.getdId(), "setOn", "");
+					break;
+
+				case 2:
+					PhilipsHueUtils.sendAction("setOn", uId, d.getdId());
+					break;
 				}
+
 			}
 		}
 

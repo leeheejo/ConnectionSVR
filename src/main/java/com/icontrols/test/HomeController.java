@@ -28,6 +28,7 @@ import com.icontrols.test.service.SendTestLogService;
 import com.icontrols.test.service.UserService;
 import com.icontrols.test.util.ArtikUtils;
 import com.icontrols.test.util.IparkUtils;
+import com.icontrols.test.util.PhilipsHueUtils;
 
 /**
  * Handles requests for the application home page.
@@ -107,6 +108,7 @@ public class HomeController {
 		mav.setViewName("home");
 
 		Device defaultDevice = IparkUtils.getIparkInfo(uId);
+		defaultDevice.setCmpCode(0);
 		deviceService.insertDevice(defaultDevice);
 		UserService.insertUser(uId, uPwd, uEmail);
 		return mav;
@@ -145,21 +147,35 @@ public class HomeController {
 		
 		List<Device> deviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
 		List<Device> artikDevice = new ArrayList<Device>();
+		List<Device> hueDevice = new ArrayList<Device>();
 		List<Device> finalDevice = new ArrayList<Device>();
 		if (deviceList.size() != 0) {
 			for (Device d : deviceList) {
-				if (d.getDtId().equals("main_light")) {
+				if (d.getCmpCode() == 0) {
 					int state = IparkUtils.getState(d);
 					if (IparkUtils.stateChangeFlag == 1) {
 						logger.info("[success] stateChangeFlag {} :", IparkUtils.stateChangeFlag);
 						deviceService.updateDeviceState(state, d.getdId(), uId);
 					}
 					finalDevice.add(d);
-				} else {
+				} else if (d.getCmpCode() == 1){
 					artikDevice.add(d);
+				} else if(d.getCmpCode() == 2) {
+					hueDevice.add(d);
 				}
 			}
-			if (session.getAttribute("ACCESS_TOKEN") != null && deviceList != null) {
+			
+			if(hueDevice.size() != 0) {
+				List<Device> hueResult = PhilipsHueUtils.getDeviceState(session, hueDevice);
+				if (PhilipsHueUtils.stateChangeFlag == 1) {
+					for (Device d : hueResult) {
+						deviceService.updateDeviceState(d.getState(), d.getdId(), uId);
+					}
+				}
+				finalDevice.addAll(hueResult);
+			}
+			
+			if (session.getAttribute("ACCESS_TOKEN") != null && artikDevice.size() != 0) {
 				List<Device> result = ArtikUtils.getDeviceState(session, artikDevice);
 				if (ArtikUtils.stateChangeFlag == 1) {
 					for (Device d : result) {

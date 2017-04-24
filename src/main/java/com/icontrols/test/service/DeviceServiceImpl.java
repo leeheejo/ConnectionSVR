@@ -31,7 +31,7 @@ public class DeviceServiceImpl implements DeviceService {
 		map.put("uId", device.getuId());
 		map.put("dId", device.getdId());
 		map.put("name", device.getName());
-		map.put("dtId", device.getDtId());
+		map.put("cmpCode", device.getCmpCode());
 
 		deviceDao.insertDevice(map);
 	}

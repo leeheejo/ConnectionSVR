@@ -10,7 +10,27 @@ public class Device {
 	private Date uptDt;
 	private Integer state;
 	private String dtId;
+	private Integer cmpCode;
 
+	public Device(String uId, String dId, String name, Integer state, String dtId, Integer cmpCode) {
+		super();
+		this.uId = uId;
+		this.dId = dId;
+		this.name = name;
+		this.dtId = dtId;
+		this.state =state;
+		this.cmpCode = cmpCode;
+	}
+	
+	public Device(String uId, String dId, String name, String dtId, int cmpCode) {
+		super();
+		this.uId = uId;
+		this.dId = dId;
+		this.name = name;
+		this.dtId = dtId;
+		this.cmpCode = cmpCode;
+	}
+	
 	public Device(String uId, String dId, String name, String dtId) {
 		super();
 		this.uId = uId;
@@ -96,6 +116,14 @@ public class Device {
 
 	public void setDtId(String dtId) {
 		this.dtId = dtId;
+	}
+
+	public int getCmpCode() {
+		return cmpCode;
+	}
+
+	public void setCmpCode(int cmpCode) {
+		this.cmpCode = cmpCode;
 	}
 
 	@Override

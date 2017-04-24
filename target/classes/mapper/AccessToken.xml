@@ -39,8 +39,7 @@
 		resultType="String">
 		SELECT accessToken
 		FROM ARTIK_ACCESS_TOKEN
-		AND uId LIKE
-		#{uId}
+		WHERE uId LIKE #{uId}
 	</select>
 
 	<select id="getAllAccessToken" resultMap="accessTokenResult">
