@@ -23,9 +23,8 @@
 
 	<insert id="insertDevice" parameterType="HashMap">
 		INSERT INTO DEVICE
-		(dId,uId, name, uptDt, state, dtId, cmpCode)
-		VALUES (#{dId}, #{uId}, #{name},
-		NOW(), 0, #{dtId}, #{cmpCode});
+		(dId, uId, name, uptDt, state, dtId, cmpCode)
+		VALUES (#{dId}, #{uId}, #{name},NOW(), 0, #{dtId}, #{cmpCode});
 	</insert>
 
 	<update id="updateDeviceState" parameterType="HashMap">

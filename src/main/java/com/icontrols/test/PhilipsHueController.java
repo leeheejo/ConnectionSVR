@@ -24,8 +24,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.icontrols.test.domain.Device;
 import com.icontrols.test.domain.DeviceList;
+import com.icontrols.test.service.DeviceService;
 import com.icontrols.test.service.PhilipsHueBridgeService;
 import com.icontrols.test.util.IparkUtils;
+import com.icontrols.test.util.PhilipsHueUtils;
 
 @Controller
 public class PhilipsHueController {
@@ -33,6 +35,8 @@ public class PhilipsHueController {
 	private static final Logger logger = LoggerFactory.getLogger(PhilipsHueController.class);
 	@Autowired
 	PhilipsHueBridgeService philipsHueBridgeService;
+	@Autowired
+	DeviceService deviceService;
 
 	@RequestMapping("philipsHueLogin")
 	public String philipsHueLogin(HttpSession session) {
@@ -41,49 +45,40 @@ public class PhilipsHueController {
 	}
 
 	@RequestMapping("bridgeIp")
-	public String setBridgeIp(Model model, HttpSession session, @RequestParam(value = "bridgeIp") String bridgeIp) throws Exception {
-
-		// philipsHueBridgeService.insertPhilipsHueBridge(bridgeIp,
-		// session.getAttribute("userLoginInfo").toString());
-		// httpGET Ελ½Ε
-		URL url = new URL("http://192.168.101.20/api/TGKOH73g4LBDRwZIW0tipRSzagbkZLT7h7Q7AOBw/lights");
-		HttpURLConnection con = (HttpURLConnection) url.openConnection();
-		con.setRequestMethod("GET");
-
-		// response Code
-		int responseCode = con.getResponseCode();
-		logger.info("[getArtikDeviceList] responseCode : {}", responseCode + con.getResponseMessage());
-
-		// response Data
-		BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
-		String responseData = br.readLine();
-		logger.info("[getArtikDeviceList] responseData : {}", responseData);
-		br.close();
-
-		List<Device> deviceList = parsingDeviceList(responseData, session.getAttribute("userLoginInfo").toString());
-		model.addAttribute("philipsHueDeviceList", deviceList);
-		
-		return "philipsHueDeviceList";
-	}
-
-	public static List<Device> parsingDeviceList(String jsonMsg, String uId) {
-
-		List<Device> deviceList = new ArrayList<Device>();
-
-		JSONObject obj = new JSONObject(jsonMsg);
-
-		for (int i = 0; i < obj.length(); i++) {
-			String s = (i+1)+"";
-			JSONObject device = obj.getJSONObject(s);
-			String dtId = device.getString("modelid");
-			String name = device.getString("name");
-			String dId = s;
-
-			Device d = new Device(uId, dId, name, dtId, 2);
-			deviceList.add(d);
+	public String setBridgeIp(Model model, HttpSession session, @RequestParam(value = "bridgeIp") String bridgeIp)
+			throws Exception {
+		String uId = session.getAttribute("userLoginInfo").toString();
+		if (philipsHueBridgeService.getPhilipsHueBridgeById(uId) != null) {
+			philipsHueBridgeService.updatePhilipsHueBridge(bridgeIp, uId);
+		} else {
+			if (!philipsHueBridgeService.getPhilipsHueBridgeById(uId).equals(bridgeIp)) {
+				philipsHueBridgeService.insertPhilipsHueBridge(bridgeIp, uId);
+			}
 		}
 
-		return deviceList;
+		String PhilipsHueURL = "http://" + session.getAttribute("PHILIPS_HUE_BRIDGE_IP").toString();
+		List<Device> deviceList = PhilipsHueUtils.getDeviceList(PhilipsHueURL,
+				session.getAttribute("userLoginInfo").toString());
+		List<Device> userDeviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
+		List<Device> newDeviceList = new ArrayList();
+
+		for (Device dl : deviceList) {
+			int flag = 0;
+			for (Device d : userDeviceList) {
+				if (dl.getdId().equals(d.getdId())) {
+					flag = 1;
+				}
+			}
+			if (flag == 0) {
+
+				newDeviceList.add(dl);
+			}
+
+		}
+
+		model.addAttribute("philipsHueDeviceList", newDeviceList);
+
+		return "philipsHueDeviceList";
 	}
 
 }

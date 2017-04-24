@@ -23,11 +23,32 @@ import com.icontrols.test.domain.SendTestLog;
 public class PhilipsHueUtils {
 
 	private static final Logger logger = LoggerFactory.getLogger(PhilipsHueUtils.class);
-	private static String PhilipsHueURL = "http://192.168.101.20";
+//	private static String PhilipsHueURL = "http://192.168.101.20";
 	private static String username = "TGKOH73g4LBDRwZIW0tipRSzagbkZLT7h7Q7AOBw";
 	public static int stateChangeFlag;
 
-	public static SendTestLog sendAction(String action, String uId, String dId) throws Exception {
+	public static List<Device> getDeviceList(String PhilipsHueURL, String uId) throws Exception{
+		URL url = new URL(PhilipsHueURL+"/api/TGKOH73g4LBDRwZIW0tipRSzagbkZLT7h7Q7AOBw/lights");
+		HttpURLConnection con = (HttpURLConnection) url.openConnection();
+		con.setRequestMethod("GET");
+
+		// response Code
+		int responseCode = con.getResponseCode();
+		logger.info("[getArtikDeviceList] responseCode : {}", responseCode + con.getResponseMessage());
+
+		// response Data
+		BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+		String responseData = br.readLine();
+		logger.info("[getArtikDeviceList] responseData : {}", responseData);
+		br.close();
+		List<Device> deviceList = parsingDeviceList(responseData,uId);
+		
+		
+		
+		return deviceList;
+	}
+
+	public static SendTestLog sendAction(String PhilipsHueURL, String action, String uId, String dId) throws Exception {
 
 		logger.info("[sendAction]");
 		// httpGET Ελ½Ε
@@ -64,13 +85,13 @@ public class PhilipsHueUtils {
 		return sendTestLog;
 	}
 
-	public static List<Device> getDeviceState(HttpSession session, List<Device> deviceList) throws Exception {
+	public static List<Device> getDeviceState(String PhilipsHueURL, HttpSession session, List<Device> deviceList) throws Exception {
 
 		logger.info("[getDeviceState]");
 
 		List<Device> device = new ArrayList<Device>();
 		stateChangeFlag = 0;
-		
+
 		for (Device d : deviceList) {
 			logger.info("[getDeviceState] DID : {}", d.getdId());
 			URL url = new URL(PhilipsHueURL + "/api/" + username + "/lights/" + d.getdId());
@@ -94,9 +115,11 @@ public class PhilipsHueUtils {
 			JSONObject state = obj.getJSONObject("state");
 			Boolean onOff = state.getBoolean("on");
 			int currentState;
-			if(onOff == true) currentState = 1;
-			else currentState = 0;
-			
+			if (onOff == true)
+				currentState = 1;
+			else
+				currentState = 0;
+
 			if (d.getState() != currentState) {
 				stateChangeFlag = 1;
 				d.setState(currentState);
@@ -106,5 +129,25 @@ public class PhilipsHueUtils {
 		}
 
 		return device;
+	}
+
+	public static List<Device> parsingDeviceList(String jsonMsg, String uId) {
+
+		List<Device> deviceList = new ArrayList<Device>();
+
+		JSONObject obj = new JSONObject(jsonMsg);
+
+		for (int i = 0; i < obj.length(); i++) {
+			String s = (i + 1) + "";
+			JSONObject device = obj.getJSONObject(s);
+			String dtId = device.getString("modelid");
+			String name = device.getString("name");
+			String dId = s;
+
+			Device d = new Device(uId, dId, name, dtId, 2);
+			deviceList.add(d);
+		}
+
+		return deviceList;
 	}
 }

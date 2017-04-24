@@ -19,7 +19,7 @@
 				<!-- <form method="get"> -->
 				<div class="form-group">
 					<input type="text" name="bridgeIp" class="form-control"
-						placeholder="bridgeIp">
+						placeholder="bridgeIp" value ="192.168.101.20">
 				</div>
 				<div>
 					<button type="submit" class="btn btn-primary">submit</button>

@@ -1,0 +1,41 @@
+<!DOCTYPE mapper   
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="IparkAccessToken">
+	<!-- resutlMap : to get List result -->
+	<resultMap id="IparkAccessTokenResult" type="com.icontrols.test.domain.IparkAccessToken">
+		<result property="uId" column="uId" javaType="java.lang.String" />
+		<result property="accessToken" column="accessToken" javaType="java.lang.String" />
+		<result property="expiresIn" column="expiresIn" javaType="java.lang.String" />
+	</resultMap>
+	<insert id="insertIparkAccessToken" parameterType="HashMap">
+		INSERT INTO
+		IPARK_ACCESS_TOKEN (uId, accessToken, expiresIn, issuedTime)
+		VALUES
+		(#{uId}, #{accessToken},#{expiresIn},#{issuedTime});
+	</insert>
+
+	<select id="getIparkAccessTokenById" parameterType="HashMap" resultType="String">
+		SELECT accessToken
+		FROM IPARK_ACCESS_TOKEN
+		WHERE uId LIKE #{uId}
+	</select>
+
+	<select id="getAllIparkAccessToken" resultMap="IparkAccessTokenResult">
+		SELECT *
+		FROM
+		IPARK_ACCESS_TOKEN
+	</select>
+
+	<update id="updateIparkAccessToken" parameterType="HashMap">
+		UPDATE
+		IPARK_ACCESS_TOKEN
+		SET accessToken= #{accessToken},expiresIn =
+		#{expiresIn}, issuedTime = #{issuedTime}
+		WHERE uId LIKE #{uId};
+	</update>
+
+
+
+</mapper>

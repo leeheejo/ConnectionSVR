@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.icontrols.test.HomeController;
 import com.icontrols.test.domain.Device;
+import com.icontrols.test.domain.IparkAccessToken;
 import com.icontrols.test.domain.SendTestLog;
 import com.icontrols.test.service.SendTestLogService;
 
@@ -29,16 +30,15 @@ public class IparkUtils {
 	public static String IparkSvrURL = "http://192.168.101.204:8080/test";
 	public static int stateChangeFlag;
 
-	public static Device getIparkInfo(String uId) throws Exception {
+	public static IparkAccessToken getIparkAccessToken(String uId) throws Exception {
 		
 		logger.info("[getIparkInfo]");
+		IparkAccessToken iparkAccessToken = new IparkAccessToken();
 		
-		String dId = "";
-		String name = "";
-		String dtId = "";
-
+		String accessToken = "";
+		String expiresIn ="";
 		// httpGET 통신
-		URL url = new URL(IparkSvrURL + "/join?id=" + uId);
+		URL url = new URL(IparkSvrURL + "/author");
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
 		con.setRequestMethod("GET");
 		
@@ -50,6 +50,44 @@ public class IparkUtils {
 		// response Data
 		BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
 		String responseData = br.readLine();
+		br.close();
+
+		logger.info("[getIparkInfo] responseData : {}", responseData);
+
+		JSONObject obj = new JSONObject(responseData);
+		accessToken = obj.getString("accessToken");
+		expiresIn = obj.getInt("expires_in")+"";
+		
+		iparkAccessToken.setuId(uId);
+		iparkAccessToken.setAccessToken(accessToken);
+		iparkAccessToken.setExpiresIn(expiresIn);
+	
+		return iparkAccessToken;
+	}
+	
+	public static Device getIparkInfo(String accessToken, String uId) throws Exception {
+		
+		logger.info("[getIparkInfo]");
+		
+		String dId = "";
+		String name = "";
+		String dtId = "";
+
+		// httpGET 통신
+		URL url = new URL(IparkSvrURL + "/join");
+		HttpURLConnection con = (HttpURLConnection) url.openConnection();
+		con.setRequestMethod("GET");
+		
+		con.setRequestProperty("accessToken", accessToken);
+		// response Code
+		int responseCode = con.getResponseCode();
+		logger.info("[getIparkInfo] responseCode : {}", responseCode);
+
+		// response Data
+		BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+		String responseData = br.readLine();
+		br.close();
+
 		logger.info("[getIparkInfo] responseData : {}", responseData);
 
 		JSONObject obj = new JSONObject(responseData);
@@ -61,7 +99,7 @@ public class IparkUtils {
 		return device;
 	}
 
-	public static SendTestLog sendAction(String action, String uId, String dId) throws Exception {
+	public static SendTestLog sendAction(String action, String uId, String dId, String accessToken) throws Exception {
 		
 		logger.info("[sendAction]");
 		// httpGET 통신
@@ -69,7 +107,7 @@ public class IparkUtils {
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
 		con.setRequestMethod("GET");
 		
-		con.setRequestProperty("id", uId);
+		con.setRequestProperty("accessToken", accessToken);
 		// response Code
 		int responseCode = con.getResponseCode();
 		logger.info("[sendAction] responseCode : {}", responseCode);
@@ -77,6 +115,8 @@ public class IparkUtils {
 		// response Data
 		BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
 		String responseData = br.readLine();
+		br.close();
+
 		logger.info("[sendAction] responseData : {}", responseData);
 
 		// Insert sendTestLog
@@ -86,7 +126,7 @@ public class IparkUtils {
 		return sendTestLog;
 	}
 
-	public static int getState(Device d) throws Exception {
+	public static int getState(Device d, String accessToken) throws Exception {
 		
 		logger.info("[getState]");
 		
@@ -98,7 +138,7 @@ public class IparkUtils {
 		con.setRequestMethod("GET");
 
 		// HEADER
-		con.setRequestProperty("id", d.getuId());
+		con.setRequestProperty("accessToken", accessToken);
 //		con.setRequestProperty("id", "hi");
 
 		// response Code
@@ -108,6 +148,8 @@ public class IparkUtils {
 		// response Data
 		BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
 		String responseData = br.readLine();
+		br.close();
+
 		JSONObject obj = new JSONObject(responseData);
 		String state = obj.getString("state");
 		logger.info("[getState] responseData : {}", responseData);

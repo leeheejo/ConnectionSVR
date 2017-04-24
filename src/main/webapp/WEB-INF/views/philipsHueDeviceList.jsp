@@ -19,6 +19,15 @@
 	src="http://code.jquery.com/jquery-1.9.1.js"></script>
 
 <body>
+	<center>
+		<br>
+		<div class="container" align="center">
+			<img src="<c:url value="/resources/logo.png"/>" height="32" width="78%" alt="" onClick="location.href='success'" />
+			<button type="button" class="btn btn-default btn-sm " onClick="location.href='logout'">
+				<span class="glyphicon glyphicon-off"></span>
+			</button>
+		</div>
+		<br>
 	<div class="container">
 		<table class="table" style="width: 100%" align="center">
 			<thead>
@@ -56,6 +65,7 @@
 				-->
 		</table>
 	</div>
+	</center>
 
 </body>
 </html>

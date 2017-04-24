@@ -6,9 +6,25 @@
 
 	<insert id="insertPhilipsHueBridge" parameterType="HashMap">
 		INSERT INTO
-		philipshuebridgeip (philipsHueBridgeIp, uId)
+		philips_hue_bridge_ip (philipsHueBridgeIp, uId)
 		VALUES
 		(#{philipsHueBridgeIp}, #{uId});
 	</insert>
+
+
+	<select id="getPhilipsHueBridgeById" parameterType="HashMap"
+		resultType="String">
+		SELECT philipsHueBridgeIp
+		FROM philips_hue_bridge_ip
+		WHERE
+		uId LIKE #{uId};
+	</select>
+
+	<update id="updatePhilipsHueBridge" parameterType="HashMap">
+		UPDATE
+		philips_hue_bridge_ip
+		SET philipsHueBridgeIp= #{philipsHueBridgeIp}
+		WHERE uId LIKE #{uId};
+	</update>
 
 </mapper>

@@ -19,11 +19,14 @@ import org.springframework.web.servlet.ModelAndView;
 import com.icontrols.test.domain.AccessToken;
 import com.icontrols.test.domain.ConnectedCompany;
 import com.icontrols.test.domain.Device;
+import com.icontrols.test.domain.IparkAccessToken;
 import com.icontrols.test.domain.SendTestLog;
 import com.icontrols.test.service.AccessTokenService;
 import com.icontrols.test.service.ArtikUserProfileService;
 import com.icontrols.test.service.ConnectedCompanyService;
 import com.icontrols.test.service.DeviceService;
+import com.icontrols.test.service.IparkAccessTokenService;
+import com.icontrols.test.service.PhilipsHueBridgeService;
 import com.icontrols.test.service.SendTestLogService;
 import com.icontrols.test.service.UserService;
 import com.icontrols.test.util.ArtikUtils;
@@ -46,7 +49,10 @@ public class HomeController {
 	AccessTokenService accessTokenService;
 	@Autowired
 	ArtikUserProfileService artikUserProfileService;
-
+	@Autowired
+	IparkAccessTokenService iparkAccessTokenService;
+	@Autowired
+	PhilipsHueBridgeService philipsHueBridgeService;
 
 	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
 
@@ -56,23 +62,20 @@ public class HomeController {
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String start(Locale locale, Model model) {
 
-
 		List<AccessToken> accessTokenList = accessTokenService.getAllAccessToken();
-		
-		logger.info("[HOME] {}" , accessTokenList.size());
-		
+
+		logger.info("[HOME] {}", accessTokenList.size());
+
 		logger.info("[HOME]");
 
 		return "home";
 	}
-	
+
 	@RequestMapping(value = "home")
 	public String home(Locale locale, Model model) {
 
-
 		return "home";
 	}
-
 
 	/*
 	 * move to join.jsp
@@ -107,7 +110,11 @@ public class HomeController {
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("home");
 
-		Device defaultDevice = IparkUtils.getIparkInfo(uId);
+		IparkAccessToken IparkAccessToken = IparkUtils.getIparkAccessToken(uId);
+		iparkAccessTokenService.insertIparkAccessToken(IparkAccessToken);
+
+		Device defaultDevice = IparkUtils.getIparkInfo(IparkAccessToken.getAccessToken(), uId);
+
 		defaultDevice.setCmpCode(0);
 		deviceService.insertDevice(defaultDevice);
 		UserService.insertUser(uId, uPwd, uEmail);
@@ -142,9 +149,8 @@ public class HomeController {
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("success");
 		String uId = session.getAttribute("userLoginInfo").toString();
-		logger.info("[success]userLoginInfo : {}",session.getAttribute("userLoginInfo").toString());
-		
-		
+		logger.info("[success]userLoginInfo : {}", session.getAttribute("userLoginInfo").toString());
+
 		List<Device> deviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
 		List<Device> artikDevice = new ArrayList<Device>();
 		List<Device> hueDevice = new ArrayList<Device>();
@@ -152,21 +158,22 @@ public class HomeController {
 		if (deviceList.size() != 0) {
 			for (Device d : deviceList) {
 				if (d.getCmpCode() == 0) {
-					int state = IparkUtils.getState(d);
+					int state = IparkUtils.getState(d, session.getAttribute("IPARK_ACCESS_TOKEN").toString());
 					if (IparkUtils.stateChangeFlag == 1) {
 						logger.info("[success] stateChangeFlag {} :", IparkUtils.stateChangeFlag);
 						deviceService.updateDeviceState(state, d.getdId(), uId);
 					}
 					finalDevice.add(d);
-				} else if (d.getCmpCode() == 1){
+				} else if (d.getCmpCode() == 1) {
 					artikDevice.add(d);
-				} else if(d.getCmpCode() == 2) {
+				} else if (d.getCmpCode() == 2) {
 					hueDevice.add(d);
 				}
 			}
-			
-			if(hueDevice.size() != 0) {
-				List<Device> hueResult = PhilipsHueUtils.getDeviceState(session, hueDevice);
+
+			if (hueDevice.size() != 0) {
+				String PhilipsHueURL ="http://"+session.getAttribute("PHILIPS_HUE_BRIDGE_IP").toString();
+				List<Device> hueResult = PhilipsHueUtils.getDeviceState(PhilipsHueURL, session, hueDevice);
 				if (PhilipsHueUtils.stateChangeFlag == 1) {
 					for (Device d : hueResult) {
 						deviceService.updateDeviceState(d.getState(), d.getdId(), uId);
@@ -174,7 +181,7 @@ public class HomeController {
 				}
 				finalDevice.addAll(hueResult);
 			}
-			
+
 			if (session.getAttribute("ACCESS_TOKEN") != null && artikDevice.size() != 0) {
 				List<Device> result = ArtikUtils.getDeviceState(session, artikDevice);
 				if (ArtikUtils.stateChangeFlag == 1) {
@@ -195,9 +202,24 @@ public class HomeController {
 		logger.info("[addDevice]");
 		ModelAndView mav = new ModelAndView();
 		List<ConnectedCompany> connectedCompnayList = connectedCompanyService.getConnectedCompany();
+		connectedCompnayList.remove(0);
 		model.addAttribute("connectedCompanyList", connectedCompnayList);
 		mav.setViewName("addDevice");
 		return mav;
+	}
+
+	@RequestMapping("selectCompany")
+	public String selectCompany(@RequestParam(value = "cmpCode") int cmpCode) {
+		logger.info("[addDevice]");
+		String s = "";
+		ModelAndView mav = new ModelAndView();
+		if (cmpCode == 1) {
+			s = "redirect:/artikLogin";
+		} else if (cmpCode == 2) {
+			s = "philipsHueBridgeIp";
+		}
+
+		return s;
 	}
 
 	@RequestMapping("deleteDevice")
@@ -234,8 +256,8 @@ public class HomeController {
 		int loginCheck = UserService.loginCheck(map);
 		if (loginCheck == 1) {
 			session.setAttribute("userLoginInfo", uId);
-			logger.info("[login]userLoginInfo : {}",session.getAttribute("userLoginInfo").toString());
-			
+			logger.info("[login]userLoginInfo : {}", session.getAttribute("userLoginInfo").toString());
+
 			List<Device> deviceList = deviceService.getDeviceById(uId);
 			model.addAttribute("deviceList", deviceList);
 
@@ -247,6 +269,17 @@ public class HomeController {
 						artikUserProfileService.getUserIdById(session.getAttribute("userLoginInfo").toString()));
 				logger.info("[login] get ACCESS_TOKEN : {}", accessTokenService.getAccessTokenById(uId));
 			}
+
+			if (philipsHueBridgeService
+					.getPhilipsHueBridgeById(session.getAttribute("userLoginInfo").toString()) != null) {
+				session.setAttribute("PHILIPS_HUE_BRIDGE_IP", philipsHueBridgeService
+						.getPhilipsHueBridgeById(session.getAttribute("userLoginInfo").toString()));
+			}
+			logger.info("[login] get IPARK_ACCESS_TOKEN : {}", session.getAttribute("PHILIPS_HUE_BRIDGE_IP"));
+			session.setAttribute("IPARK_ACCESS_TOKEN", iparkAccessTokenService.getIparkAccessTokenById(uId));
+
+			logger.info("[login] get IPARK_ACCESS_TOKEN : {}", iparkAccessTokenService.getIparkAccessTokenById(uId));
+
 			return "redirect:/success";
 
 		} else {

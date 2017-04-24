@@ -237,9 +237,11 @@ public class ArtikController {
 		if (cmpCode == 1) {
 			sendTestLog = ArtikUtils.Action(session, dId, action, "");
 		} else if (cmpCode == 0) {
-			sendTestLog = IparkUtils.sendAction(action, session.getAttribute("userLoginInfo").toString(), dId);
+			sendTestLog = IparkUtils.sendAction(action, session.getAttribute("userLoginInfo").toString(), dId,
+					session.getAttribute("IPARK_ACCESS_TOKEN").toString());
 		} else if (cmpCode == 2) {
-			sendTestLog = PhilipsHueUtils.sendAction(action, session.getAttribute("userLoginInfo").toString(), dId);
+			String PhilipsHueURL ="http://"+session.getAttribute("PHILIPS_HUE_BRIDGE_IP").toString();
+			sendTestLog = PhilipsHueUtils.sendAction(PhilipsHueURL, action, session.getAttribute("userLoginInfo").toString(), dId);
 		}
 
 		sendTestLogService.insertSendTestLog(sendTestLog);
@@ -276,26 +278,23 @@ public class ArtikController {
 
 	@RequestMapping("/allOff")
 	public String allOff(HttpSession session) throws Exception {
-
 		List<Device> deviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
 		String uId = session.getAttribute("userLoginInfo").toString();
 		for (Device d : deviceList) {
 			logger.info("{}", d.getName());
-			if (d.getState() != 1) {
+			SendTestLog sendTestLog = null;
 
-				switch (d.getCmpCode()) {
-				case 0:
-					IparkUtils.sendAction("setOn", uId, d.getdId());
-					break;
-				case 1:
-					ArtikUtils.Action(session, d.getdId(), "setOn", "");
-					break;
-
-				case 2:
-					PhilipsHueUtils.sendAction("setOn", uId, d.getdId());
-					break;
+			if (d.getState() == 1) {
+				if (d.getCmpCode() == 1) {
+					sendTestLog = ArtikUtils.Action(session, d.getdId(), "setOff", "");
+				} else if (d.getCmpCode() == 0) {
+					sendTestLog = IparkUtils.sendAction("setOff", uId, d.getdId(),
+							session.getAttribute("IPARK_ACCESS_TOKEN").toString());
+				} else if (d.getCmpCode() == 2) {
+					String PhilipsHueURL ="http://"+session.getAttribute("PHILIPS_HUE_BRIDGE_IP").toString();
+					sendTestLog = PhilipsHueUtils.sendAction(PhilipsHueURL,"setOff", uId, d.getdId());
 				}
-
+				sendTestLogService.insertSendTestLog(sendTestLog);
 			}
 		}
 		return "redirect:/success";
@@ -306,22 +305,19 @@ public class ArtikController {
 		List<Device> deviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
 		String uId = session.getAttribute("userLoginInfo").toString();
 		for (Device d : deviceList) {
+			SendTestLog sendTestLog = null;
 			logger.info("{}", d.getName());
-			if (d.getState() != 1) {
-
-				switch (d.getCmpCode()) {
-				case 0:
-					IparkUtils.sendAction("setOn", uId, d.getdId());
-					break;
-				case 1:
-					ArtikUtils.Action(session, d.getdId(), "setOn", "");
-					break;
-
-				case 2:
-					PhilipsHueUtils.sendAction("setOn", uId, d.getdId());
-					break;
+			if (d.getState() == 0) {
+				if (d.getCmpCode() == 1) {
+					sendTestLog = ArtikUtils.Action(session, d.getdId(), "setOn", "");
+				} else if (d.getCmpCode() == 0) {
+					sendTestLog = IparkUtils.sendAction("setOn", uId, d.getdId(),
+							session.getAttribute("IPARK_ACCESS_TOKEN").toString());
+				} else if (d.getCmpCode() == 2) {
+					String PhilipsHueURL ="http://"+session.getAttribute("PHILIPS_HUE_BRIDGE_IP").toString();
+					sendTestLog = PhilipsHueUtils.sendAction(PhilipsHueURL, "setOn", uId, d.getdId());
 				}
-
+				sendTestLogService.insertSendTestLog(sendTestLog);
 			}
 		}
 
