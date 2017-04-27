@@ -9,4 +9,6 @@ public interface PhilipsHueBridgeDao {
 	public void insertPhilipsHueBridge(HashMap<String, Object> map);
 	public String getPhilipsHueBridgeById(HashMap<String, Object> map);
 	public void updatePhilipsHueBridge (HashMap<String, Object> map);
+	public String getPhilipsHueUsernameById(HashMap<String, Object> map);
+	
 }

@@ -9,11 +9,11 @@ import com.icontrols.test.dao.PhilipsHueBridgeDao;
 import com.icontrols.test.domain.PhilipsHueBridge;
 
 @Service
-public class PhilipsHueBridgeServiceImpl implements PhilipsHueBridgeService{
+public class PhilipsHueBridgeServiceImpl implements PhilipsHueBridgeService {
 
-	@Autowired 
+	@Autowired
 	PhilipsHueBridgeDao philipsHueBridgeDao;
-	
+
 	@Override
 	public void insertPhilipsHueBridge(String philipsHueBridgeIp, String uId) {
 		// TODO Auto-generated method stub
@@ -21,9 +21,9 @@ public class PhilipsHueBridgeServiceImpl implements PhilipsHueBridgeService{
 
 		map.put("philipsHueBridgeIp", philipsHueBridgeIp);
 		map.put("uId", uId);
-		
+
 		philipsHueBridgeDao.insertPhilipsHueBridge(map);
-		
+
 	}
 
 	@Override
@@ -32,7 +32,7 @@ public class PhilipsHueBridgeServiceImpl implements PhilipsHueBridgeService{
 		HashMap<String, Object> map = new HashMap<String, Object>();
 
 		map.put("uId", uId);
-		
+
 		return philipsHueBridgeDao.getPhilipsHueBridgeById(map);
 	}
 
@@ -43,8 +43,18 @@ public class PhilipsHueBridgeServiceImpl implements PhilipsHueBridgeService{
 
 		map.put("philipsHueBridgeIp", philipsHueBridgeIp);
 		map.put("uId", uId);
-		
+
 		philipsHueBridgeDao.updatePhilipsHueBridge(map);
+	}
+
+	@Override
+	public String getPhilipsHueUsernameById(String uId) {
+		// TODO Auto-generated method stub
+		HashMap<String, Object> map = new HashMap<String, Object>();
+
+		map.put("uId", uId);
+
+		return philipsHueBridgeDao.getPhilipsHueUsernameById(map);
 	}
 
 }

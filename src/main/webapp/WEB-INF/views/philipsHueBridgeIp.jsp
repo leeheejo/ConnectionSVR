@@ -13,11 +13,19 @@
 <body>
 	<br>
 	<center>
+		<div class="container" align="center">
+			<img src="<c:url value="/resources/logo.png"/>" height="32" width="78%" alt="" onClick="location.href='success'" />
+			<button type="button" class="btn btn-default btn-sm " onClick="location.href='logout'">
+				<span class="glyphicon glyphicon-off"></span>
+			</button>
+		</div>
+		<br>
 		<div class="container" style="width: 100%">
 			<form name="bridgeIp" method="post" action="bridgeIp"
 				style="width: 100%">
 				<!-- <form method="get"> -->
 				<div class="form-group">
+					<label for="bridgeIp">PHILIPS HUE BRIDGE IP</label>
 					<input type="text" name="bridgeIp" class="form-control"
 						placeholder="bridgeIp" value ="192.168.101.20">
 				</div>

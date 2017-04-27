@@ -46,6 +46,12 @@ public class DeviceDaoImpl implements DeviceDao {
 	public void deleteDevice(HashMap<String, Object> map) {
 		// TODO Auto-generated method stub
 		sqlSession.delete(PATH + "deleteDevice", map);
-		
+
+	}
+
+	@Override
+	public String getDIdByName(HashMap<String, Object> map) {
+		// TODO Auto-generated method stub
+		return sqlSession.selectOne(PATH + "getDIdByName", map);
 	}
 }

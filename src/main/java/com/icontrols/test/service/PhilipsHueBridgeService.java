@@ -9,4 +9,6 @@ public interface PhilipsHueBridgeService{
 	public void insertPhilipsHueBridge(String philipsHueBridgeIp, String uId);
 	public String getPhilipsHueBridgeById(String uId);
 	public void updatePhilipsHueBridge(String philipsHueBridgeIp, String uId);
+	public String getPhilipsHueUsernameById(String uId);
+	
 }

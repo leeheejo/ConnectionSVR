@@ -27,7 +27,7 @@ import com.icontrols.test.service.SendTestLogService;
 public class IparkUtils {
 
 	private static final Logger logger = LoggerFactory.getLogger(IparkUtils.class);
-	public static String IparkSvrURL = "http://192.168.101.204:8080/test";
+
 	public static int stateChangeFlag;
 
 	public static IparkAccessToken getIparkAccessToken(String uId) throws Exception {
@@ -38,7 +38,7 @@ public class IparkUtils {
 		String accessToken = "";
 		String expiresIn ="";
 		// httpGET 통신
-		URL url = new URL(IparkSvrURL + "/author");
+		URL url = new URL(NetworkInfo.IPARK_URL + "/author");
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
 		con.setRequestMethod("GET");
 		
@@ -74,7 +74,7 @@ public class IparkUtils {
 		String dtId = "";
 
 		// httpGET 통신
-		URL url = new URL(IparkSvrURL + "/join");
+		URL url = new URL(NetworkInfo.IPARK_URL + "/join");
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
 		con.setRequestMethod("GET");
 		
@@ -103,7 +103,7 @@ public class IparkUtils {
 		
 		logger.info("[sendAction]");
 		// httpGET 통신
-		URL url = new URL(IparkSvrURL + "/control?dId=" + dId + "&action=" + action);
+		URL url = new URL(NetworkInfo.IPARK_URL + "/control?dId=" + dId + "&action=" + action);
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
 		con.setRequestMethod("GET");
 		
@@ -133,7 +133,7 @@ public class IparkUtils {
 		stateChangeFlag = 0;
 		int result = 0;
 		// httpGET 통신
-		URL url = new URL(IparkSvrURL + "/state?dId=" + d.getdId());
+		URL url = new URL(NetworkInfo.IPARK_URL + "/state?dId=" + d.getdId());
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
 		con.setRequestMethod("GET");
 

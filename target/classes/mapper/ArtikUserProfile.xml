@@ -6,7 +6,7 @@
 
 	<insert id="insertArtikUserProfile" parameterType="HashMap">
 		INSERT INTO
-		ARTIK_USER_PROFILE (uId, id, name, email, fullName,
+		artik_user_profile (uId, id, name, email, fullName,
 		saIdentity,accountType, createdOn,modifiedOn )
 		VALUES
 		(#{uId}, #{id},
@@ -16,7 +16,7 @@
 
 	<update id="updateArtikUserProfile" parameterType="HashMap">
 		UPDATE
-		ARTIK_USER_PROFILE
+		artik_user_profile
 		SET
 		id = #{id}, name = #{name}, email = #{email},
 		fullName = #{fullName},
@@ -28,13 +28,13 @@
 
 	<select id="getUserIdById" parameterType="HashMap" resultType="String">
 		SELECT id
-		FROM ARTIK_USER_PROFILE
+		FROM artik_user_profile
 		WHERE uId LIKE #{uId}
 	</select>
 
 	<select id="artikUserCheck" parameterType="HashMap" resultType="Integer">
 		SELECT count(*)
-		FROM ARTIK_USER_PROFILE
+		FROM artik_user_profile
 		WHERE uId LIKE #{uId}
 	</select>
 </mapper>

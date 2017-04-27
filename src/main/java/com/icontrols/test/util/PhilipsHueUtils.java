@@ -18,17 +18,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.icontrols.test.domain.Device;
+import com.icontrols.test.domain.PhilipsHueBridge;
 import com.icontrols.test.domain.SendTestLog;
 
 public class PhilipsHueUtils {
 
 	private static final Logger logger = LoggerFactory.getLogger(PhilipsHueUtils.class);
-//	private static String PhilipsHueURL = "http://192.168.101.20";
-	private static String username = "TGKOH73g4LBDRwZIW0tipRSzagbkZLT7h7Q7AOBw";
+	// private static String PhilipsHueURL = "http://192.168.101.20";
+	// private static String username =
+	// "TGKOH73g4LBDRwZIW0tipRSzagbkZLT7h7Q7AOBw";
 	public static int stateChangeFlag;
 
-	public static List<Device> getDeviceList(String PhilipsHueURL, String uId) throws Exception{
-		URL url = new URL(PhilipsHueURL+"/api/TGKOH73g4LBDRwZIW0tipRSzagbkZLT7h7Q7AOBw/lights");
+	public static List<Device> getDeviceList(HttpSession session) throws Exception {
+		String PhilipsHueURL = "http://" + session.getAttribute("PHILIPS_HUE_BRIDGE_IP").toString();
+		String PhilipsUsername = session.getAttribute("PHILIPS_HUE_USERNAME").toString();
+		String uId = session.getAttribute("userLoginInfo").toString();
+
+		URL url = new URL(PhilipsHueURL + "/api/" + PhilipsUsername + "/lights");
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
 		con.setRequestMethod("GET");
 
@@ -41,18 +47,21 @@ public class PhilipsHueUtils {
 		String responseData = br.readLine();
 		logger.info("[getArtikDeviceList] responseData : {}", responseData);
 		br.close();
-		List<Device> deviceList = parsingDeviceList(responseData,uId);
-		
-		
-		
+		List<Device> deviceList = parsingDeviceList(responseData, uId);
+
 		return deviceList;
 	}
 
-	public static SendTestLog sendAction(String PhilipsHueURL, String action, String uId, String dId) throws Exception {
+	public static SendTestLog sendAction(HttpSession session, String action, String dId) throws Exception {
+
+		String PhilipsHueURL = "http://" + session.getAttribute("PHILIPS_HUE_BRIDGE_IP").toString();
+		String PhilipsUsername = session.getAttribute("PHILIPS_HUE_USERNAME").toString();
+		String uId = session.getAttribute("userLoginInfo").toString();
 
 		logger.info("[sendAction]");
 		// httpGET Ελ½Ε
-		URL url = new URL(PhilipsHueURL + "/api/" + username + "/lights/" + dId + "/state");
+		URL url = new URL(PhilipsHueURL + "/api/" + PhilipsUsername + "/lights/" + dId + "/state");
+		logger.info("{}", url.getContent().toString());
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
 		con.setRequestMethod("PUT");
 		con.setDoOutput(true);
@@ -85,16 +94,19 @@ public class PhilipsHueUtils {
 		return sendTestLog;
 	}
 
-	public static List<Device> getDeviceState(String PhilipsHueURL, HttpSession session, List<Device> deviceList) throws Exception {
+	public static List<Device> getDeviceState(HttpSession session, List<Device> deviceList) throws Exception {
 
 		logger.info("[getDeviceState]");
+
+		String PhilipsHueURL = "http://" + session.getAttribute("PHILIPS_HUE_BRIDGE_IP").toString();
+		String PhilipsUsername = session.getAttribute("PHILIPS_HUE_USERNAME").toString();
 
 		List<Device> device = new ArrayList<Device>();
 		stateChangeFlag = 0;
 
 		for (Device d : deviceList) {
 			logger.info("[getDeviceState] DID : {}", d.getdId());
-			URL url = new URL(PhilipsHueURL + "/api/" + username + "/lights/" + d.getdId());
+			URL url = new URL(PhilipsHueURL + "/api/" + PhilipsUsername + "/lights/" + d.getdId());
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			con.setRequestMethod("GET");
 			con.setDoInput(true);
@@ -149,5 +161,46 @@ public class PhilipsHueUtils {
 		}
 
 		return deviceList;
+	}
+
+	public static void authorize1(String bridgeIp) throws Exception {
+
+		String PhilipsHueURL = "http://" + bridgeIp;
+		URL url = new URL(PhilipsHueURL + "/api/newdeveloper");
+		logger.info("{}", url.getContent().toString());
+		HttpURLConnection con = (HttpURLConnection) url.openConnection();
+		con.setRequestMethod("GET");
+
+		// response Code
+		int responseCode = con.getResponseCode();
+		// response Data
+		BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+		String responseData = br.readLine();
+		logger.info("[authorize1] responseData: {} - {}", responseCode, responseData);
+	}
+
+	public static void authorize2(String bridgeIp, int step) throws Exception {
+
+		String PhilipsHueURL = "http://" + bridgeIp;
+		URL url = new URL(PhilipsHueURL + "/api");
+		logger.info("{}", url.getContent().toString());
+		HttpURLConnection con = (HttpURLConnection) url.openConnection();
+		con.setRequestMethod("POST");
+		con.setDoOutput(true);
+		con.setDoInput(true);
+		
+		String param = "{\"devicetype\":\"my_hue_app#iphone peter\"}";
+
+		OutputStream os = con.getOutputStream();
+		os.write(param.getBytes());
+		os.flush();
+		os.close();
+		// response Code
+		int responseCode = con.getResponseCode();
+		// response Data
+		BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+		String responseData = br.readLine();
+		logger.info("[authorize2] responseData: {} - {}", responseCode, responseData);
+		
 	}
 }

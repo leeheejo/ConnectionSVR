@@ -68,5 +68,16 @@ public class DeviceServiceImpl implements DeviceService {
 		
 	}
 
+	@Override
+	public String getDIdByName(String uId, String name, int cmpCode) {
+		// TODO Auto-generated method stub
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("name", name);
+		map.put("uId", uId);
+		map.put("cmpCode", cmpCode);
+		
+		return deviceDao.getDIdByName(map);
+	}
+
 
 }

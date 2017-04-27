@@ -7,14 +7,14 @@
 
 	<insert id="insertSendTestLog" parameterType="HashMap">
 		INSERT INTO
-			SEND_TEST_LOG (uId, cmpCode, ddid, data, response, sendDt)
+			send_test_log (uId, cmpCode, ddid, data, response, sendDt)
 		VALUES
 			(#{uId}, #{cmpCode}, #{ddid}, #{data}, #{response}, #{sendDt});
 	</insert>
 	
 	<insert id="getSendTestLog" parameterType="HashMap">
 		SELECT *
-		FROM SEND_TEST_LOG
+		FROM send_test_log
 		WHERE
 			1=1;
 	</insert>

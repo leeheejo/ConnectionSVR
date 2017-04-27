@@ -17,18 +17,19 @@
 	<!-- resultMap -->
 	<select id="getDeviceById" parameterType="HashMap" resultMap="DeviceResult">
 		SELECT uId, dId, name, state, dtId, cmpCode
-		FROM DEVICE
-		WHERE uId LIKE #{uId}
+		FROM device
+		WHERE uId LIKE #{uId};
 	</select>
 
 	<insert id="insertDevice" parameterType="HashMap">
-		INSERT INTO DEVICE
+		INSERT INTO device
 		(dId, uId, name, uptDt, state, dtId, cmpCode)
-		VALUES (#{dId}, #{uId}, #{name},NOW(), 0, #{dtId}, #{cmpCode});
+		VALUES (#{dId}, #{uId},
+		#{name},NOW(), 0, #{dtId}, #{cmpCode});
 	</insert>
 
 	<update id="updateDeviceState" parameterType="HashMap">
-		UPDATE DEVICE
+		UPDATE device
 		SET
 		state = #{state}
 		WHERE dId LIKE #{dId} AND uId LIKE #{uId};
@@ -36,14 +37,20 @@
 
 	<select id="getDeviceTypeId" parameterType="HashMap" resultType="String">
 		SELECT dtId
-		FROM DEVICE
+		FROM device
 		WHERE dId LIKE #{dId} AND uId LIKE #{uId};
 	</select>
 
 	<delete id="deleteDevice" parameterType="HashMap">
-		delete from DEVICE
-		WHERE dId LIKE #{dId} AND uId LIKE #{uId};
+		delete from device
+		WHERE
+		dId LIKE #{dId} AND uId  #{uId};
 	</delete>
 
-
+	<select id="getDIdByName" parameterType="HashMap" resultType="String">
+		select dId
+		from device
+		where
+		cmpCode = #{cmpCode} AND uId LIKE #{uId} AND name LIKE #{name};
+	</select>
 </mapper>

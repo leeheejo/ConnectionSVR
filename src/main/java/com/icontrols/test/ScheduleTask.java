@@ -46,7 +46,7 @@ public class ScheduleTask {
 		List<IparkAccessToken> iparkAccessTokenList = iparkAccessTokenService.getAllIparkAccessToken();
 		for (IparkAccessToken iat : iparkAccessTokenList) {
 			logger.info(" {} 's old token {}", iat.getuId(), iat.getAccessToken());
-			if (Long.parseLong(iat.getIssuedTime()) + Long.parseLong(iat.getExpiresIn()) > 0) {
+			if (Long.parseLong(iat.getIssuedTime()) + Long.parseLong(iat.getExpiresIn()) > System.currentTimeMillis()+86500) {
 				IparkAccessToken iparkAccessToken = IparkUtils.getIparkAccessToken(iat.getuId());
 				iparkAccessToken.setuId(iat.getuId());
 				iparkAccessTokenService.updateIparkAccessToken(iparkAccessToken);

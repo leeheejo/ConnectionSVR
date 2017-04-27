@@ -17,7 +17,11 @@
 	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script type="text/javascript"
 	src="http://code.jquery.com/jquery-1.9.1.js"></script>
-
+<script type="text/javascript">
+		<c:if test="${!empty sessionScope.PHILIPS_HUE_BRIDGE_IP}">
+			alert('이미 로그인이 되어 있습니다XD');
+		</c:if>
+</script>
 <body>
 	<center>
 		<br>

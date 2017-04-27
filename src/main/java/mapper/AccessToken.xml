@@ -14,7 +14,7 @@
 
 	<insert id="insertAccessToken" parameterType="HashMap">
 		INSERT INTO
-		ARTIK_ACCESS_TOKEN (uId, accessToken,
+		artik_access_token (uId, accessToken,
 		tokenType,expiresIn,refreshToken,issuedTime)
 		VALUES
 		(#{uId}, #{accessToken},
@@ -23,13 +23,13 @@
 
 	<select id="tokenCheck" parameterType="HashMap" resultType="Integer">
 		SELECT count(*)
-		FROM ARTIK_ACCESS_TOKEN
+		FROM artik_access_token
 		WHERE uId LIKE #{uId}
 	</select>
 
 	<update id="updateAccessToken" parameterType="HashMap">
 		UPDATE
-		ARTIK_ACCESS_TOKEN
+		artik_access_token
 		SET accessToken= #{accessToken}, tokenType =
 		#{tokenType}, expiresIn = #{expiresIn}, refreshToken = #{refreshToken}, issuedTime = #{issuedTime}
 		WHERE uId LIKE #{uId};
@@ -38,13 +38,13 @@
 	<select id="getAccessTokenById" parameterType="HashMap"
 		resultType="String">
 		SELECT accessToken
-		FROM ARTIK_ACCESS_TOKEN
+		FROM artik_access_token
 		WHERE uId LIKE #{uId}
 	</select>
 
 	<select id="getAllAccessToken" resultMap="accessTokenResult">
 		SELECT *
-		FROM ARTIK_ACCESS_TOKEN
+		FROM artik_access_token
 	</select>
 
 </mapper>

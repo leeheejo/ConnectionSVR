@@ -11,26 +11,26 @@
 	</resultMap>
 	<insert id="insertIparkAccessToken" parameterType="HashMap">
 		INSERT INTO
-		IPARK_ACCESS_TOKEN (uId, accessToken, expiresIn, issuedTime)
+		ipark_access_token (uId, accessToken, expiresIn, issuedTime)
 		VALUES
 		(#{uId}, #{accessToken},#{expiresIn},#{issuedTime});
 	</insert>
 
 	<select id="getIparkAccessTokenById" parameterType="HashMap" resultType="String">
 		SELECT accessToken
-		FROM IPARK_ACCESS_TOKEN
+		FROM ipark_access_token
 		WHERE uId LIKE #{uId}
 	</select>
 
 	<select id="getAllIparkAccessToken" resultMap="IparkAccessTokenResult">
 		SELECT *
 		FROM
-		IPARK_ACCESS_TOKEN
+		ipark_access_token
 	</select>
 
 	<update id="updateIparkAccessToken" parameterType="HashMap">
 		UPDATE
-		IPARK_ACCESS_TOKEN
+		ipark_access_token
 		SET accessToken= #{accessToken},expiresIn =
 		#{expiresIn}, issuedTime = #{issuedTime}
 		WHERE uId LIKE #{uId};

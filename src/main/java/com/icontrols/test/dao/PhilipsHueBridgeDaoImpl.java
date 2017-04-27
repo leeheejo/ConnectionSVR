@@ -34,4 +34,10 @@ public class PhilipsHueBridgeDaoImpl implements PhilipsHueBridgeDao {
 		sqlSession.update(PATH+"updatePhilipsHueBridge", map);
 	}
 
+	@Override
+	public String getPhilipsHueUsernameById(HashMap<String, Object> map) {
+		// TODO Auto-generated method stub
+		return sqlSession.selectOne(PATH+"getPhilipsHueUsernameById", map);
+	}
+
 }

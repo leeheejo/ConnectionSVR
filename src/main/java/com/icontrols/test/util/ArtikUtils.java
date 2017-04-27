@@ -23,24 +23,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.icontrols.test.domain.AccessToken;
 import com.icontrols.test.domain.ArtikUserProfile;
 import com.icontrols.test.domain.Device;
-import com.icontrols.test.domain.DeviceList;
 import com.icontrols.test.domain.SendTestLog;
 import com.icontrols.test.service.DeviceService;
 
 public class ArtikUtils {
 
-	/* heejo's cloud info private static */
-
-	// private static String clientId = "cfecebedc26b4690bf9f883d425200a5";
-	// private static String clientSecret = "88fb76ff979543979b3f7b4728b317f2";
-
-	/* inbo's cloud info */
-	private static String clientId = "cbd3e38e12344b22a8c76cd3789b0e0e";
-	private static String clientSecret = "fafe61a1191940989a86d9e69e1e3d66";
-
-	// private static String callbackUrl =
-	// "https://localhost:8443/test/callback";
-	private static String callbackUrl = "http://192.168.101.24:8080/connectionSVR/callback";
 
 	private static final Logger logger = LoggerFactory.getLogger(ArtikUtils.class);
 	public static int stateChangeFlag;
@@ -48,7 +35,7 @@ public class ArtikUtils {
 	public static AccessToken getArtikAccessToken(String code) throws Exception {
 
 		logger.info("[getArtikAccessToken]");
-		String userpass = clientId + ":" + clientSecret;
+		String userpass = NetworkInfo.ARTIK_CLIENT_ID + ":" + NetworkInfo.ARTIK_CLIENT_SECRET;
 		String basicAuth = "Basic " + new String(new Base64().encode(userpass.getBytes()));
 
 		// httpPost 통신
@@ -64,7 +51,7 @@ public class ArtikUtils {
 		con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 
 		// Parameter
-		String param = "grant_type=authorization_code&code=" + code + "&redirect_uri=" + callbackUrl;
+		String param = "grant_type=authorization_code&code=" + code + "&redirect_uri=" + NetworkInfo.ARTIK_CALLBACK_URL;
 		OutputStream os = con.getOutputStream();
 		os.write(param.getBytes());
 		os.flush();
@@ -380,7 +367,7 @@ public class ArtikUtils {
 
 		// Param
 		String param = "{\"uid\": \"" + session.getAttribute("ARTIK_USER_ID").toString() + "\",\"callbackUrl\": \""
-				+ callbackUrl + "\",  \"messageType\": \"message\"}";
+				+ NetworkInfo.ARTIK_CALLBACK_URL + "\",  \"messageType\": \"message\"}";
 
 		logger.info("[createSubscription] PARAM : {}", param);
 
@@ -403,7 +390,7 @@ public class ArtikUtils {
 	public static AccessToken refreshAccessToken(String refreshToken) throws Exception {
 
 		logger.info("[getArtikAccessToken]");
-		String userpass = clientId + ":" + clientSecret;
+		String userpass = NetworkInfo.ARTIK_CLIENT_ID + ":" + NetworkInfo.ARTIK_CLIENT_SECRET;
 		String basicAuth = "Basic " + new String(new Base64().encode(userpass.getBytes()));
 
 		// httpPost 통신

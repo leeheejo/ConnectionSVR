@@ -18,12 +18,10 @@ import org.springframework.web.servlet.ModelAndView;
 import com.icontrols.test.domain.AccessToken;
 import com.icontrols.test.domain.ArtikUserProfile;
 import com.icontrols.test.domain.Device;
-import com.icontrols.test.domain.DeviceList;
 import com.icontrols.test.domain.SendTestLog;
 import com.icontrols.test.service.AccessTokenService;
 import com.icontrols.test.service.ArtikUserProfileService;
 import com.icontrols.test.service.ConnectedCompanyService;
-import com.icontrols.test.service.DeviceListService;
 import com.icontrols.test.service.DeviceService;
 import com.icontrols.test.service.SendTestLogService;
 import com.icontrols.test.util.*;
@@ -34,11 +32,6 @@ import com.icontrols.test.util.*;
  * */
 @Controller
 public class ArtikController {
-
-	/* inbo's cloud info */
-	private static String clientId = "cbd3e38e12344b22a8c76cd3789b0e0e";
-
-	private static String callbackUrl = "http://192.168.101.24:8080/connectionSVR/callback";
 
 	private static final Logger logger = LoggerFactory.getLogger(ArtikController.class);
 
@@ -52,8 +45,6 @@ public class ArtikController {
 	ConnectedCompanyService connectedCompanyService;
 	@Autowired
 	DeviceService deviceService;
-	@Autowired
-	DeviceListService deviceListService;
 
 	@RequestMapping("artikLogin")
 	public ModelAndView artikLogin(Model model, HttpSession session) throws Exception {
@@ -69,8 +60,8 @@ public class ArtikController {
 		 * redirect url과 일치해야함
 		 */
 
-		String oauthUrl = "https://accounts.artik.cloud/authorize?" + "client_id=" + clientId
-				+ "&response_type=code&redirect_uri=" + callbackUrl;
+		String oauthUrl = "https://accounts.artik.cloud/authorize?" + "client_id=" + NetworkInfo.ARTIK_CLIENT_ID
+				+ "&response_type=code&redirect_uri=" + NetworkInfo.ARTIK_CALLBACK_URL;
 
 		model.addAttribute("oauthUrl", oauthUrl);
 
@@ -128,7 +119,7 @@ public class ArtikController {
 
 		List<Device> artikDeviceList = ArtikUtils.getArtikDeviceList(session);
 		List<Device> userDeviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
-		List<Device> newDeviceList = new ArrayList();
+		List<Device> newDeviceList = new ArrayList<Device>();
 
 		for (Device dl : artikDeviceList) {
 			int flag = 0;
@@ -146,6 +137,33 @@ public class ArtikController {
 		model.addAttribute("artikDeviceList", newDeviceList);
 
 		return "deviceList";
+	}
+
+	@RequestMapping("/getDeviceListAjax")
+	public List<Device> getDeviceListAjax(HttpSession session, Model model) throws Exception {
+
+		logger.info("[getArtikDeviceList]");
+
+		List<Device> artikDeviceList = ArtikUtils.getArtikDeviceList(session);
+		List<Device> userDeviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
+		List<Device> newDeviceList = new ArrayList<Device>();
+
+		for (Device dl : artikDeviceList) {
+			int flag = 0;
+			for (Device d : userDeviceList) {
+				if (dl.getdId().equals(d.getdId())) {
+					flag = 1;
+				}
+			}
+			if (flag == 0) {
+
+				newDeviceList.add(dl);
+			}
+
+		}
+//		model.addAttribute("artikDeviceList", newDeviceList);
+
+		return newDeviceList ;
 	}
 
 	/*
@@ -240,11 +258,11 @@ public class ArtikController {
 			sendTestLog = IparkUtils.sendAction(action, session.getAttribute("userLoginInfo").toString(), dId,
 					session.getAttribute("IPARK_ACCESS_TOKEN").toString());
 		} else if (cmpCode == 2) {
-			String PhilipsHueURL ="http://"+session.getAttribute("PHILIPS_HUE_BRIDGE_IP").toString();
-			sendTestLog = PhilipsHueUtils.sendAction(PhilipsHueURL, action, session.getAttribute("userLoginInfo").toString(), dId);
+			
+			sendTestLog = PhilipsHueUtils.sendAction(session, action, dId);
 		}
 
-		sendTestLogService.insertSendTestLog(sendTestLog);
+//		sendTestLogService.insertSendTestLog(sendTestLog);
 
 		return "redirect:/success";
 
@@ -291,10 +309,9 @@ public class ArtikController {
 					sendTestLog = IparkUtils.sendAction("setOff", uId, d.getdId(),
 							session.getAttribute("IPARK_ACCESS_TOKEN").toString());
 				} else if (d.getCmpCode() == 2) {
-					String PhilipsHueURL ="http://"+session.getAttribute("PHILIPS_HUE_BRIDGE_IP").toString();
-					sendTestLog = PhilipsHueUtils.sendAction(PhilipsHueURL,"setOff", uId, d.getdId());
+					sendTestLog = PhilipsHueUtils.sendAction(session,"setOff", d.getdId());
 				}
-				sendTestLogService.insertSendTestLog(sendTestLog);
+//				sendTestLogService.insertSendTestLog(sendTestLog);
 			}
 		}
 		return "redirect:/success";
@@ -314,10 +331,9 @@ public class ArtikController {
 					sendTestLog = IparkUtils.sendAction("setOn", uId, d.getdId(),
 							session.getAttribute("IPARK_ACCESS_TOKEN").toString());
 				} else if (d.getCmpCode() == 2) {
-					String PhilipsHueURL ="http://"+session.getAttribute("PHILIPS_HUE_BRIDGE_IP").toString();
-					sendTestLog = PhilipsHueUtils.sendAction(PhilipsHueURL, "setOn", uId, d.getdId());
+					sendTestLog = PhilipsHueUtils.sendAction(session, "setOn",d.getdId());
 				}
-				sendTestLogService.insertSendTestLog(sendTestLog);
+//				sendTestLogService.insertSendTestLog(sendTestLog);
 			}
 		}
 
@@ -339,6 +355,16 @@ public class ArtikController {
 		return "redirect:/success";
 	}
 
+	@RequestMapping("/modalAction")
+	public String modalAction(HttpSession session,@RequestParam(value="modal_name") String name, @RequestParam(value ="modal_cmpCode") int cmpCode) throws Exception {
+		
+		logger.info("modalAction {}{}", name, cmpCode);
+		String uId = session.getAttribute("userLoginInfo").toString();
+		String dId = deviceService.getDIdByName(uId, name, cmpCode);
+		PhilipsHueUtils.sendAction(session, "setOff", dId);
+		return "redirect:/success";
+	}
+	
 	@RequestMapping("/addNewDevice")
 	public String addNewDevice(HttpSession session, @RequestParam(value = "dtId") String dtId,
 			@RequestParam(value = "name") String name) throws Exception {
