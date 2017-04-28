@@ -39,7 +39,7 @@
 	}
 </script>
 <script>
-
+	
 </script>
 <body>
 	<center>
@@ -131,16 +131,24 @@
 
 									</td>
 								</form>
+								<c:set value="${row.cmpCode}" var="cmpCode" />
 
-								<td>
-									<form action="deleteDevice" method="GET">
-										<input type="hidden" name="dId" value='${row.dId}' />
-										<button type="submit" class="btn btn-danger btn-sm"
-											onClick="location.href='deleteDevice'">
-											<span class="glyphicon glyphicon-trash"></span>
-										</button>
-									</form>
-								</td>
+								<c:choose>
+									<c:when test="${cmpCode eq '0'}">
+										<td>&nbsp&nbsp</td>
+									</c:when>
+									<c:otherwise>
+										<td>
+											<form action="deleteDevice" method="GET">
+												<input type="hidden" name="dId" value='${row.dId}' />
+												<button type="submit" class="btn btn-danger btn-sm"
+													onClick="location.href='deleteDevice'">
+													<span class="glyphicon glyphicon-trash"></span>
+												</button>
+											</form>
+										</td>
+									</c:otherwise>
+								</c:choose>
 							</tr>
 						</c:forEach>
 					</c:when>
@@ -156,7 +164,7 @@
 
 		<div class="container" align="right">
 			<button type="button" class="btn btn-default btn-md"
-				onClick="location.href='refresh'" id="refresh" name="refresh">
+				onClick="location.href='success'" id="refresh" name="refresh">
 				<span class="glyphicon glyphicon-refresh"></span>
 			</button>
 			<button type="button" class="btn btn-info btn-md"

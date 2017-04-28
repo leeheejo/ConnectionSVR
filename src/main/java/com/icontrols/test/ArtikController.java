@@ -66,6 +66,7 @@ public class ArtikController {
 		model.addAttribute("oauthUrl", oauthUrl);
 
 		logger.info("[artikLogin] oauthUrl : {}", oauthUrl);
+		logger.info("[artikLogin] accessToken : {}", session.getAttribute("ACCESS_TOKEN"));
 
 		return mav;
 	}
@@ -262,7 +263,7 @@ public class ArtikController {
 			sendTestLog = PhilipsHueUtils.sendAction(session, action, dId);
 		}
 
-//		sendTestLogService.insertSendTestLog(sendTestLog);
+		sendTestLogService.insertSendTestLog(sendTestLog);
 
 		return "redirect:/success";
 
@@ -311,7 +312,7 @@ public class ArtikController {
 				} else if (d.getCmpCode() == 2) {
 					sendTestLog = PhilipsHueUtils.sendAction(session,"setOff", d.getdId());
 				}
-//				sendTestLogService.insertSendTestLog(sendTestLog);
+				sendTestLogService.insertSendTestLog(sendTestLog);
 			}
 		}
 		return "redirect:/success";
@@ -333,7 +334,7 @@ public class ArtikController {
 				} else if (d.getCmpCode() == 2) {
 					sendTestLog = PhilipsHueUtils.sendAction(session, "setOn",d.getdId());
 				}
-//				sendTestLogService.insertSendTestLog(sendTestLog);
+				sendTestLogService.insertSendTestLog(sendTestLog);
 			}
 		}
 

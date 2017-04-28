@@ -36,10 +36,10 @@
 				<form name="LoginForm" method="post" action="login"
 					style="width: 100%">
 					<div class="form-group">
-						<input type="text" class="form-control" id="uId" name="uId" placeholder="ID" value="test2"/>
+						<input type="text" class="form-control" id="uId" name="uId" placeholder="ID"/>
 					</div>
 					<div class="form-group">
-						<input type="password" class="form-control" id="uPwd" name="uPwd" placeholder="Password"  value="test2"/>
+						<input type="password" class="form-control" id="uPwd" name="uPwd" placeholder="Password"/>
 					</div>
 					<br>
 					<div>

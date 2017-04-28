@@ -185,7 +185,8 @@ public class ArtikUtils {
 			param = "{\"ddid\": \"" + dId + "\",\"ts\":" + System.currentTimeMillis()
 					+ ",\"type\": \"action\",\"data\": {\"actions\": [{\"name\": \"setOff\",\"parameters\": {}}]}}";
 
-		} else if (action.equals("setColorRGB")) {
+		} 
+		else if (action.equals("setColorRGB")) {
 			logger.info("[Action] setColorRGB");
 			int R = Integer.parseInt(rgb.split(";")[0]);
 			int G = Integer.parseInt(rgb.split(";")[1]);

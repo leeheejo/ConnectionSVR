@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Locale;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,7 @@ import com.icontrols.test.service.SendTestLogService;
 import com.icontrols.test.service.UserService;
 import com.icontrols.test.util.ArtikUtils;
 import com.icontrols.test.util.IparkUtils;
+import com.icontrols.test.util.NetworkInfo;
 import com.icontrols.test.util.PhilipsHueUtils;
 
 /**
@@ -63,7 +65,7 @@ public class HomeController {
 	public String start(Locale locale, Model model) {
 
 		logger.info("[HOME]");
-
+		
 		return "home";
 	}
 
@@ -123,14 +125,6 @@ public class HomeController {
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("deviceList");
 		return mav;
-	}
-
-	@RequestMapping("refresh")
-	public String refresh() {
-		logger.info("[refresh]");
-		ModelAndView mav = new ModelAndView();
-		mav.setViewName("refresh");
-		return "redirect:/success";
 	}
 
 	@RequestMapping("success")

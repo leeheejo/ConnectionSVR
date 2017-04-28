@@ -44,7 +44,7 @@
 	<delete id="deleteDevice" parameterType="HashMap">
 		delete from device
 		WHERE
-		dId LIKE #{dId} AND uId  #{uId};
+		dId LIKE #{dId} AND uId LIKE #{uId};
 	</delete>
 
 	<select id="getDIdByName" parameterType="HashMap" resultType="String">
