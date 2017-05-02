@@ -1,20 +1,29 @@
 package com.icontrols.test;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.Callable;
+
+import javax.net.ssl.HttpsURLConnection;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.icontrols.test.domain.AccessToken;
@@ -62,10 +71,8 @@ public class HomeController {
 	 * Simply selects the home view to render by returning its name.
 	 */
 	@RequestMapping(value = "/", method = RequestMethod.GET)
-	public String start(Locale locale, Model model) {
+	public String start(Locale locale, Model model) throws Exception {
 
-		logger.info("[HOME]");
-		
 		return "home";
 	}
 
@@ -126,6 +133,12 @@ public class HomeController {
 		mav.setViewName("deviceList");
 		return mav;
 	}
+	
+	@RequestMapping("refresh")
+	public String refresh(){
+		logger.info("[refresh]");
+		return"redirect:/success";
+	}
 
 	@RequestMapping("success")
 	public ModelAndView success(HttpSession session, Model model) throws Exception {
@@ -137,6 +150,7 @@ public class HomeController {
 		logger.info("[success]userLoginInfo : {}", session.getAttribute("userLoginInfo").toString());
 
 		List<Device> deviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
+		logger.info("{}",deviceList.toString());
 		List<Device> artikDevice = new ArrayList<Device>();
 		List<Device> hueDevice = new ArrayList<Device>();
 		List<Device> finalDevice = new ArrayList<Device>();
@@ -176,8 +190,7 @@ public class HomeController {
 			}
 		}
 
-		model.addAttribute("deviceList", deviceList);
-
+		model.addAttribute("deviceList", finalDevice);
 		return mav;
 	}
 
@@ -186,11 +199,11 @@ public class HomeController {
 		logger.info("[addDevice]");
 		ModelAndView mav = new ModelAndView();
 		List<ConnectedCompany> connectedCompnayList = connectedCompanyService.getConnectedCompany();
-		//단지 SVR
+		// 단지 SVR
 		connectedCompnayList.remove(0);
-		//Philips Hue SVR - TEST VER
+		// Philips Hue SVR - TEST VER
 		connectedCompnayList.remove(0);
-		
+
 		model.addAttribute("connectedCompanyList", connectedCompnayList);
 		mav.setViewName("addDevice");
 		return mav;
@@ -242,7 +255,7 @@ public class HomeController {
 		 * @return success : return 1 / fail : return 0
 		 */
 		int loginCheck = UserService.loginCheck(map);
-		
+
 		if (loginCheck == 1) {
 			session.setAttribute("userLoginInfo", uId);
 			logger.info("[login]login success : {}", session.getAttribute("userLoginInfo").toString());
@@ -287,6 +300,62 @@ public class HomeController {
 		session.invalidate();
 
 		return mv;
+	}
+
+	@RequestMapping("thread")
+	public String thread (HttpSession session) throws Exception{
+		InnerThread thread = new InnerThread(session.getAttribute("userLoginInfo").toString());
+		logger.info("[thread] {}", session.getAttribute("userLoginInfo").toString());
+		thread.call();
+		logger.info("try out");
+		return"redirect:/refresh";
+	}
+
+	@Async
+	public class InnerThread implements Callable {
+		String userId;
+		InnerThread(String userId){
+			this.userId = userId;
+		}
+		
+		@SuppressWarnings("deprecation")
+		public void test() {
+			boolean stop = false;
+			int i = 0;
+			List<Device> oldList = deviceService.getDeviceById(userId);
+			List<Device> newList = deviceService.getDeviceById(userId);
+			
+			while (!stop) {
+				i++;
+				try {
+					Thread.sleep(2000);
+					newList.clear();
+					newList = deviceService.getDeviceById(userId);
+					for (int j = 0; j < oldList.size(); j++) {
+						logger.info("{} < {}", userId+":" + newList.get(j).getName() + newList.get(j).getState(),
+								oldList.get(j).getName() + oldList.get(j).getState());
+						if (oldList.get(j).getState() != newList.get(j).getState()) {
+							oldList.clear();
+							oldList.addAll(newList);
+							stop = true;
+						}
+					}
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+
+		}
+
+		@Override
+		public Object call() throws Exception {
+			// TODO Auto-generated method stub
+			test();
+			
+			return "redirect:/success";
+		}
+
 	}
 
 }

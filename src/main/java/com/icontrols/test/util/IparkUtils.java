@@ -118,11 +118,15 @@ public class IparkUtils {
 		br.close();
 
 		logger.info("[sendAction] responseData : {}", responseData);
-
+		
+		JSONObject obj = new JSONObject(responseData);
+		String iparkState = obj.getString("state");
+		
 		// Insert sendTestLog
 		SendTestLog sendTestLog = new SendTestLog(uId, 0, dId, action, responseCode + "",
 				new Date(System.currentTimeMillis()));
-
+		sendTestLog.setIparkState(iparkState);
+		
 		return sendTestLog;
 	}
 

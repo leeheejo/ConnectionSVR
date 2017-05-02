@@ -37,6 +37,20 @@
 			trObj.style.backgroundColor = oldColor;
 		}
 	}
+
+	$(document).ready(function() {
+		$.ajax({
+			url : "thread",
+			dataType : "text",
+			type : "get",
+			success : function(data) {
+				document.location.reload();
+			},
+			error : function(request, status, error) {
+			}
+		});
+	});
+	
 </script>
 <script>
 	

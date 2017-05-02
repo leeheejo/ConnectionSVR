@@ -27,7 +27,7 @@ public class ScheduleTask {
 	@Autowired
 	IparkAccessTokenService iparkAccessTokenService;
 
-	@Scheduled(cron = "0 0 15 * * ?") // 매일 오후3시에 AccessToken Validate 검사
+	@Scheduled(cron = "0 0 18 * * ?") // 매일 오후3시에 AccessToken Validate 검사
 	public void scheduleRun() throws Exception {
 		logger.info("Token Check Scheduler START");
 

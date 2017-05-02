@@ -11,6 +11,7 @@ public class SendTestLog {
 	private String data;
 	private String response;
 	private Date sendDt;
+	private String iparkState;
 
 	
 	public SendTestLog(String uId, int cmpCode, String ddid, String data, String response, Date sendDt) {
@@ -91,6 +92,16 @@ public class SendTestLog {
 
 	public void setSendDt(Date sendDt) {
 		this.sendDt = sendDt;
+	}
+
+	
+	public String getIparkState() {
+		return iparkState;
+	}
+
+
+	public void setIparkState(String iparkState) {
+		this.iparkState = iparkState;
 	}
 
 

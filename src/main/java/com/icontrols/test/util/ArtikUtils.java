@@ -28,7 +28,6 @@ import com.icontrols.test.service.DeviceService;
 
 public class ArtikUtils {
 
-
 	private static final Logger logger = LoggerFactory.getLogger(ArtikUtils.class);
 	public static int stateChangeFlag;
 
@@ -185,8 +184,7 @@ public class ArtikUtils {
 			param = "{\"ddid\": \"" + dId + "\",\"ts\":" + System.currentTimeMillis()
 					+ ",\"type\": \"action\",\"data\": {\"actions\": [{\"name\": \"setOff\",\"parameters\": {}}]}}";
 
-		} 
-		else if (action.equals("setColorRGB")) {
+		} else if (action.equals("setColorRGB")) {
 			logger.info("[Action] setColorRGB");
 			int R = Integer.parseInt(rgb.split(";")[0]);
 			int G = Integer.parseInt(rgb.split(";")[1]);
@@ -474,6 +472,40 @@ public class ArtikUtils {
 		}
 
 		return result;
+	}
+
+	public static void createSubscription() throws Exception {
+		String userpass = NetworkInfo.ARTIK_CLIENT_ID + ":" + NetworkInfo.ARTIK_CLIENT_SECRET;
+		String basicAuth = "Basic " + new String(new Base64().encode(userpass.getBytes()));
+
+		logger.info("[createSubscription]");
+		URL url = new URL("https://api.artik.cloud/v1.1/subscriptions");
+		HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+		con.setRequestMethod("POST");
+		con.setDoInput(true);
+		con.setDoOutput(true);
+
+		// Header
+		con.setRequestProperty("Host", "accounts.artik.cloud");
+		con.setRequestProperty("Authorization", basicAuth);
+		con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+
+		// Parameter
+		String param = "{\"messageType\":\"message\", \"uid\":\"58e8794672f848f5bf65dfd6267ff9b9\",\"description\":\"This is a subscription to a user's devices\", \"subscriptionType\": \"httpCallback\",\"callbackUrl\":\"https://icontrols-dev.com/connectionSVR/callback\"}";
+
+		OutputStream os = con.getOutputStream();
+		os.write(param.getBytes());
+		os.flush();
+		os.close();
+
+		// Response
+		int responseCode = con.getResponseCode();
+		logger.info("[createSubscription] responseCode : {}", responseCode + con.getResponseMessage());
+
+		BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+		String responseData = br.readLine();
+		logger.info("[createSubscription] responseData : {}", responseData);
+		br.close();
 	}
 
 	// Parsing DeviceList(Json)

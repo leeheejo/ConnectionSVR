@@ -162,9 +162,9 @@ public class ArtikController {
 			}
 
 		}
-//		model.addAttribute("artikDeviceList", newDeviceList);
+		// model.addAttribute("artikDeviceList", newDeviceList);
 
-		return newDeviceList ;
+		return newDeviceList;
 	}
 
 	/*
@@ -258,8 +258,14 @@ public class ArtikController {
 		} else if (cmpCode == 0) {
 			sendTestLog = IparkUtils.sendAction(action, session.getAttribute("userLoginInfo").toString(), dId,
 					session.getAttribute("IPARK_ACCESS_TOKEN").toString());
+
+			if (sendTestLog.getIparkState().equals("on")) {
+				deviceService.updateDeviceState(1, dId, session.getAttribute("userLoginInfo").toString());
+			} else if (sendTestLog.getIparkState().equals("off")) {
+				deviceService.updateDeviceState(0, dId, session.getAttribute("userLoginInfo").toString());
+			}
 		} else if (cmpCode == 2) {
-			
+
 			sendTestLog = PhilipsHueUtils.sendAction(session, action, dId);
 		}
 
@@ -310,7 +316,7 @@ public class ArtikController {
 					sendTestLog = IparkUtils.sendAction("setOff", uId, d.getdId(),
 							session.getAttribute("IPARK_ACCESS_TOKEN").toString());
 				} else if (d.getCmpCode() == 2) {
-					sendTestLog = PhilipsHueUtils.sendAction(session,"setOff", d.getdId());
+					sendTestLog = PhilipsHueUtils.sendAction(session, "setOff", d.getdId());
 				}
 				sendTestLogService.insertSendTestLog(sendTestLog);
 			}
@@ -332,7 +338,7 @@ public class ArtikController {
 					sendTestLog = IparkUtils.sendAction("setOn", uId, d.getdId(),
 							session.getAttribute("IPARK_ACCESS_TOKEN").toString());
 				} else if (d.getCmpCode() == 2) {
-					sendTestLog = PhilipsHueUtils.sendAction(session, "setOn",d.getdId());
+					sendTestLog = PhilipsHueUtils.sendAction(session, "setOn", d.getdId());
 				}
 				sendTestLogService.insertSendTestLog(sendTestLog);
 			}
@@ -357,15 +363,16 @@ public class ArtikController {
 	}
 
 	@RequestMapping("/modalAction")
-	public String modalAction(HttpSession session,@RequestParam(value="modal_name") String name, @RequestParam(value ="modal_cmpCode") int cmpCode) throws Exception {
-		
+	public String modalAction(HttpSession session, @RequestParam(value = "modal_name") String name,
+			@RequestParam(value = "modal_cmpCode") int cmpCode) throws Exception {
+
 		logger.info("modalAction {}{}", name, cmpCode);
 		String uId = session.getAttribute("userLoginInfo").toString();
 		String dId = deviceService.getDIdByName(uId, name, cmpCode);
 		PhilipsHueUtils.sendAction(session, "setOff", dId);
 		return "redirect:/success";
 	}
-	
+
 	@RequestMapping("/addNewDevice")
 	public String addNewDevice(HttpSession session, @RequestParam(value = "dtId") String dtId,
 			@RequestParam(value = "name") String name) throws Exception {
