@@ -50,7 +50,6 @@
 			}
 		});
 	});
-	
 </script>
 <script>
 	
@@ -177,9 +176,14 @@
 		</div>
 
 		<div class="container" align="right">
+			
 			<button type="button" class="btn btn-default btn-md"
 				onClick="location.href='success'" id="refresh" name="refresh">
 				<span class="glyphicon glyphicon-refresh"></span>
+			</button>
+			<button type="button" class="btn btn-default btn-md"
+				onClick="location.href='createGroup'" id="createGroup" name="createGroup">
+				<span class="glyphicon glyphicon-link"></span>
 			</button>
 			<button type="button" class="btn btn-info btn-md"
 				onClick="location.href='addDevice'">

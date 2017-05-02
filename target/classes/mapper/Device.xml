@@ -18,12 +18,14 @@
 	<select id="getDeviceById" parameterType="HashMap" resultMap="DeviceResult">
 		SELECT uId, dId, name, state, dtId, cmpCode
 		FROM device
-		WHERE uId LIKE #{uId};
+		WHERE uId LIKE
+		#{uId};
 	</select>
 
 	<insert id="insertDevice" parameterType="HashMap">
 		INSERT INTO device
-		(dId, uId, name, uptDt, state, dtId, cmpCode)
+		(dId,
+		uId, name, uptDt, state, dtId, cmpCode)
 		VALUES (#{dId}, #{uId},
 		#{name},NOW(), 0, #{dtId}, #{cmpCode});
 	</insert>
@@ -35,8 +37,8 @@
 		WHERE dId LIKE #{dId} AND uId LIKE #{uId};
 	</update>
 
-	<select id="getDeviceTypeId" parameterType="HashMap" resultType="String">
-		SELECT dtId
+	<select id="getDeviceCmpCode" parameterType="HashMap" resultType="Integer">
+		SELECT cmpCode
 		FROM device
 		WHERE dId LIKE #{dId} AND uId LIKE #{uId};
 	</select>
@@ -51,6 +53,22 @@
 		select dId
 		from device
 		where
-		cmpCode = #{cmpCode} AND uId LIKE #{uId} AND name LIKE #{name};
+		cmpCode = #{cmpCode} AND uId LIKE #{uId} AND
+		name LIKE #{name};
 	</select>
+
+	<insert id="insertDeviceGroup" parameterType="HashMap">
+		INSERT INTO
+		device_group
+		(dIds, uId, gId)
+		VALUES (#{dIds}, #{uId},#{gId});
+	</insert>
+
+	<select id="getDeviceGroupDids" parameterType="HashMap"
+		resultType="String">
+		select dIds
+		from device_group
+		where uId like  #{uId} and gId like #{gId};
+	</select>
+
 </mapper>

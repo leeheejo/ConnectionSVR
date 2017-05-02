@@ -18,6 +18,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.icontrols.test.domain.AccessToken;
 import com.icontrols.test.domain.ArtikUserProfile;
 import com.icontrols.test.domain.Device;
+import com.icontrols.test.domain.DeviceGroup;
 import com.icontrols.test.domain.SendTestLog;
 import com.icontrols.test.service.AccessTokenService;
 import com.icontrols.test.service.ArtikUserProfileService;
@@ -244,7 +245,7 @@ public class ArtikController {
 			@RequestParam(value = "state") int currentState, @RequestParam(value = "cmpCode") int cmpCode)
 			throws Exception {
 		logger.info("[sendActionTest]");
-		String dtId = deviceService.getDeviceTypeId(dId, session.getAttribute("userLoginInfo").toString());
+		String uId = session.getAttribute("userLoginInfo").toString();
 		SendTestLog sendTestLog = null;
 		String action = "";
 		if (currentState == 0) {
@@ -256,17 +257,48 @@ public class ArtikController {
 		if (cmpCode == 1) {
 			sendTestLog = ArtikUtils.Action(session, dId, action, "");
 		} else if (cmpCode == 0) {
-			sendTestLog = IparkUtils.sendAction(action, session.getAttribute("userLoginInfo").toString(), dId,
+			sendTestLog = IparkUtils.sendAction(action, uId, dId,
 					session.getAttribute("IPARK_ACCESS_TOKEN").toString());
 
 			if (sendTestLog.getIparkState().equals("on")) {
-				deviceService.updateDeviceState(1, dId, session.getAttribute("userLoginInfo").toString());
+				deviceService.updateDeviceState(1, dId, uId);
 			} else if (sendTestLog.getIparkState().equals("off")) {
-				deviceService.updateDeviceState(0, dId, session.getAttribute("userLoginInfo").toString());
+				deviceService.updateDeviceState(0, dId, uId);
 			}
 		} else if (cmpCode == 2) {
 
 			sendTestLog = PhilipsHueUtils.sendAction(session, action, dId);
+			
+		} else if (cmpCode == 4) {
+			
+			String groupDIds = deviceService.getDeviceGroupDids(uId, dId);
+			logger.info("{}", groupDIds);
+			String[] dIds = groupDIds.split(";");
+			logger.info("{}", dIds.length);
+			
+			for (String s : dIds) {
+				
+				Integer deviceType = deviceService.getDeviceCmpCode(s, uId);
+				logger.info("{} : {}", deviceType, s);
+				
+				if (deviceType == 1) {
+					sendTestLog = ArtikUtils.Action(session, s, action, "");
+				} else if (deviceType == 0) {
+					sendTestLog = IparkUtils.sendAction(action, uId, s,
+							session.getAttribute("IPARK_ACCESS_TOKEN").toString());
+
+					if (sendTestLog.getIparkState().equals("on")) {
+						deviceService.updateDeviceState(1, s, uId);
+					} else if (sendTestLog.getIparkState().equals("off")) {
+						deviceService.updateDeviceState(0, s, uId);
+					}
+				} else if (deviceType == 2) {
+
+					sendTestLog = PhilipsHueUtils.sendAction(session, action, s);
+				}
+
+			}
+
 		}
 
 		sendTestLogService.insertSendTestLog(sendTestLog);
@@ -388,6 +420,17 @@ public class ArtikController {
 		ArtikUtils.createSubscription(session);
 
 		return "deviceList";
+	}
+
+	@RequestMapping("/insertGroup")
+	public String insertGroup(HttpSession session, @RequestParam(value = "dIds") String dIds,
+			@RequestParam(value = "name") String name) throws Exception {
+
+		Device device = new Device(session.getAttribute("userLoginInfo").toString(), name, name, 0, "group", 4);
+		DeviceGroup dg = new DeviceGroup(session.getAttribute("userLoginInfo").toString(), dIds, name);
+		deviceService.insertDevice(device);
+		deviceService.insertDeviceGroup(dg);
+		return "redirect:/success";
 	}
 
 }

@@ -66,6 +66,7 @@ public class HomeController {
 	PhilipsHueBridgeService philipsHueBridgeService;
 
 	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
+	InnerThread thread = null;
 
 	/**
 	 * Simply selects the home view to render by returning its name.
@@ -134,15 +135,11 @@ public class HomeController {
 		return mav;
 	}
 	
-	@RequestMapping("refresh")
-	public String refresh(){
-		logger.info("[refresh]");
-		return"redirect:/success";
-	}
-
 	@RequestMapping("success")
 	public ModelAndView success(HttpSession session, Model model) throws Exception {
 		logger.info("[success]");
+		if(thread != null) 
+			thread.shutdownNow();
 
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("success");
@@ -162,10 +159,13 @@ public class HomeController {
 						deviceService.updateDeviceState(state, d.getdId(), uId);
 					}
 					finalDevice.add(d);
+					
 				} else if (d.getCmpCode() == 1) {
 					artikDevice.add(d);
 				} else if (d.getCmpCode() == 2) {
 					hueDevice.add(d);
+				} else if(d.getCmpCode() == 4) {
+					finalDevice.add(d);
 				}
 			}
 
@@ -196,6 +196,7 @@ public class HomeController {
 
 	@RequestMapping("addDevice")
 	public ModelAndView addDevice(Model model) {
+		thread.shutdownNow();
 		logger.info("[addDevice]");
 		ModelAndView mav = new ModelAndView();
 		List<ConnectedCompany> connectedCompnayList = connectedCompanyService.getConnectedCompany();
@@ -211,6 +212,7 @@ public class HomeController {
 
 	@RequestMapping("selectCompany")
 	public String selectCompany(@RequestParam(value = "cmpCode") int cmpCode) {
+		thread.shutdownNow();
 		logger.info("[addDevice]");
 		String s = "";
 
@@ -225,6 +227,7 @@ public class HomeController {
 
 	@RequestMapping("deleteDevice")
 	public String deleteDevice(HttpSession session, @RequestParam(value = "dId") String dId) {
+		thread.shutdownNow();
 		logger.info("[deleteDevice]");
 		deviceService.deleteDevice(session.getAttribute("userLoginInfo").toString(), dId);
 
@@ -284,6 +287,7 @@ public class HomeController {
 
 			logger.info("[login] get IPARK_ACCESS_TOKEN : {}", iparkAccessTokenService.getIparkAccessTokenById(uId));
 
+			thread = new InnerThread(session.getAttribute("userLoginInfo").toString());
 			return "redirect:/success";
 
 		} else {
@@ -296,31 +300,49 @@ public class HomeController {
 
 	@RequestMapping("logout")
 	public ModelAndView logout(HttpSession session, Model model) {
+		thread.shutdownNow();
 		ModelAndView mv = new ModelAndView("home", "error_message", "로그인 후 이용바랍니다:D");
 		session.invalidate();
 
 		return mv;
 	}
 
+	@RequestMapping("createGroup")
+	public ModelAndView createGroup(HttpSession session, Model model) {
+		thread.shutdownNow();
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("createGroup");
+		String uId = session.getAttribute("userLoginInfo").toString();
+		List<Device> deviceList = deviceService.getDeviceById(uId);
+		
+		model.addAttribute("deviceList", deviceList);
+		
+		return mav;
+	}
 	@RequestMapping("thread")
-	public String thread (HttpSession session) throws Exception{
-		InnerThread thread = new InnerThread(session.getAttribute("userLoginInfo").toString());
+	public void thread (HttpSession session) throws Exception{
 		logger.info("[thread] {}", session.getAttribute("userLoginInfo").toString());
 		thread.call();
 		logger.info("try out");
-		return"redirect:/refresh";
 	}
 
 	@Async
 	public class InnerThread implements Callable {
 		String userId;
+		Boolean stop = false;
+		
+		
 		InnerThread(String userId){
 			this.userId = userId;
 		}
-		
+
+		public void shutdownNow() {
+			// TODO Auto-generated method stub
+			stop = true;
+		}
+
 		@SuppressWarnings("deprecation")
 		public void test() {
-			boolean stop = false;
 			int i = 0;
 			List<Device> oldList = deviceService.getDeviceById(userId);
 			List<Device> newList = deviceService.getDeviceById(userId);
@@ -335,8 +357,6 @@ public class HomeController {
 						logger.info("{} < {}", userId+":" + newList.get(j).getName() + newList.get(j).getState(),
 								oldList.get(j).getName() + oldList.get(j).getState());
 						if (oldList.get(j).getState() != newList.get(j).getState()) {
-							oldList.clear();
-							oldList.addAll(newList);
 							stop = true;
 						}
 					}
@@ -351,9 +371,9 @@ public class HomeController {
 		@Override
 		public Object call() throws Exception {
 			// TODO Auto-generated method stub
+			stop = false;
 			test();
-			
-			return "redirect:/success";
+			return stop;
 		}
 
 	}

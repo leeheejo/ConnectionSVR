@@ -37,9 +37,9 @@ public class DeviceDaoImpl implements DeviceDao {
 	}
 
 	@Override
-	public String getDeviceTypeId(HashMap<String, Object> map) {
+	public Integer getDeviceCmpCode(HashMap<String, Object> map) {
 		// TODO Auto-generated method stub
-		return sqlSession.selectOne(PATH + "getDeviceTypeId", map);
+		return sqlSession.selectOne(PATH + "getDeviceCmpCode", map);
 	}
 
 	@Override
@@ -53,5 +53,17 @@ public class DeviceDaoImpl implements DeviceDao {
 	public String getDIdByName(HashMap<String, Object> map) {
 		// TODO Auto-generated method stub
 		return sqlSession.selectOne(PATH + "getDIdByName", map);
+	}
+
+	@Override
+	public void insertDeviceGroup(HashMap<String, Object> map) {
+		// TODO Auto-generated method stub
+		sqlSession.insert(PATH+"insertDeviceGroup", map);
+	}
+
+	@Override
+	public String getDeviceGroupDids(HashMap<String, Object> map) {
+		// TODO Auto-generated method stub
+		return sqlSession.selectOne(PATH+"getDeviceGroupDids", map);
 	}
 }

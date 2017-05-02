@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.icontrols.test.dao.DeviceDao;
 import com.icontrols.test.domain.Device;
+import com.icontrols.test.domain.DeviceGroup;
 
 @Service
 public class DeviceServiceImpl implements DeviceService {
@@ -48,13 +49,13 @@ public class DeviceServiceImpl implements DeviceService {
 	}
 
 	@Override
-	public String getDeviceTypeId(String dId, String uId) {
+	public Integer getDeviceCmpCode(String dId, String uId) {
 		// TODO Auto-generated method stub
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		map.put("dId", dId);
 		map.put("uId", uId);
 		
-		return deviceDao.getDeviceTypeId(map);
+		return deviceDao.getDeviceCmpCode(map);
 	}
 
 	@Override
@@ -79,5 +80,25 @@ public class DeviceServiceImpl implements DeviceService {
 		return deviceDao.getDIdByName(map);
 	}
 
+	@Override
+	public void insertDeviceGroup(DeviceGroup dg) {
+		// TODO Auto-generated method stub
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("dIds", dg.getdIds());
+		map.put("uId", dg.getuId());
+		map.put("gId", dg.getgId());
+		
+		deviceDao.insertDeviceGroup(map);
+	}
+
+	@Override
+	public String getDeviceGroupDids(String uId, String gId) {
+		// TODO Auto-generated method stub
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("gId", gId);
+		map.put("uId", uId);
+		
+		return deviceDao.getDeviceGroupDids(map);
+	}
 
 }

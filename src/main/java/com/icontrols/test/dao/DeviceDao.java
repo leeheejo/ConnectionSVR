@@ -11,8 +11,10 @@ public interface DeviceDao {
 	public List<Device> getDeviceById(HashMap<String, Object> map);
 	public void insertDevice(HashMap<String, Object> map);
 	public void updateDeviceState(HashMap<String, Object> map);
-	public String getDeviceTypeId(HashMap<String, Object> map);
+	public Integer getDeviceCmpCode(HashMap<String, Object> map);
 	public void deleteDevice(HashMap<String, Object> map);
 	public String getDIdByName (HashMap<String, Object> map);
 	
+	public void insertDeviceGroup(HashMap<String, Object> map);
+	public String getDeviceGroupDids(HashMap<String, Object> map);
 }
