@@ -134,11 +134,11 @@ public class HomeController {
 		mav.setViewName("deviceList");
 		return mav;
 	}
-	
+
 	@RequestMapping("success")
 	public ModelAndView success(HttpSession session, Model model) throws Exception {
 		logger.info("[success]");
-		if(thread != null) 
+		if (thread != null)
 			thread.shutdownNow();
 
 		ModelAndView mav = new ModelAndView();
@@ -147,7 +147,7 @@ public class HomeController {
 		logger.info("[success]userLoginInfo : {}", session.getAttribute("userLoginInfo").toString());
 
 		List<Device> deviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
-		logger.info("{}",deviceList.toString());
+		logger.info("{}", deviceList.toString());
 		List<Device> artikDevice = new ArrayList<Device>();
 		List<Device> hueDevice = new ArrayList<Device>();
 		List<Device> finalDevice = new ArrayList<Device>();
@@ -159,12 +159,12 @@ public class HomeController {
 						deviceService.updateDeviceState(state, d.getdId(), uId);
 					}
 					finalDevice.add(d);
-					
+
 				} else if (d.getCmpCode() == 1) {
 					artikDevice.add(d);
 				} else if (d.getCmpCode() == 2) {
 					hueDevice.add(d);
-				} else if(d.getCmpCode() == 4) {
+				} else if (d.getCmpCode() == 4) {
 					finalDevice.add(d);
 				}
 			}
@@ -314,13 +314,19 @@ public class HomeController {
 		mav.setViewName("createGroup");
 		String uId = session.getAttribute("userLoginInfo").toString();
 		List<Device> deviceList = deviceService.getDeviceById(uId);
-		
-		model.addAttribute("deviceList", deviceList);
-		
+		List<Device> finalDevice = new ArrayList<Device>();
+		for (Device d : deviceList) {
+			if (d.getCmpCode() != 4) {
+				finalDevice.add(d);
+			}
+		}
+		model.addAttribute("deviceList", finalDevice);
+
 		return mav;
 	}
+
 	@RequestMapping("thread")
-	public void thread (HttpSession session) throws Exception{
+	public void thread(HttpSession session) throws Exception {
 		logger.info("[thread] {}", session.getAttribute("userLoginInfo").toString());
 		thread.call();
 		logger.info("try out");
@@ -330,9 +336,8 @@ public class HomeController {
 	public class InnerThread implements Callable {
 		String userId;
 		Boolean stop = false;
-		
-		
-		InnerThread(String userId){
+
+		InnerThread(String userId) {
 			this.userId = userId;
 		}
 
@@ -346,7 +351,7 @@ public class HomeController {
 			int i = 0;
 			List<Device> oldList = deviceService.getDeviceById(userId);
 			List<Device> newList = deviceService.getDeviceById(userId);
-			
+
 			while (!stop) {
 				i++;
 				try {
@@ -354,7 +359,7 @@ public class HomeController {
 					newList.clear();
 					newList = deviceService.getDeviceById(userId);
 					for (int j = 0; j < oldList.size(); j++) {
-						logger.info("{} < {}", userId+":" + newList.get(j).getName() + newList.get(j).getState(),
+						logger.info("{} < {}", userId + ":" + newList.get(j).getName() + newList.get(j).getState(),
 								oldList.get(j).getName() + oldList.get(j).getState());
 						if (oldList.get(j).getState() != newList.get(j).getState()) {
 							stop = true;
