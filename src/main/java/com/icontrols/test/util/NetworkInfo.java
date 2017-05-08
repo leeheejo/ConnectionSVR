@@ -10,7 +10,7 @@ public class NetworkInfo {
 	 * AWS에서 ARTIK Cloud 로그인 시 Token 발급 가능함
 	 * 
 	 */
-	public static String ARTIK_CALLBACK_URL = "http://52.79.230.217:8080/connectionSVR/callback";
+	public static String ARTIK_CALLBACK_URL = "https://icontrols-dev.com/connectionSVR/callback";
 
 	/* ARTIK CALLBACK URL */
 	// public String ARTIK_CALLBACK_URL_AWS =

@@ -14,6 +14,8 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.codec.binary.Base64;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,12 +75,13 @@ public class HomeController {
 	 */
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String start(Locale locale, Model model) throws Exception {
-
+		logger.info("[home]");
 		return "home";
 	}
 
 	@RequestMapping(value = "home")
 	public String home(Locale locale, Model model) {
+		logger.info("[home]");
 
 		return "home";
 	}
@@ -147,56 +150,61 @@ public class HomeController {
 		logger.info("[success]userLoginInfo : {}", session.getAttribute("userLoginInfo").toString());
 
 		List<Device> deviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
-		logger.info("{}", deviceList.toString());
-		List<Device> artikDevice = new ArrayList<Device>();
-		List<Device> hueDevice = new ArrayList<Device>();
-		List<Device> finalDevice = new ArrayList<Device>();
-		if (deviceList.size() != 0) {
-			for (Device d : deviceList) {
-				if (d.getCmpCode() == 0) {
-					int state = IparkUtils.getState(d, session.getAttribute("IPARK_ACCESS_TOKEN").toString());
-					if (IparkUtils.stateChangeFlag == 1) {
-						deviceService.updateDeviceState(state, d.getdId(), uId);
-					}
-					finalDevice.add(d);
+		// logger.info("{}", deviceList.toString());
+		// List<Device> artikDevice = new ArrayList<Device>();
+		// List<Device> hueDevice = new ArrayList<Device>();
+		// List<Device> finalDevice = new ArrayList<Device>();
+		// if (deviceList.size() != 0) {
+		// for (Device d : deviceList) {
+		// if (d.getCmpCode() == 0) {
+		// int state = IparkUtils.getState(d,
+		// session.getAttribute("IPARK_ACCESS_TOKEN").toString());
+		// if (IparkUtils.stateChangeFlag == 1) {
+		// deviceService.updateDeviceState(state, d.getdId(), uId);
+		// }
+		// finalDevice.add(d);
+		//
+		// } else if (d.getCmpCode() == 1) {
+		// artikDevice.add(d);
+		// } else if (d.getCmpCode() == 2) {
+		// hueDevice.add(d);
+		// } else if (d.getCmpCode() == 4) {
+		// finalDevice.add(d);
+		// }
+		// }
+		//
+		// if (hueDevice.size() != 0) {
+		// List<Device> hueResult = PhilipsHueUtils.getDeviceState(session,
+		// hueDevice);
+		// if (PhilipsHueUtils.stateChangeFlag == 1) {
+		// for (Device d : hueResult) {
+		// deviceService.updateDeviceState(d.getState(), d.getdId(), uId);
+		// }
+		// }
+		// finalDevice.addAll(hueResult);
+		// }
+		//
+		// if (session.getAttribute("ACCESS_TOKEN") != null &&
+		// artikDevice.size() != 0) {
+		// List<Device> result = ArtikUtils.getDeviceState(session,
+		// artikDevice);
+		// if (ArtikUtils.stateChangeFlag == 1) {
+		// for (Device d : result) {
+		// deviceService.updateDeviceState(d.getState(), d.getdId(), uId);
+		// }
+		// }
+		// finalDevice.addAll(result);
+		// }
+		// }
 
-				} else if (d.getCmpCode() == 1) {
-					artikDevice.add(d);
-				} else if (d.getCmpCode() == 2) {
-					hueDevice.add(d);
-				} else if (d.getCmpCode() == 4) {
-					finalDevice.add(d);
-				}
-			}
-
-			if (hueDevice.size() != 0) {
-				List<Device> hueResult = PhilipsHueUtils.getDeviceState(session, hueDevice);
-				if (PhilipsHueUtils.stateChangeFlag == 1) {
-					for (Device d : hueResult) {
-						deviceService.updateDeviceState(d.getState(), d.getdId(), uId);
-					}
-				}
-				finalDevice.addAll(hueResult);
-			}
-
-			if (session.getAttribute("ACCESS_TOKEN") != null && artikDevice.size() != 0) {
-				List<Device> result = ArtikUtils.getDeviceState(session, artikDevice);
-				if (ArtikUtils.stateChangeFlag == 1) {
-					for (Device d : result) {
-						deviceService.updateDeviceState(d.getState(), d.getdId(), uId);
-					}
-				}
-				finalDevice.addAll(result);
-			}
-		}
-
-		model.addAttribute("deviceList", finalDevice);
+		model.addAttribute("deviceList", deviceList);
 		return mav;
 	}
 
 	@RequestMapping("addDevice")
 	public ModelAndView addDevice(Model model) {
-		thread.shutdownNow();
+		if (thread != null)
+			thread.shutdownNow();
 		logger.info("[addDevice]");
 		ModelAndView mav = new ModelAndView();
 		List<ConnectedCompany> connectedCompnayList = connectedCompanyService.getConnectedCompany();
@@ -212,7 +220,8 @@ public class HomeController {
 
 	@RequestMapping("selectCompany")
 	public String selectCompany(@RequestParam(value = "cmpCode") int cmpCode) {
-		thread.shutdownNow();
+		if (thread != null)
+			thread.shutdownNow();
 		logger.info("[addDevice]");
 		String s = "";
 
@@ -226,9 +235,15 @@ public class HomeController {
 	}
 
 	@RequestMapping("deleteDevice")
-	public String deleteDevice(HttpSession session, @RequestParam(value = "dId") String dId) {
-		thread.shutdownNow();
+	public String deleteDevice(HttpSession session, @RequestParam(value = "dId") String dId,
+			@RequestParam(value = "cmpCode") int cmpCode) throws Exception {
+		if (thread != null)
+			thread.shutdownNow();
 		logger.info("[deleteDevice]");
+		if (cmpCode == 1 && deviceService.getSubscriptionCnt(dId) <= 1) {
+			if (deviceService.getSubscriptionIdByDId(dId) != null)
+				ArtikUtils.deleteSubscription(session, deviceService.getSubscriptionIdByDId(dId));
+		}
 		deviceService.deleteDevice(session.getAttribute("userLoginInfo").toString(), dId);
 
 		return "redirect:/success";
@@ -246,7 +261,7 @@ public class HomeController {
 	 */
 	@RequestMapping("login")
 	public String login(@RequestParam(value = "uId") String uId, @RequestParam(value = "uPwd") String uPwd,
-			HttpSession session, Model model) {
+			HttpSession session, Model model) throws Exception {
 		logger.info("[login]");
 
 		HashMap<String, Object> map = new HashMap<String, Object>();
@@ -264,7 +279,6 @@ public class HomeController {
 			logger.info("[login]login success : {}", session.getAttribute("userLoginInfo").toString());
 
 			List<Device> deviceList = deviceService.getDeviceById(uId);
-			model.addAttribute("deviceList", deviceList);
 
 			// AccessToken을 이미 받은 경우 ACCESS_TOKEN 과 ARTIK_USER_ID 을 세션에 저장
 			if (accessTokenService.getAccessTokenById(uId) != null
@@ -274,20 +288,65 @@ public class HomeController {
 						artikUserProfileService.getUserIdById(session.getAttribute("userLoginInfo").toString()));
 				logger.info("[login] get ACCESS_TOKEN : {}", accessTokenService.getAccessTokenById(uId));
 			}
-
-			if (philipsHueBridgeService
-					.getPhilipsHueBridgeById(session.getAttribute("userLoginInfo").toString()) != null) {
-				session.setAttribute("PHILIPS_HUE_BRIDGE_IP", philipsHueBridgeService
-						.getPhilipsHueBridgeById(session.getAttribute("userLoginInfo").toString()));
-				session.setAttribute("PHILIPS_HUE_USERNAME", philipsHueBridgeService
-						.getPhilipsHueUsernameById(session.getAttribute("userLoginInfo").toString()));
-			}
-			logger.info("[login] get IPARK_ACCESS_TOKEN : {}", session.getAttribute("PHILIPS_HUE_BRIDGE_IP"));
+			//
+			// if (philipsHueBridgeService
+			// .getPhilipsHueBridgeById(session.getAttribute("userLoginInfo").toString())
+			// != null) {
+			// session.setAttribute("PHILIPS_HUE_BRIDGE_IP",
+			// philipsHueBridgeService
+			// .getPhilipsHueBridgeById(session.getAttribute("userLoginInfo").toString()));
+			// session.setAttribute("PHILIPS_HUE_USERNAME",
+			// philipsHueBridgeService
+			// .getPhilipsHueUsernameById(session.getAttribute("userLoginInfo").toString()));
+			// }
+			// logger.info("[login] get IPARK_ACCESS_TOKEN : {}",
+			// session.getAttribute("PHILIPS_HUE_BRIDGE_IP"));
 			session.setAttribute("IPARK_ACCESS_TOKEN", iparkAccessTokenService.getIparkAccessTokenById(uId));
 
 			logger.info("[login] get IPARK_ACCESS_TOKEN : {}", iparkAccessTokenService.getIparkAccessTokenById(uId));
 
+			List<Device> artikDevice = new ArrayList<Device>();
+			int flag = 0;
+			if (deviceList.size() != 0) {
+				for (Device d : deviceList) {
+					if (d.getCmpCode() == 0) {
+						int state = IparkUtils.getState(d, session.getAttribute("IPARK_ACCESS_TOKEN").toString());
+						if (IparkUtils.stateChangeFlag == 1) {
+							deviceService.updateDeviceState(state, d.getdId(), uId);
+						}
+
+					} else if (d.getCmpCode() == 1) {
+						artikDevice.add(d);
+					}
+				}
+
+				if (session.getAttribute("ACCESS_TOKEN") != null && artikDevice.size() != 0) {
+					List<Device> result = ArtikUtils.getDeviceState(session, artikDevice);
+					if (ArtikUtils.stateChangeFlag == 1) {
+						for (Device d : result) {
+							deviceService.updateDeviceState(d.getState(), d.getdId(), uId);
+						}
+					}
+				}
+
+				List<Device> finalList = deviceService.getDeviceById(uId);
+				for (Device d : finalList) {
+					if (deviceService.getGIdBydId(d.getdId()) != null) {
+						for (String s : deviceService.getGIdBydId(d.getdId())) {
+							deviceService.updateGroupState(0, s);
+							for (String dId : deviceService.getDeviceGroupDids(uId, s)) {
+								if (deviceService.getDeviceStateByDId(dId, uId) == 1) {
+									deviceService.updateGroupState(1, s);
+								}
+							}
+
+						}
+					}
+				}
+			}
+
 			thread = new InnerThread(session.getAttribute("userLoginInfo").toString());
+
 			return "redirect:/success";
 
 		} else {
@@ -300,7 +359,8 @@ public class HomeController {
 
 	@RequestMapping("logout")
 	public ModelAndView logout(HttpSession session, Model model) {
-		thread.shutdownNow();
+		if (thread != null)
+			thread.shutdownNow();
 		ModelAndView mv = new ModelAndView("home", "error_message", "로그인 후 이용바랍니다:D");
 		session.invalidate();
 
@@ -309,7 +369,8 @@ public class HomeController {
 
 	@RequestMapping("createGroup")
 	public ModelAndView createGroup(HttpSession session, Model model) {
-		thread.shutdownNow();
+		if (thread != null)
+			thread.shutdownNow();
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("createGroup");
 		String uId = session.getAttribute("userLoginInfo").toString();
@@ -326,14 +387,16 @@ public class HomeController {
 	}
 
 	@RequestMapping("thread")
-	public void thread(HttpSession session) throws Exception {
+	public String thread(HttpSession session) throws Exception {
 		logger.info("[thread] {}", session.getAttribute("userLoginInfo").toString());
-		thread.call();
-		logger.info("try out");
+		if (thread.stop)
+			thread.call();
+
+		return "redirect:/success";
 	}
 
 	@Async
-	public class InnerThread implements Callable {
+	public class InnerThread implements Callable<Object> {
 		String userId;
 		Boolean stop = false;
 
@@ -343,26 +406,32 @@ public class HomeController {
 
 		public void shutdownNow() {
 			// TODO Auto-generated method stub
+			logger.info("thread shutdown");
 			stop = true;
 		}
 
 		@SuppressWarnings("deprecation")
 		public void test() {
-			int i = 0;
 			List<Device> oldList = deviceService.getDeviceById(userId);
 			List<Device> newList = deviceService.getDeviceById(userId);
 
 			while (!stop) {
-				i++;
 				try {
-					Thread.sleep(2000);
+					Thread.sleep(1000);
 					newList.clear();
 					newList = deviceService.getDeviceById(userId);
-					for (int j = 0; j < oldList.size(); j++) {
-						logger.info("{} < {}", userId + ":" + newList.get(j).getName() + newList.get(j).getState(),
-								oldList.get(j).getName() + oldList.get(j).getState());
-						if (oldList.get(j).getState() != newList.get(j).getState()) {
-							stop = true;
+					if (oldList.size() != 0 && newList.size() != 0) {
+						for (int j = 0; j < oldList.size(); j++) {
+							for (int i = 0; i < newList.size(); i++) {
+								if (oldList.get(j).getdId().equals(newList.get(i).getdId())) {
+									if (oldList.get(j).getState() != newList.get(i).getState()) {
+										logger.info("[DB change]");
+										Thread.sleep(1000);
+										stop = true;
+										
+									}
+								}
+							}
 						}
 					}
 
@@ -371,6 +440,7 @@ public class HomeController {
 				}
 			}
 
+			return;
 		}
 
 		@Override

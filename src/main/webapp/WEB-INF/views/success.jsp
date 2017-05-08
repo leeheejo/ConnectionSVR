@@ -15,7 +15,7 @@
 <script
 	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script type="text/javascript"
-	src="http:////code.jquery.com/jquery-1.12.4.js"></script>
+	src="https:////code.jquery.com/jquery-1.12.4.js"></script>
 
 <script
 	src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
@@ -48,12 +48,11 @@
 			},
 			error : function(request, status, error) {
 			}
+
 		});
 	});
 </script>
-<script>
-	
-</script>
+
 <body>
 	<center>
 		<br>
@@ -153,7 +152,8 @@
 									<c:otherwise>
 										<td>
 											<form action="deleteDevice" method="GET">
-												<input type="hidden" name="dId" value='${row.dId}' />
+												<input type="hidden" name="dId" value='${row.dId}' /> <input
+													type="hidden" name="cmpCode" value='${row.cmpCode}' />
 												<button type="submit" class="btn btn-danger btn-sm"
 													onClick="location.href='deleteDevice'">
 													<span class="glyphicon glyphicon-trash"></span>
@@ -176,13 +176,21 @@
 		</div>
 
 		<div class="container" align="right">
-			
+
+			<button type="button" class="btn btn-default btn-md"
+				onClick="location.href='test'" id="subscription" name="subscription">
+				<span class="glyphicon glyphicon-plus"></span>
+			</button>
+			<!--  
 			<button type="button" class="btn btn-default btn-md"
 				onClick="location.href='success'" id="refresh" name="refresh">
 				<span class="glyphicon glyphicon-refresh"></span>
 			</button>
+			
+			-->
 			<button type="button" class="btn btn-default btn-md"
-				onClick="location.href='createGroup'" id="createGroup" name="createGroup">
+				onClick="location.href='createGroup'" id="createGroup"
+				name="createGroup">
 				<span class="glyphicon glyphicon-link"></span>
 			</button>
 			<button type="button" class="btn btn-info btn-md"

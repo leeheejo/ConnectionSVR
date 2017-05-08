@@ -25,22 +25,35 @@
 	<insert id="insertDevice" parameterType="HashMap">
 		INSERT INTO device
 		(dId,
-		uId, name, uptDt, state, dtId, cmpCode)
-		VALUES (#{dId}, #{uId},
-		#{name},NOW(), 0, #{dtId}, #{cmpCode});
+		uId, name, uptDt, state, dtId, cmpCode, subscriptionId)
+		VALUES (#{dId},
+		#{uId},
+		#{name},NOW(), 0, #{dtId}, #{cmpCode}, #{subscriptionId});
 	</insert>
 
 	<update id="updateDeviceState" parameterType="HashMap">
 		UPDATE device
 		SET
 		state = #{state}
-		WHERE dId LIKE #{dId} AND uId LIKE #{uId};
+		WHERE dId LIKE #{dId}
+		AND uId LIKE #{uId};
 	</update>
 
-	<select id="getDeviceCmpCode" parameterType="HashMap" resultType="Integer">
+	<update id="updateDeviceStateSubscription" parameterType="HashMap">
+		UPDATE
+		device
+		SET
+		state = #{state}
+		WHERE dId LIKE #{dId};
+	</update>
+
+	<select id="getDeviceCmpCode" parameterType="HashMap"
+		resultType="Integer">
 		SELECT cmpCode
 		FROM device
-		WHERE dId LIKE #{dId} AND uId LIKE #{uId};
+		WHERE dId LIKE #{dId} AND uId LIKE
+		#{uId};
+
 	</select>
 
 	<delete id="deleteDevice" parameterType="HashMap">
@@ -64,11 +77,62 @@
 		VALUES (#{dIds}, #{uId},#{gId});
 	</insert>
 
+	<select id="getUIdByDId" parameterType="HashMap" resultType="String">
+		select uId
+		from device
+		where dId like #{dId} limit 1 ;
+	</select>
+
+	<select id="getUIdsByDId" parameterType="HashMap" resultType="String">
+		select uId
+		from device
+		where dId like #{dId};
+	</select>
+
+	<select id="getSubscriptionIdByDId" parameterType="HashMap"
+		resultType="String">
+		select subscriptionId
+		from device
+		where dId like #{dId} limit
+		1 ;
+	</select>
+
+	<select id="getSubscriptionCnt" parameterType="HashMap"
+		resultType="Integer">
+		select count(subscriptionId)
+		from device
+		where dId like
+		#{dId};
+	</select>
+
+	<update id="updateGroupState" parameterType="HashMap">
+		UPDATE
+		device
+		SET
+		state = #{state}
+		WHERE dId LIKE #{dId};
+	</update>
+
+	<select id="getGIdBydId" parameterType="HashMap" resultType="String">
+		select gId
+		from device_group
+		where dIds like #{dId};
+	</select>
+
 	<select id="getDeviceGroupDids" parameterType="HashMap"
 		resultType="String">
 		select dIds
 		from device_group
-		where uId like  #{uId} and gId like #{gId};
+		where uId like #{uId} and gId
+		like #{gId};
+	</select>
+
+	<select id="getDeviceStateByDId" parameterType="HashMap"
+		resultType="Integer">
+		select state
+		from device
+		where dId like #{dId} and uId like
+		#{uId};
 	</select>
 
 </mapper>

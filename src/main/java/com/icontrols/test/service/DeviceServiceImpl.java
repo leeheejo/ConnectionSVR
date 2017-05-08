@@ -33,6 +33,7 @@ public class DeviceServiceImpl implements DeviceService {
 		map.put("dId", device.getdId());
 		map.put("name", device.getName());
 		map.put("cmpCode", device.getCmpCode());
+		map.put("subscriptionId", device.getSubscriptionId());
 
 		deviceDao.insertDevice(map);
 	}
@@ -54,7 +55,7 @@ public class DeviceServiceImpl implements DeviceService {
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		map.put("dId", dId);
 		map.put("uId", uId);
-		
+
 		return deviceDao.getDeviceCmpCode(map);
 	}
 
@@ -64,9 +65,9 @@ public class DeviceServiceImpl implements DeviceService {
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		map.put("dId", dId);
 		map.put("uId", uId);
-		
+
 		deviceDao.deleteDevice(map);
-		
+
 	}
 
 	@Override
@@ -76,7 +77,7 @@ public class DeviceServiceImpl implements DeviceService {
 		map.put("name", name);
 		map.put("uId", uId);
 		map.put("cmpCode", cmpCode);
-		
+
 		return deviceDao.getDIdByName(map);
 	}
 
@@ -87,18 +88,92 @@ public class DeviceServiceImpl implements DeviceService {
 		map.put("dIds", dg.getdIds());
 		map.put("uId", dg.getuId());
 		map.put("gId", dg.getgId());
-		
+
 		deviceDao.insertDeviceGroup(map);
 	}
 
 	@Override
-	public String getDeviceGroupDids(String uId, String gId) {
+	public List<String> getDeviceGroupDids(String uId, String gId) {
 		// TODO Auto-generated method stub
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		map.put("gId", gId);
 		map.put("uId", uId);
-		
+
 		return deviceDao.getDeviceGroupDids(map);
+	}
+
+	@Override
+	public String getUIdByDId(String dId) {
+		// TODO Auto-generated method stub
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("dId", dId);
+		return deviceDao.getUIdByDId(map);
+	}
+
+	@Override
+	public void updateDeviceStateSubscription(Integer state, String dId) {
+		// TODO Auto-generated method stub
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("dId", dId);
+		map.put("state", state);
+
+		deviceDao.updateDeviceStateSubscription(map);
+
+	}
+
+	@Override
+	public String getSubscriptionIdByDId(String dId) {
+		// TODO Auto-generated method stub
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("dId", dId);
+
+		return deviceDao.getSubscriptionIdByDId(map);
+	}
+
+	@Override
+	public Integer getSubscriptionCnt(String dId) {
+		// TODO Auto-generated method stub
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("dId", dId);
+
+		return deviceDao.getSubscriptionCnt(map);
+	}
+
+	@Override
+	public void updateGroupState(Integer state, String dId) {
+		// TODO Auto-generated method stub
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("dId", dId);
+		map.put("state", state);
+
+		deviceDao.updateGroupState(map);
+	}
+
+	@Override
+	public List<String> getGIdBydId(String dId) {
+		// TODO Auto-generated method stub
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("dId", dId);
+		return deviceDao.getGIdBydId(map);
+	}
+
+	@Override
+	public Integer getDeviceStateByDId(String dId, String uId) {
+		// TODO Auto-generated method stub
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("dId", dId);
+		map.put("uId", uId);
+
+		return deviceDao.getDeviceStateByDId(map);
+	}
+
+	@Override
+	public List<String> getUIdsByDId(String dId) {
+		// TODO Auto-generated method stub
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("dId", dId);
+		
+		return deviceDao.getUIdsByDId(map);
 	}
 
 }

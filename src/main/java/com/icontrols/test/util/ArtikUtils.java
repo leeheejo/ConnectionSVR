@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-
 import javax.net.ssl.HttpsURLConnection;
 import javax.servlet.http.HttpSession;
 
@@ -232,7 +231,7 @@ public class ArtikUtils {
 		int result = 0;
 
 		// HttpPost 통신
-		URL url = new URL("https://api.artik.cloud/v1.1/subscriptions/");
+		URL url = new URL("https://api.artik.cloud/v1.1/subscriptions");
 		HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
 		con.setRequestMethod("GET");
 		con.setDoInput(true);
@@ -348,44 +347,6 @@ public class ArtikUtils {
 		br.close();
 	}
 
-	public static void createSubscription(HttpSession session) throws Exception {
-
-		logger.info("[createSubscription]");
-		// HttpPost 통신
-		URL url = new URL("https://api.artik.cloud/v1.1/subscriptions");
-		HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
-		con.setRequestMethod("POST");
-		con.setDoInput(true);
-		con.setDoOutput(true);
-
-		String accessToken = session.getAttribute("ACCESS_TOKEN").toString();
-		// Header
-		String authorizationHeader = "bearer " + accessToken;
-		con.setRequestProperty("Authorization", authorizationHeader);
-		con.setRequestProperty("Content-Type", "application/json");
-
-		// Param
-		String param = "{\"uid\": \"" + session.getAttribute("ARTIK_USER_ID").toString() + "\",\"callbackUrl\": \""
-				+ NetworkInfo.ARTIK_CALLBACK_URL + "\",  \"messageType\": \"message\"}";
-
-		logger.info("[createSubscription] PARAM : {}", param);
-
-		OutputStream os = con.getOutputStream();
-		os.write(param.getBytes());
-		os.flush();
-		os.close();
-
-		// Response Code
-		int responseCode = con.getResponseCode();
-		logger.info("[createSubscription] responseCode : {}", responseCode + con.getResponseMessage());
-
-		// Response Data
-		BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
-		String responseData = br.readLine();
-		logger.info("[createSubscription] responseData : {}", responseData);
-		br.close();
-	}
-
 	public static AccessToken refreshAccessToken(String refreshToken) throws Exception {
 
 		logger.info("[getArtikAccessToken]");
@@ -427,6 +388,174 @@ public class ArtikUtils {
 
 		return accessToken;
 	}
+	
+	public static String createSubscription(HttpSession session, String uId, String ddId) throws Exception {
+
+		logger.info("[createSubscription]");
+		// HttpPost 통신
+		URL url = new URL("https://api.artik.cloud/v1.1/subscriptions");
+		HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+		con.setRequestMethod("POST");
+		con.setDoInput(true);
+		con.setDoOutput(true);
+
+		String accessToken = session.getAttribute("ACCESS_TOKEN").toString();
+		// Header
+		String authorizationHeader = "bearer " + accessToken;
+		con.setRequestProperty("Authorization", authorizationHeader);
+		con.setRequestProperty("Content-Type", "application/json");
+
+		// Param
+		String param = "{\"messageType\":\"action\", \"uid\":\"" + uId + "\",\"ddid\":\"" + ddId
+				+ "\",\"description\":\"" + ddId
+				+ "\", \"subscriptionType\": \"httpCallback\",\"callbackUrl\":\"https://icontrols-dev.com/connectionSVR/callback\"}";
+
+		logger.info("[createSubscription] PARAM : {}", param);
+
+		OutputStream os = con.getOutputStream();
+		os.write(param.getBytes());
+		os.flush();
+		os.close();
+
+		// Response Code
+		int responseCode = con.getResponseCode();
+		logger.info("[createSubscription] responseCode : {}", responseCode + con.getResponseMessage());
+
+		// Response Data
+		BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+		String responseData = br.readLine();
+		logger.info("[createSubscription] responseData : {}", responseData);
+		br.close();
+		String subscriptionId = new JSONObject(responseData).getJSONObject("data").getString("id");
+		
+		
+		return subscriptionId;
+		// {"data":{"id":"46d418adf6454ecb8ca18632e445e843","aid":"cbd3e38e12344b22a8c76cd3789b0e0e","messageType":"action","uid":"58e8794672f848f5bf65dfd6267ff9b9","ddid":"f9da7204a9644b99a92ae2da56c48df8","description":"f9da7204a9644b99a92ae2da56c48df8","subscriptionType":"httpCallback","callbackUrl":"https://icontrols-dev.com/connectionSVR/callback","status":"PENDING_CALLBACK_VALIDATION","createdOn":1494131150908,"modifiedOn":1494131150908}}
+
+	}
+
+	public static void getSubscription(HttpSession session) throws Exception {
+
+		logger.info("[getSubscription]");
+		// HttpPost 통신
+		URL url = new URL(
+				"https://api.artik.cloud/v1.1/subscriptions?count=100&uid=58e8794672f848f5bf65dfd6267ff9b9&offset=0");
+		HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+		con.setRequestMethod("GET");
+		con.setDoInput(true);
+		con.setDoOutput(true);
+
+		String accessToken = session.getAttribute("ACCESS_TOKEN").toString();
+		// Header
+		String authorizationHeader = "bearer " + accessToken;
+		con.setRequestProperty("Authorization", authorizationHeader);
+		con.setRequestProperty("Content-Type", "application/json");
+
+		// Response Code
+		int responseCode = con.getResponseCode();
+		logger.info("[getSubscription] responseCode : {}", responseCode + con.getResponseMessage());
+
+		// Response Data
+		BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+		String responseData = br.readLine();
+		logger.info("[getSubscription] responseData : {}", responseData);
+		br.close();
+	}
+	
+	public static void validateSubscription(String subscriptionId, String aId, String nonce) throws Exception {
+		logger.info("[validateSubscription]");
+		// HttpPost 통신
+		URL url = new URL("https://api.artik.cloud/v1.1/subscriptions/"+subscriptionId+"/validate");
+		HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+		con.setRequestMethod("POST");
+		con.setDoInput(true);
+		con.setDoOutput(true);
+		con.setRequestProperty("Content-Type", "application/json");
+
+		// Param
+		String param = "{\"aid\":\"" + aId +"\",\"nonce\":\""+nonce+"\"}";
+
+		logger.info("[validateSubscription] PARAM : {}", param);
+
+		OutputStream os = con.getOutputStream();
+		os.write(param.getBytes());
+		os.flush();
+		os.close();
+
+		// Response Code
+		int responseCode = con.getResponseCode();
+		logger.info("[validateSubscription] responseCode : {}", responseCode + con.getResponseMessage());
+
+		// Response Data
+		BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+		String responseData = br.readLine();
+		logger.info("[validateSubscription] responseData : {}", responseData);
+		br.close();
+	}
+	
+	public static void deleteSubscription(HttpSession session, String subscriptionId) throws Exception {
+		logger.info("[deleteSubscription]");
+		// HttpPost 통신
+		URL url = new URL("https://api.artik.cloud/v1.1/subscriptions/"+subscriptionId);
+		HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+		con.setRequestMethod("DELETE");
+		con.setDoInput(true);
+		con.setDoOutput(true);
+
+		String accessToken = session.getAttribute("ACCESS_TOKEN").toString();
+		// Header
+		String authorizationHeader = "bearer " + accessToken;
+		con.setRequestProperty("Authorization", authorizationHeader);
+		con.setRequestProperty("Content-Type", "application/json");
+
+
+		// Response Code
+		int responseCode = con.getResponseCode();
+		logger.info("[deleteSubscription] responseCode : {}", responseCode + con.getResponseMessage());
+
+		// Response Data
+		BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+		String responseData = br.readLine();
+		logger.info("[deleteSubscription] responseData : {}", responseData);
+		br.close();
+	}
+	
+	public static String getNotification(String accessToken, String notificationId) throws Exception {
+
+		logger.info("[getNotification] {} ",notificationId );
+		// HttpPost 통신
+		URL url = new URL("https://api.artik.cloud/v1.1/notifications/"+notificationId+"/messages");
+		HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+		con.setRequestMethod("GET");
+		con.setDoInput(true);
+		con.setDoOutput(true);
+
+		// Header
+		String authorizationHeader = "bearer " + accessToken;
+		con.setRequestProperty("Authorization", authorizationHeader);
+		con.setRequestProperty("Content-Type", "application/json");
+
+		// Response Code
+		int responseCode = con.getResponseCode();
+		logger.info("[getNotification] responseCode : {}", responseCode + con.getResponseMessage());
+
+		// Response Data
+		BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+		String responseData = br.readLine();
+		logger.info("[getNotification] responseData : {}", responseData);
+		br.close();
+		
+		JSONObject obj = new JSONObject(responseData);
+		logger.info("{}",obj);
+		JSONObject data = obj.getJSONArray("data").getJSONObject(0);
+		logger.info("{}",data);
+		JSONObject actions = data.getJSONObject("data").getJSONArray("actions").getJSONObject(0);
+		logger.info("{}",actions);
+		String action = actions.getString("name");
+		
+		return action;
+	}
+	
 
 	public static List<Device> stateParser(String uId, String responseData, List<Device> deviceList) {
 
@@ -472,40 +601,6 @@ public class ArtikUtils {
 		}
 
 		return result;
-	}
-
-	public static void createSubscription() throws Exception {
-		String userpass = NetworkInfo.ARTIK_CLIENT_ID + ":" + NetworkInfo.ARTIK_CLIENT_SECRET;
-		String basicAuth = "Basic " + new String(new Base64().encode(userpass.getBytes()));
-
-		logger.info("[createSubscription]");
-		URL url = new URL("https://api.artik.cloud/v1.1/subscriptions");
-		HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
-		con.setRequestMethod("POST");
-		con.setDoInput(true);
-		con.setDoOutput(true);
-
-		// Header
-		con.setRequestProperty("Host", "accounts.artik.cloud");
-		con.setRequestProperty("Authorization", basicAuth);
-		con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-
-		// Parameter
-		String param = "{\"messageType\":\"message\", \"uid\":\"58e8794672f848f5bf65dfd6267ff9b9\",\"description\":\"This is a subscription to a user's devices\", \"subscriptionType\": \"httpCallback\",\"callbackUrl\":\"https://icontrols-dev.com/connectionSVR/callback\"}";
-
-		OutputStream os = con.getOutputStream();
-		os.write(param.getBytes());
-		os.flush();
-		os.close();
-
-		// Response
-		int responseCode = con.getResponseCode();
-		logger.info("[createSubscription] responseCode : {}", responseCode + con.getResponseMessage());
-
-		BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
-		String responseData = br.readLine();
-		logger.info("[createSubscription] responseData : {}", responseData);
-		br.close();
 	}
 
 	// Parsing DeviceList(Json)

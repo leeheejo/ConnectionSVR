@@ -11,6 +11,17 @@ public class Device {
 	private Integer state;
 	private String dtId;
 	private Integer cmpCode;
+	private String subscriptionId;
+
+	public Device(String uId, String dId, String name, String dtId, Integer cmpCode, String subscriptionId) {
+		super();
+		this.uId = uId;
+		this.dId = dId;
+		this.name = name;
+		this.dtId = dtId;
+		this.cmpCode = cmpCode;
+		this.subscriptionId = subscriptionId;
+	}
 
 	public Device(String uId, String dId, String name, Integer state, String dtId, Integer cmpCode) {
 		super();
@@ -18,10 +29,10 @@ public class Device {
 		this.dId = dId;
 		this.name = name;
 		this.dtId = dtId;
-		this.state =state;
+		this.state = state;
 		this.cmpCode = cmpCode;
 	}
-	
+
 	public Device(String uId, String dId, String name, String dtId, int cmpCode) {
 		super();
 		this.uId = uId;
@@ -30,7 +41,7 @@ public class Device {
 		this.dtId = dtId;
 		this.cmpCode = cmpCode;
 	}
-	
+
 	public Device(String uId, String dId, String name, String dtId) {
 		super();
 		this.uId = uId;
@@ -53,7 +64,7 @@ public class Device {
 		this.name = name;
 		this.state = state;
 	}
-	
+
 	public Device(String uId, String dId, String name, Integer state, String dtId) {
 		super();
 		this.uId = uId;
@@ -62,7 +73,6 @@ public class Device {
 		this.state = state;
 		this.dtId = dtId;
 	}
-
 
 	public Device(String dId, String name) {
 		super();
@@ -123,6 +133,18 @@ public class Device {
 	}
 
 	public void setCmpCode(int cmpCode) {
+		this.cmpCode = cmpCode;
+	}
+
+	public String getSubscriptionId() {
+		return subscriptionId;
+	}
+
+	public void setSubscriptionId(String subscriptionId) {
+		this.subscriptionId = subscriptionId;
+	}
+
+	public void setCmpCode(Integer cmpCode) {
 		this.cmpCode = cmpCode;
 	}
 
