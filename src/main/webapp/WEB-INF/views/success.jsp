@@ -1,10 +1,9 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@ page language="java" contentType="text/html; charset=EUC-KR"
 	pageEncoding="EUC-KR"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ page session="true"%>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -38,84 +37,44 @@
 		}
 	}
 
-	$(document)
-			.ready(
-					function() {
-						$('#example')
-								.dataTable(
-										{
-											"ajax" : "getDeviceListAjax",
-											"paging" : false,
-											"searching" : false,
-											"ordering" : false,
-											"info" : false,
-											"columnDefs" : [
-													{
-														"render" : function(
-																data, type, row) {
-															return row.name;
-														},
-														"targets" : 0
-													},
-													{
-														"render" : function(
-																data, type, row) {
-															if (row.state == 0)
-																return '<span class="label label-default">OFF</span>';
-															else
-																return '<span class="label label-primary">ON</span>';
-														},
-														"targets" : 1
-													},
-													{
-														"render" : function(
-																data, type, row) {
-															return '<form action="sendActionTest" method="GET">'
-																	+ '<input type="hidden" name="dId" value="'+row.dId+'"/>'
-																	+ '<input type="hidden" name="cmpCode" value="'+row.cmpCode+'"/>'
-																	+ '<input type="hidden" name="state" value="'+row.state+'"/>'
-																	+ '<button type="submit" class="btn btn-success btn-sm" id="send" value="send">'
-																	+ '<span class="glyphicon glyphicon-send">'
-																	+ '</span>'
-																	+ '</button>'
-																	+ '</form>';
-														},
-														"targets" : 2
-													},
-													{
-														"render" : function(
-																data, type, row) {
+	function sendAction(dId, state, cmpCode) {
 
-															return '<form action="deleteDevice" method="GET">'
-																	+ '<input type="hidden" name="dId" value="'+row.dId+'"/>'
-																	+ '<input type="hidden" name="cmpCode" value="'+row.cmpCode+'"/>'
-																	+ '<button type= "submit" class="btn btn-danger btn-sm">'
-																	+ '<span class="glyphicon glyphicon-trash">'
-																	+ '</span>'
-																	+ '</button>'
-																	+ '</form>';
-														},
-														"targets" : 3
-													} ]
+		var allData = {
+			"dId" : dId,
+			"state" : state,
+			"cmpCode" : cmpCode
+		};
 
-										});
+		$.ajax({
+			url : "sendActionTest",
+			dataType : "json",
+			data : allData,
+			type : "get",
+			success : function() {
+				return false;
+			},
+			error : function(request, status, error) {
+				return false;
+			}
 
-						setTimeout(function(){
-							$.ajax({
-								url : "thread",
-								dataType : "text",
-								type : "get",
-								success : function(data) {
-									document.location.reload();
-								},
-								error : function(request, status, error) {
-								}
+		});
 
-							});
-						}, 2000);
-						
+	}
 
-					});
+	$(document).ready(function() {
+		$.ajax({
+			url : "thread",
+			dataType : "text",
+			type : "get",
+			success : function(data) {
+				document.location.reload();
+			},
+			error : function(request, status, error) {
+			}
+
+		});
+
+	});
 </script>
 
 <body>
@@ -154,6 +113,87 @@
 						<th>삭제</th>
 					</tr>
 				</thead>
+
+				<c:choose>
+					<c:when test="${fn:length(deviceList) > 0}">
+						<c:forEach items="${deviceList}" var="row">
+							<tr
+								onmouseover="javascript:changeTrColor(this, '#FFFFFF', '#F4FFFD')">
+
+								<!-- <td>${row.cmpCode}</td> -->
+								<td name="name">${row.name}</td>
+
+								<c:set value="${row.state}" var="state" />
+								<c:choose>
+									<c:when test="${state == 0}">
+										<td><span class="label label-default">OFF</span></td>
+									</c:when>
+									<c:when test="${state == 1}">
+										<td><span class="label label-primary">ON</span></td>
+									</c:when>
+								</c:choose>
+
+								<td>
+									<button type="button" class="btn btn-success btn-sm" id="send"
+										value="send" onclick='sendAction("${row.dId}",${row.state},${row.cmpCode})'>
+										<span class="glyphicon glyphicon-send"></span>
+									</button> <!-- 										 <c:set
+											value="${row.dtId}" var="dtId" /> 
+											
+										<c:choose>
+											<c:when test="${dtId eq 'dt6f79b9b4aa3b4a80b7b76c2190016c61'}">
+												<table>
+													<tr>
+														<td><input type="text" id="R" name="R"
+															placeHolder="R" style="width: 30px;"
+															onKeyPress="return numkeyCheck(event)" /></td>
+														<td><input type="text" id="G" name="G"
+															placeHolder="G" style="width: 30px;"
+															onKeyPress="return numkeyCheck(event)" /></td>
+														<td><input type="text" id="B" name="B"
+															placeHolder="B" style="width: 30px;"
+															onKeyPress="return numkeyCheck(event)" /></td>
+													</tr>
+												</table>
+											</c:when>
+										</c:choose>
+
+ -->
+
+
+
+
+								</td>
+
+								<c:set value="${row.cmpCode}" var="cmpCode" />
+
+								<c:choose>
+									<c:when test="${cmpCode eq '0'}">
+										<td>&nbsp&nbsp</td>
+									</c:when>
+									<c:otherwise>
+										<td>
+											<form action="deleteDevice" method="GET">
+												<input type="hidden" name="dId" value='${row.dId}' /> <input
+													type="hidden" name="cmpCode" value='${row.cmpCode}' />
+												<button type="submit" class="btn btn-danger btn-sm"
+													onClick="location.href='deleteDevice'">
+													<span class="glyphicon glyphicon-trash"></span>
+												</button>
+											</form>
+										</td>
+									</c:otherwise>
+								</c:choose>
+							</tr>
+						</c:forEach>
+					</c:when>
+					<c:otherwise>
+						<tr align="center">
+							<td colspan="4">조회된 결과가 없습니다.</td>
+						</tr>
+					</c:otherwise>
+				</c:choose>
+
 			</table>
 		</div>
 

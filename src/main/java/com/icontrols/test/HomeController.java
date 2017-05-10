@@ -140,60 +140,16 @@ public class HomeController {
 
 	@RequestMapping("success")
 	public ModelAndView success(HttpSession session, Model model) throws Exception {
-		logger.info("[success]");
 		if (thread != null)
 			thread.shutdownNow();
-
+		logger.info("[success]");
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("success");
 		String uId = session.getAttribute("userLoginInfo").toString();
+		List<Device> deviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
 
-		// logger.info("{}", deviceList.toString());
-		// List<Device> artikDevice = new ArrayList<Device>();
-		// List<Device> hueDevice = new ArrayList<Device>();
-		// List<Device> finalDevice = new ArrayList<Device>();
-		// if (deviceList.size() != 0) {
-		// for (Device d : deviceList) {
-		// if (d.getCmpCode() == 0) {
-		// int state = IparkUtils.getState(d,
-		// session.getAttribute("IPARK_ACCESS_TOKEN").toString());
-		// if (IparkUtils.stateChangeFlag == 1) {
-		// deviceService.updateDeviceState(state, d.getdId(), uId);
-		// }
-		// finalDevice.add(d);
-		//
-		// } else if (d.getCmpCode() == 1) {
-		// artikDevice.add(d);
-		// } else if (d.getCmpCode() == 2) {
-		// hueDevice.add(d);
-		// } else if (d.getCmpCode() == 4) {
-		// finalDevice.add(d);
-		// }
-		// }
-		//
-		// if (hueDevice.size() != 0) {
-		// List<Device> hueResult = PhilipsHueUtils.getDeviceState(session,
-		// hueDevice);
-		// if (PhilipsHueUtils.stateChangeFlag == 1) {
-		// for (Device d : hueResult) {
-		// deviceService.updateDeviceState(d.getState(), d.getdId(), uId);
-		// }
-		// }
-		// finalDevice.addAll(hueResult);
-		// }
-		//
-		// if (session.getAttribute("ACCESS_TOKEN") != null &&
-		// artikDevice.size() != 0) {
-		// List<Device> result = ArtikUtils.getDeviceState(session,
-		// artikDevice);
-		// if (ArtikUtils.stateChangeFlag == 1) {
-		// for (Device d : result) {
-		// deviceService.updateDeviceState(d.getState(), d.getdId(), uId);
-		// }
-		// }
-		// finalDevice.addAll(result);
-		// }
-		// }
+		model.addAttribute("deviceList", deviceList);
+
 		return mav;
 	}
 
@@ -249,13 +205,13 @@ public class HomeController {
 		return "redirect:/success";
 	}
 
-	@RequestMapping("/sendActionTest")
-	public String sendActionTest(HttpSession session, @RequestParam(value = "dId") String dId,
+	@RequestMapping(value = "sendActionTest")
+	@ResponseBody
+	public void sendActionTest(HttpSession session, @RequestParam(value = "dId") String dId,
 			@RequestParam(value = "state") int currentState, @RequestParam(value = "cmpCode") int cmpCode)
 			throws Exception {
-		if (thread != null) {
+		if (thread != null)
 			thread.shutdownNow();
-		}
 
 		logger.info("[sendActionTest]");
 
@@ -312,9 +268,7 @@ public class HomeController {
 
 		}
 
-		// sendTestLogService.insertSendTestLog(sendTestLog);
-
-		return "redirect:/success";
+		// return "";
 	}
 
 	/*
@@ -371,48 +325,47 @@ public class HomeController {
 
 			logger.info("[login] get IPARK_ACCESS_TOKEN : {}", iparkAccessTokenService.getIparkAccessTokenById(uId));
 
-			// List<Device> artikDevice = new ArrayList<Device>();
-			// int flag = 0;
-			// if (deviceList.size() != 0) {
-			// for (Device d : deviceList) {
-			// if (d.getCmpCode() == 0) {
-			// int state = IparkUtils.getState(d,
-			// session.getAttribute("IPARK_ACCESS_TOKEN").toString());
-			// if (IparkUtils.stateChangeFlag == 1) {
-			// deviceService.updateDeviceState(state, d.getdId(), uId);
-			// }
-			//
-			// } else if (d.getCmpCode() == 1) {
-			// artikDevice.add(d);
-			// }
-			// }
-			//
-			// if (session.getAttribute("ACCESS_TOKEN") != null &&
-			// artikDevice.size() != 0) {
-			// List<Device> result = ArtikUtils.getDeviceState(session,
-			// artikDevice);
-			// if (ArtikUtils.stateChangeFlag == 1) {
-			// for (Device d : result) {
-			// deviceService.updateDeviceState(d.getState(), d.getdId(), uId);
-			// }
-			// }
-			// }
-			//
-			// List<Device> finalList = deviceService.getDeviceById(uId);
-			// for (Device d : finalList) {
-			// if (deviceService.getGIdBydId(d.getdId()) != null) {
-			// for (String s : deviceService.getGIdBydId(d.getdId())) {
-			// deviceService.updateGroupState(0, s);
-			// for (String dId : deviceService.getDeviceGroupDids(uId, s)) {
-			// if (deviceService.getDeviceStateByDId(dId, uId) == 1) {
-			// deviceService.updateGroupState(1, s);
-			// }
-			// }
-			//
-			// }
-			// }
-			// }
-			// }
+			List<Device> deviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
+			List<Device> artikDevice = new ArrayList<Device>();
+			List<Device> finalDevice = new ArrayList<Device>();
+			if (deviceList.size() != 0) {
+				for (Device d : deviceList) {
+					if (d.getCmpCode() == 0) {
+						int state = IparkUtils.getState(d, session.getAttribute("IPARK_ACCESS_TOKEN").toString());
+						if (IparkUtils.stateChangeFlag == 1) {
+							deviceService.updateDeviceState(state, d.getdId(), uId);
+						}
+						finalDevice.add(d);
+
+					} else if (d.getCmpCode() == 1) {
+						artikDevice.add(d);
+					} else if (d.getCmpCode() == 4) {
+						finalDevice.add(d);
+					}
+				}
+
+				if (session.getAttribute("ACCESS_TOKEN") != null && artikDevice.size() != 0) {
+					List<Device> result = ArtikUtils.getDeviceState(session, artikDevice);
+					if (ArtikUtils.stateChangeFlag == 1) {
+						for (Device d : result) {
+							deviceService.updateDeviceState(d.getState(), d.getdId(), uId);
+						}
+					}
+					finalDevice.addAll(result);
+				}
+			}
+
+			List<Device> groupList = deviceService.getGroupByUId(uId);
+			if (groupList != null) {
+				for (Device d : groupList) {
+					deviceService.updateGroupState(0, d.getdId());
+					for (String dId : deviceService.getDeviceGroupDids(uId, d.getdId())) {
+						if (deviceService.getDeviceStateByDId(dId, uId) == 1) {
+							deviceService.updateGroupState(1, d.getdId());
+						}
+					}
+				}
+			}
 
 			thread = new InnerThread(session.getAttribute("userLoginInfo").toString());
 
@@ -463,8 +416,6 @@ public class HomeController {
 
 		return "redirect:/success";
 	}
-	
-	
 
 	@Async
 	public class InnerThread implements Callable<Object> {
@@ -494,12 +445,13 @@ public class HomeController {
 					if (oldList.size() != 0 && newList.size() != 0) {
 						for (int j = 0; j < oldList.size(); j++) {
 							for (int i = 0; i < newList.size(); i++) {
-								if (oldList.get(j).getdId().equals(newList.get(i).getdId())) {
-									if (oldList.get(j).getCmpCode() != 4 && oldList.get(j).getState() != newList.get(i).getState()) {
+								if (oldList.get(j).getCmpCode() != 4 && oldList.get(j).getdId().equals(newList.get(i).getdId())) {
+									if (oldList.get(j).getState() != newList.get(i).getState()) {
 										logger.info("[DB change]");
+										oldList.clear();
+										oldList.addAll(newList);
 										Thread.sleep(1000);
 										stop = true;
-
 									}
 								}
 							}

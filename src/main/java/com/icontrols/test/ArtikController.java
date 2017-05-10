@@ -143,7 +143,6 @@ public class ArtikController {
 			// id msg ID
 			// {"id":"5336bf1ef2804dd882c315d32675ab4f","ts":1494137879113,"type":"action","subscriptionId":"0d3dd7d79f664087a649540d19f11663","subscriptionQuery":{"uid":"58e8794672f848f5bf65dfd6267ff9b9","ddid":"f9da7204a9644b99a92ae2da56c48df8"},"startDate":"1494137878872","endDate":"1494137878872","count":1}
 			logger.info("{}", obj.getString("id"));
-
 			String dId = obj.getJSONObject("subscriptionQuery").getString("ddid");
 			String accessToken = accessTokenService.getAccessTokenById(deviceService.getUIdByDId(dId));
 			String action = ArtikUtils.getNotification(accessToken, obj.getString("id"));
@@ -152,9 +151,24 @@ public class ArtikController {
 			if (action.equals("setOn")) {
 				state = 1;
 			}
-			deviceService.updateDeviceStateSubscription(state, dId);
+			List<String> groupList = deviceService.getGIdBydId(dId);
 
+			if (groupList != null) {
+				for (String s : groupList) {
+					deviceService.updateGroupState(0, s);
+					for (String dIds : deviceService.getDeviceGroupDids(deviceService.getUIdByDId(s), s)) {
+						
+						if (state == 1 && deviceService.getDeviceStateByDId(s, deviceService.getUIdByDId(dIds)) != 1) {
+							logger.info("Group {} update", s);
+							deviceService.updateGroupState(state, s);
+						} 
+					}
+				}
+			}
+			
+			deviceService.updateDeviceStateSubscription(state, dId);
 		}
+
 		return "success";
 
 	}
@@ -189,34 +203,6 @@ public class ArtikController {
 
 	@RequestMapping("/getDeviceListAjax")
 	public @ResponseBody Object getDeviceListAjax(HttpSession session, Model model) throws Exception {
-
-		List<Device> userDeviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
-
-		for (Device d : userDeviceList) {
-			String dId = d.getdId();
-			
-			if (deviceService.getGIdBydId(dId) != null) {
-				for (String gId : deviceService.getGIdBydId(dId)) {
-					int flag = 0;
-					String user = deviceService.getUIdsByDId(gId).get(0);
-
-					for (String dIds : deviceService.getDeviceGroupDids(user, gId)) {
-						if (deviceService.getDeviceStateByDId(dIds, user) == 1) {
-							flag = 1;
-						}
-					}
-
-					if (flag == 1) {
-						logger.info("group update 1 ");
-						deviceService.updateGroupState(1, gId);
-					} else {
-						logger.info("group update 0 ");
-						deviceService.updateGroupState(0, gId);
-					}
-				}
-
-			}
-		}
 
 		List<Device> finalList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
 

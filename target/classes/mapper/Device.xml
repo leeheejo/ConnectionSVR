@@ -28,7 +28,8 @@
 		uId, name, uptDt, state, dtId, cmpCode, subscriptionId)
 		VALUES (#{dId},
 		#{uId},
-		#{name},NOW(), #{state}, #{dtId}, #{cmpCode}, #{subscriptionId});
+		#{name},NOW(), #{state}, #{dtId}, #{cmpCode},
+		#{subscriptionId});
 	</insert>
 
 	<update id="updateDeviceState" parameterType="HashMap">
@@ -93,7 +94,8 @@
 		resultType="String">
 		select subscriptionId
 		from device
-		where dId like #{dId} limit 1 ;
+		where dId like #{dId} limit
+		1 ;
 	</select>
 
 	<select id="getSubscriptionCnt" parameterType="HashMap"
@@ -133,11 +135,18 @@
 		where dId like #{dId} and uId like
 		#{uId};
 	</select>
-	
+
 	<delete id="deleteGroupDevice" parameterType="HashMap">
-		delete from device_group
+		delete from
+		device_group
 		WHERE
 		gId LIKE #{gId};
 	</delete>
+
+	<select id="getGroupByUId" parameterType="HashMap" resultMap="DeviceResult">
+		select uId, dId, name, state, dtId, cmpCode
+		from device
+		where cmpCode = 4 and uId like #{uId};
+	</select>
 
 </mapper>
