@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -144,9 +145,7 @@ public class ArtikController {
 			logger.info("{}", obj.getString("id"));
 
 			String dId = obj.getJSONObject("subscriptionQuery").getString("ddid");
-			String accessToken = "1e928e0a00994454b3492d794b2b1029";
-			// String accessToken =
-			// accessTokenService.getAccessTokenById(deviceService.getUIdByDId(dId));
+			String accessToken = accessTokenService.getAccessTokenById(deviceService.getUIdByDId(dId));
 			String action = ArtikUtils.getNotification(accessToken, obj.getString("id"));
 			logger.info("{}", action);
 			int state = 0;
@@ -156,7 +155,6 @@ public class ArtikController {
 			deviceService.updateDeviceStateSubscription(state, dId);
 
 		}
-
 		return "success";
 
 	}
@@ -192,31 +190,42 @@ public class ArtikController {
 	@RequestMapping("/getDeviceListAjax")
 	public @ResponseBody Object getDeviceListAjax(HttpSession session, Model model) throws Exception {
 
-		logger.info("[getDeviceListAjax]");
-
-		List<Device> artikDeviceList = ArtikUtils.getArtikDeviceList(session);
 		List<Device> userDeviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
-		List<Device> newDeviceList = new ArrayList<Device>();
 
-		for (Device dl : artikDeviceList) {
-			int flag = 0;
-			for (Device d : userDeviceList) {
-				if (dl.getdId().equals(d.getdId())) {
-					flag = 1;
+		for (Device d : userDeviceList) {
+			String dId = d.getdId();
+			
+			if (deviceService.getGIdBydId(dId) != null) {
+				for (String gId : deviceService.getGIdBydId(dId)) {
+					int flag = 0;
+					String user = deviceService.getUIdsByDId(gId).get(0);
+
+					for (String dIds : deviceService.getDeviceGroupDids(user, gId)) {
+						if (deviceService.getDeviceStateByDId(dIds, user) == 1) {
+							flag = 1;
+						}
+					}
+
+					if (flag == 1) {
+						logger.info("group update 1 ");
+						deviceService.updateGroupState(1, gId);
+					} else {
+						logger.info("group update 0 ");
+						deviceService.updateGroupState(0, gId);
+					}
 				}
-			}
-			if (flag == 0) {
 
-				newDeviceList.add(dl);
 			}
-
 		}
-		 Map<String, Object> mp = new HashMap<String, Object>();
-		  mp.put("data", newDeviceList);
-		  
-		  Object result = mp;
-		  
-		  return result;
+
+		List<Device> finalList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
+
+		Map<String, Object> mp = new HashMap<String, Object>();
+		mp.put("data", finalList);
+
+		Object result = mp;
+
+		return result;
 	}
 
 	/*
@@ -291,70 +300,6 @@ public class ArtikController {
 
 	// SEND ACTION ONLY ON/OFF
 
-	@RequestMapping("/sendActionTest")
-	public String sendActionTest(HttpSession session, @RequestParam(value = "dId") String dId,
-			@RequestParam(value = "state") int currentState, @RequestParam(value = "cmpCode") int cmpCode)
-			throws Exception {
-		logger.info("[sendActionTest]");
-		String uId = session.getAttribute("userLoginInfo").toString();
-		SendTestLog sendTestLog = null;
-		String action = "";
-		if (currentState == 0) {
-			action = "setOn";
-		} else {
-			action = "setOff";
-		}
-
-		if (cmpCode == 1) {
-			sendTestLog = ArtikUtils.Action(session, dId, action, "");
-		} else if (cmpCode == 0) {
-			sendTestLog = IparkUtils.sendAction(action, uId, dId,
-					session.getAttribute("IPARK_ACCESS_TOKEN").toString());
-
-			if (sendTestLog.getIparkState().equals("on")) {
-				deviceService.updateDeviceState(1, dId, uId);
-			} else if (sendTestLog.getIparkState().equals("off")) {
-				deviceService.updateDeviceState(0, dId, uId);
-			}
-		} else if (cmpCode == 2) {
-
-			sendTestLog = PhilipsHueUtils.sendAction(session, action, dId);
-
-		} else if (cmpCode == 4) {
-
-			List<String> groupDIds = deviceService.getDeviceGroupDids(uId, dId);
-
-			for (String s : groupDIds) {
-
-				Integer deviceType = deviceService.getDeviceCmpCode(s, uId);
-				logger.info("{} : {}", deviceType, s);
-
-				if (deviceType == 1) {
-					sendTestLog = ArtikUtils.Action(session, s, action, "");
-				} else if (deviceType == 0) {
-					sendTestLog = IparkUtils.sendAction(action, uId, s,
-							session.getAttribute("IPARK_ACCESS_TOKEN").toString());
-
-					if (sendTestLog.getIparkState().equals("on")) {
-						deviceService.updateDeviceState(1, s, uId);
-					} else if (sendTestLog.getIparkState().equals("off")) {
-						deviceService.updateDeviceState(0, s, uId);
-					}
-				} else if (deviceType == 2) {
-
-					sendTestLog = PhilipsHueUtils.sendAction(session, action, s);
-				}
-
-			}
-
-		}
-
-		sendTestLogService.insertSendTestLog(sendTestLog);
-
-		return "redirect:/success";
-
-	}
-
 	/*
 	 * Insert Device
 	 * 
@@ -375,17 +320,20 @@ public class ArtikController {
 		logger.info("[insertDevice]");
 
 		String subscriptionId = "";
-		if (cmpCode == 1 && deviceService.getSubscriptionIdByDId(dId) != null && !deviceService.getSubscriptionIdByDId(dId).equals("")) {
+		if (cmpCode == 1 && deviceService.getSubscriptionIdByDId(dId) != null
+				&& !deviceService.getSubscriptionIdByDId(dId).equals("")) {
 			subscriptionId = deviceService.getSubscriptionIdByDId(dId);
 		} else {
-			subscriptionId = ArtikUtils.createSubscription(session, session.getAttribute("userLoginInfo").toString(),dId);
+			subscriptionId = ArtikUtils.createSubscription(session, session.getAttribute("userLoginInfo").toString(),
+					dId);
 		}
-		
-		Device device = new Device(session.getAttribute("userLoginInfo").toString(), dId, name, dtId, cmpCode, subscriptionId);
+
+		Device device = new Device(session.getAttribute("userLoginInfo").toString(), dId, name, dtId, cmpCode,
+				subscriptionId);
 		device.setState(ArtikUtils.getDeviceState(session, dId));
 
 		deviceService.insertDevice(device);
-		
+
 		logger.info("[insertDevice] name : {}, state : {}", name, device.getState());
 
 		return "redirect:/success";

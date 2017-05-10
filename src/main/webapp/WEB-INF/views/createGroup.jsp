@@ -32,10 +32,9 @@
 									function() {
 										select += $(this).val() + ";";
 									});
-							alert('click');
-							document.location.href("insertGroup?dIds=" + select
-									+ "&name=" + groupName
-									+ "&dtId=group&cmpCode=4");
+							document.location.href = "insertGroup?dIds="
+									+ select + "&name=" + groupName
+									+ "&dtId=group&cmpCode=4";
 						});
 			});
 </script>
