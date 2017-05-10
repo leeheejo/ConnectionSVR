@@ -1,12 +1,13 @@
-<%@ page language="java" contentType="text/html; charset=EUC-KR"
-	pageEncoding="EUC-KR"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<%@ page language="java" contentType="text/html; charset=utf-8"
+	pageEncoding="utf-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ page session="true"%>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
 <html>
-<meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
+<meta http-equiv="Content-Type" content="text/html; charset=EUC-KR"
+	charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet"
 	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -15,24 +16,28 @@
 <script
 	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script type="text/javascript"
-	src="http:////code.jquery.com/jquery-1.12.4.js"></script>
+	src="https://code.jquery.com/jquery-1.9.1.js"></script>
 
-<script
-	src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
 
 <title>Main Page</title>
 </head>
 <script type="text/javascript">
-	function submit() {
-		 var select ="";
-		 var groupName =$('#groupName').val();
-         $.each($("input[name='device']:checked"), function(){            
-             select += $(this).val() +";";
-         });
-         
-         document.location.href("insertGroup?dIds="+select+"&name="+groupName+"&dtId=group&cmpCode=4")
-         
-	}
+	$(document).ready(
+			function() {
+				$("#clicker").click(
+						function() {
+							var select = "";
+							var groupName = $('#groupName').val();
+							$.each($("input[name='device']:checked"),
+									function() {
+										select += $(this).val() + ";";
+									});
+							alert('click');
+							document.location.href("insertGroup?dIds=" + select
+									+ "&name=" + groupName
+									+ "&dtId=group&cmpCode=4");
+						});
+			});
 </script>
 
 <body>
@@ -56,13 +61,15 @@
 				<c:when test="${fn:length(deviceList) > 0}">
 					<c:forEach items="${deviceList}" var="row">
 						<div class="checkbox">
-							<label><input type="checkbox" value='${row.dId}' name ="device">${row.name}</label>
+							<label><input type="checkbox" value='${row.dId}'
+								name="device">${row.name}</label>
 						</div>
 					</c:forEach>
 				</c:when>
 			</c:choose>
 			<div>
-				<button type="button" class="btn btn-primary" onClick ="submit()">submit</button>
+				<button type="button" class="btn btn-primary" id="clicker"
+					name="clicker">submit</button>
 			</div>
 
 		</div>

@@ -2,7 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 
 <script type="text/javascript"
-	src="http://code.jquery.com/jquery-1.9.1.js"></script>
+	src="https://code.jquery.com/jquery-1.9.1.js"></script>
 <script type="text/javascript">
 	var doc = window.opener.document;
 	var theForm = doc.getElementById("LoginForm");

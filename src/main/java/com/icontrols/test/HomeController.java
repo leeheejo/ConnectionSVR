@@ -147,9 +147,7 @@ public class HomeController {
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("success");
 		String uId = session.getAttribute("userLoginInfo").toString();
-		logger.info("[success]userLoginInfo : {}", session.getAttribute("userLoginInfo").toString());
-
-		List<Device> deviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
+		List<Device> deviceList = deviceService.getDeviceById(uId);
 
 		for (Device d : deviceList) {
 			String dId = d.getdId();
@@ -268,12 +266,16 @@ public class HomeController {
 		if (thread != null)
 			thread.shutdownNow();
 		logger.info("[deleteDevice]");
-		if (cmpCode == 1 && deviceService.getSubscriptionCnt(dId) <= 1) {
-			if (deviceService.getSubscriptionIdByDId(dId) != null)
-				ArtikUtils.deleteSubscription(session, deviceService.getSubscriptionIdByDId(dId));
+		if (cmpCode == 1 && deviceService.getSubscriptionCnt(dId) == 1) {
+			logger.info("[deleteDevice] {}", deviceService.getSubscriptionIdByDId(dId));
+			ArtikUtils.deleteSubscription(session, deviceService.getSubscriptionIdByDId(dId));
 		}
-		deviceService.deleteDevice(session.getAttribute("userLoginInfo").toString(), dId);
+		if (cmpCode == 4) {
+			deviceService.deleteGroupDevice(dId);
+		}
 
+		deviceService.deleteDevice(session.getAttribute("userLoginInfo").toString(), dId);
+		
 		return "redirect:/success";
 	}
 

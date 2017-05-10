@@ -6,7 +6,7 @@
 <c:set var="oauthUrl" value="${oauthUrl}"></c:set>
 
 <script type="text/javascript"
-	src="http://code.jquery.com/jquery-1.9.1.js"></script>
+	src="https://code.jquery.com/jquery-1.9.1.js"></script>
 <script type="text/javascript">
 <c:if test="${!empty oauthUrl and empty sessionScope.ACCESS_TOKEN}">
 	window.open('${oauthUrl}',"artikLogin", "width=500, height=1000, scrollbars=yes, resizable=yes");

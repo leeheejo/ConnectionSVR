@@ -24,4 +24,5 @@ public interface DeviceService {
 	public void updateGroupState (Integer state, String dId);
 	public List<String> getGIdBydId (String dId);
 	public Integer getDeviceStateByDId (String dId, String uId);
+	public void deleteGroupDevice (String gId);
 }

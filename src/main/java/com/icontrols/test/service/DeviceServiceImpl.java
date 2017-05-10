@@ -177,4 +177,12 @@ public class DeviceServiceImpl implements DeviceService {
 		return deviceDao.getUIdsByDId(map);
 	}
 
+	@Override
+	public void deleteGroupDevice(String gId) {
+		// TODO Auto-generated method stub
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("gId", gId);
+		deviceDao.deleteGroupDevice(map);
+	}
+
 }

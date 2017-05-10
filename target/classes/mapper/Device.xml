@@ -93,8 +93,7 @@
 		resultType="String">
 		select subscriptionId
 		from device
-		where dId like #{dId} limit
-		1 ;
+		where dId like #{dId} limit 1 ;
 	</select>
 
 	<select id="getSubscriptionCnt" parameterType="HashMap"
@@ -134,5 +133,11 @@
 		where dId like #{dId} and uId like
 		#{uId};
 	</select>
+	
+	<delete id="deleteGroupDevice" parameterType="HashMap">
+		delete from device_group
+		WHERE
+		gId LIKE #{gId};
+	</delete>
 
 </mapper>
