@@ -150,6 +150,33 @@ public class HomeController {
 		logger.info("[success]userLoginInfo : {}", session.getAttribute("userLoginInfo").toString());
 
 		List<Device> deviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
+
+		for (Device d : deviceList) {
+			String dId = d.getdId();
+			if (d.getCmpCode() != 4) {
+				if (deviceService.getGIdBydId(dId) != null) {
+					for (String gId : deviceService.getGIdBydId(dId)) {
+						int flag = 0;
+						String user = deviceService.getUIdsByDId(gId).get(0);
+
+						for (String dIds : deviceService.getDeviceGroupDids(user, gId)) {
+							if (deviceService.getDeviceStateByDId(dIds, user) == 1) {
+								flag = 1;
+							}
+						}
+
+						if (flag == 1) {
+							logger.info("group update 1 ");
+							deviceService.updateGroupState(1, gId);
+						} else {
+							logger.info("group update 0 ");
+							deviceService.updateGroupState(0, gId);
+						}
+					}
+
+				}
+			}
+		}
 		// logger.info("{}", deviceList.toString());
 		// List<Device> artikDevice = new ArrayList<Device>();
 		// List<Device> hueDevice = new ArrayList<Device>();
@@ -197,7 +224,8 @@ public class HomeController {
 		// }
 		// }
 
-		model.addAttribute("deviceList", deviceList);
+		List<Device> finalList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
+		model.addAttribute("deviceList", finalList);
 		return mav;
 	}
 
@@ -428,7 +456,7 @@ public class HomeController {
 										logger.info("[DB change]");
 										Thread.sleep(1000);
 										stop = true;
-										
+
 									}
 								}
 							}

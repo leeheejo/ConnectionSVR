@@ -24,7 +24,11 @@
 		window.open('${oauthUrl}',"artikLogin", "width=500, height=1000, scrollbars=yes, resizable=yes");
 		</c:if>
 		<c:if test="${!empty oauthUrl and !empty sessionScope.ACCESS_TOKEN}">
-			alert('이미 로그인이 되어 있습니다XD');
+		 $(document).ready(function(){
+			 alert('이미 로그인이 되어 있습니다XD');
+			document.forms["call"].submit();
+		 });
+		
 		</c:if>
 </script>
 <body>
@@ -62,20 +66,21 @@
 							</tr>
 						</c:forEach>
 					</c:when>
+					
 					<c:otherwise>
 						<tr align="center">
 							<td colspan="3">
 								<div class="container" align="center">
-									<small>기기 목록 가져오기</small>
-									<button type="button" class="btn btn-info"
-										onClick="location.href='getArtikDeviceList'">
-										<span class="glyphicon glyphicon-download-alt"></span>
-									</button>
+									<small>기기 목록 가져오는중...</small>
+									<form action="getArtikDeviceList" id="call" name="call">
+									</form>
 								</div>
 							</td>
 						</tr>
 					</c:otherwise>
+					
 				</c:choose>
+
 				<!-- 
 				<tr align="right">
 					<td colspan="3">

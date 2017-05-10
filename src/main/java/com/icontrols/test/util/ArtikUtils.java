@@ -306,6 +306,39 @@ public class ArtikUtils {
 		return result;
 	}
 
+	public static Integer getDeviceState(HttpSession session, String dId) throws Exception {
+
+		logger.info("[getDeviceState]");
+
+		int result = 0;
+		String AccessToken = session.getAttribute("ACCESS_TOKEN").toString();
+		String authorizationHeader = "bearer " + AccessToken;
+
+		URL url = new URL("https://api.artik.cloud/v1.1/messages/last?count=1&sdids=" + dId);
+		HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+		con.setRequestMethod("GET");
+		con.setDoInput(true);
+		con.setDoOutput(true);
+
+		// Header
+		con.setRequestProperty("Authorization", authorizationHeader);
+		con.setRequestProperty("Content-Type", "application/json");
+
+		// Response Code
+		int responseCode = con.getResponseCode();
+		logger.info("[messages] responseCode : {}", responseCode + con.getResponseMessage());
+
+		// Response Data
+		BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+		String responseData = br.readLine();
+		logger.info("[messages] responseData : {}", responseData);
+		br.close();
+
+		result = stateParser(session.getAttribute("userLoginInfo").toString(), responseData);
+
+		return result;
+	}
+
 	public static void addNewArtikDevice(HttpSession session, String name, String dtId) throws Exception {
 
 		logger.info("[addNewArtikDevice]");
@@ -388,7 +421,7 @@ public class ArtikUtils {
 
 		return accessToken;
 	}
-	
+
 	public static String createSubscription(HttpSession session, String uId, String ddId) throws Exception {
 
 		logger.info("[createSubscription]");
@@ -427,8 +460,7 @@ public class ArtikUtils {
 		logger.info("[createSubscription] responseData : {}", responseData);
 		br.close();
 		String subscriptionId = new JSONObject(responseData).getJSONObject("data").getString("id");
-		
-		
+
 		return subscriptionId;
 		// {"data":{"id":"46d418adf6454ecb8ca18632e445e843","aid":"cbd3e38e12344b22a8c76cd3789b0e0e","messageType":"action","uid":"58e8794672f848f5bf65dfd6267ff9b9","ddid":"f9da7204a9644b99a92ae2da56c48df8","description":"f9da7204a9644b99a92ae2da56c48df8","subscriptionType":"httpCallback","callbackUrl":"https://icontrols-dev.com/connectionSVR/callback","status":"PENDING_CALLBACK_VALIDATION","createdOn":1494131150908,"modifiedOn":1494131150908}}
 
@@ -461,11 +493,11 @@ public class ArtikUtils {
 		logger.info("[getSubscription] responseData : {}", responseData);
 		br.close();
 	}
-	
+
 	public static void validateSubscription(String subscriptionId, String aId, String nonce) throws Exception {
 		logger.info("[validateSubscription]");
 		// HttpPost 통신
-		URL url = new URL("https://api.artik.cloud/v1.1/subscriptions/"+subscriptionId+"/validate");
+		URL url = new URL("https://api.artik.cloud/v1.1/subscriptions/" + subscriptionId + "/validate");
 		HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
 		con.setRequestMethod("POST");
 		con.setDoInput(true);
@@ -473,7 +505,7 @@ public class ArtikUtils {
 		con.setRequestProperty("Content-Type", "application/json");
 
 		// Param
-		String param = "{\"aid\":\"" + aId +"\",\"nonce\":\""+nonce+"\"}";
+		String param = "{\"aid\":\"" + aId + "\",\"nonce\":\"" + nonce + "\"}";
 
 		logger.info("[validateSubscription] PARAM : {}", param);
 
@@ -492,11 +524,11 @@ public class ArtikUtils {
 		logger.info("[validateSubscription] responseData : {}", responseData);
 		br.close();
 	}
-	
+
 	public static void deleteSubscription(HttpSession session, String subscriptionId) throws Exception {
 		logger.info("[deleteSubscription]");
 		// HttpPost 통신
-		URL url = new URL("https://api.artik.cloud/v1.1/subscriptions/"+subscriptionId);
+		URL url = new URL("https://api.artik.cloud/v1.1/subscriptions/" + subscriptionId);
 		HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
 		con.setRequestMethod("DELETE");
 		con.setDoInput(true);
@@ -508,7 +540,6 @@ public class ArtikUtils {
 		con.setRequestProperty("Authorization", authorizationHeader);
 		con.setRequestProperty("Content-Type", "application/json");
 
-
 		// Response Code
 		int responseCode = con.getResponseCode();
 		logger.info("[deleteSubscription] responseCode : {}", responseCode + con.getResponseMessage());
@@ -519,12 +550,12 @@ public class ArtikUtils {
 		logger.info("[deleteSubscription] responseData : {}", responseData);
 		br.close();
 	}
-	
+
 	public static String getNotification(String accessToken, String notificationId) throws Exception {
 
-		logger.info("[getNotification] {} ",notificationId );
+		logger.info("[getNotification] {} ", notificationId);
 		// HttpPost 통신
-		URL url = new URL("https://api.artik.cloud/v1.1/notifications/"+notificationId+"/messages");
+		URL url = new URL("https://api.artik.cloud/v1.1/notifications/" + notificationId + "/messages");
 		HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
 		con.setRequestMethod("GET");
 		con.setDoInput(true);
@@ -544,18 +575,17 @@ public class ArtikUtils {
 		String responseData = br.readLine();
 		logger.info("[getNotification] responseData : {}", responseData);
 		br.close();
-		
+
 		JSONObject obj = new JSONObject(responseData);
-		logger.info("{}",obj);
+		logger.info("{}", obj);
 		JSONObject data = obj.getJSONArray("data").getJSONObject(0);
-		logger.info("{}",data);
+		logger.info("{}", data);
 		JSONObject actions = data.getJSONObject("data").getJSONArray("actions").getJSONObject(0);
-		logger.info("{}",actions);
+		logger.info("{}", actions);
 		String action = actions.getString("name");
-		
+
 		return action;
 	}
-	
 
 	public static List<Device> stateParser(String uId, String responseData, List<Device> deviceList) {
 
@@ -601,6 +631,41 @@ public class ArtikUtils {
 		}
 
 		return result;
+	}
+
+	public static int stateParser(String uId, String responseData) {
+
+		JSONObject obj = new JSONObject(responseData);
+		JSONArray object = obj.getJSONArray("data");
+		int state = 0;
+
+		String power = "";
+		JSONObject data = object.getJSONObject(0);
+		String dtId = data.getString("sdtid");
+		String dId = data.getString("sdid");
+		JSONObject data1 = data.getJSONObject("data");
+		state = 0;
+
+		if (dtId.equals(ArtikDeviceType.SAMSUNG_SMARTHOME_AIRPURIFIER)) {
+			JSONObject operation = data1.getJSONObject("Operation");
+			power = operation.get("power").toString();
+		} else {
+			JSONArray devices = obj.getJSONArray("data");
+			if (devices.length() != 0) {
+				if (dtId.equals(ArtikDeviceType.AMULATOR)) {
+					power = data1.getBoolean("state") + "";
+				} else if (dtId.equals(ArtikDeviceType.PHILIPS_HUE_COLOR_LAMP)) {
+					power = data1.getString("state");
+				}
+			}
+		}
+
+		if (power.equals("off") || power.equals("Off") || power.equals("false"))
+			state = 0;
+		else
+			state = 1;
+
+		return state;
 	}
 
 	// Parsing DeviceList(Json)

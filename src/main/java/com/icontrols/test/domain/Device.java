@@ -13,6 +13,18 @@ public class Device {
 	private Integer cmpCode;
 	private String subscriptionId;
 
+	public Device(String uId, String dId, String name, String dtId, Integer cmpCode, String subscriptionId, Integer state) {
+		super();
+		this.uId = uId;
+		this.dId = dId;
+		this.name = name;
+		this.dtId = dtId;
+		this.cmpCode = cmpCode;
+		this.subscriptionId = subscriptionId;
+		this.state = state;
+	}
+
+	
 	public Device(String uId, String dId, String name, String dtId, Integer cmpCode, String subscriptionId) {
 		super();
 		this.uId = uId;

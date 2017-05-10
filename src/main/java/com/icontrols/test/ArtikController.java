@@ -3,7 +3,9 @@ package com.icontrols.test;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -153,19 +155,6 @@ public class ArtikController {
 			}
 			deviceService.updateDeviceStateSubscription(state, dId);
 
-			// if (deviceService.getGIdBydId(dId) != null) {
-			// for (String s : deviceService.getGIdBydId(dId)) {
-			// deviceService.updateGroupState(0, s);
-			// for (String user : deviceService.getUIdsByDId(dId))
-			// for (String dIds : deviceService.getDeviceGroupDids(user, s)) {
-			// if (deviceService.getDeviceStateByDId(dId, user) == 1) {
-			// deviceService.updateGroupState(1, s);
-			// }
-			// }
-			// }
-			//
-			// }
-
 		}
 
 		return "success";
@@ -178,6 +167,7 @@ public class ArtikController {
 		logger.info("[getArtikDeviceList]");
 
 		List<Device> artikDeviceList = ArtikUtils.getArtikDeviceList(session);
+		logger.info("[getArtikDeviceList] {} ", artikDeviceList.toString());
 		List<Device> userDeviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
 		List<Device> newDeviceList = new ArrayList<Device>();
 
@@ -200,9 +190,9 @@ public class ArtikController {
 	}
 
 	@RequestMapping("/getDeviceListAjax")
-	public List<Device> getDeviceListAjax(HttpSession session, Model model) throws Exception {
+	public @ResponseBody Object getDeviceListAjax(HttpSession session, Model model) throws Exception {
 
-		logger.info("[getArtikDeviceList]");
+		logger.info("[getDeviceListAjax]");
 
 		List<Device> artikDeviceList = ArtikUtils.getArtikDeviceList(session);
 		List<Device> userDeviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
@@ -221,9 +211,12 @@ public class ArtikController {
 			}
 
 		}
-		// model.addAttribute("artikDeviceList", newDeviceList);
-
-		return newDeviceList;
+		 Map<String, Object> mp = new HashMap<String, Object>();
+		  mp.put("data", newDeviceList);
+		  
+		  Object result = mp;
+		  
+		  return result;
 	}
 
 	/*
@@ -382,18 +375,18 @@ public class ArtikController {
 		logger.info("[insertDevice]");
 
 		String subscriptionId = "";
-		if (cmpCode == 1 && deviceService.getSubscriptionIdByDId(dId) != null
-				&& !deviceService.getSubscriptionIdByDId(dId).equals("")) {
+		if (cmpCode == 1 && deviceService.getSubscriptionIdByDId(dId) != null && !deviceService.getSubscriptionIdByDId(dId).equals("")) {
 			subscriptionId = deviceService.getSubscriptionIdByDId(dId);
-		} else if (cmpCode == 1) {
-			subscriptionId = ArtikUtils.createSubscription(session, session.getAttribute("userLoginInfo").toString(),
-					dId);
+		} else {
+			subscriptionId = ArtikUtils.createSubscription(session, session.getAttribute("userLoginInfo").toString(),dId);
 		}
-		Device device = new Device(session.getAttribute("userLoginInfo").toString(), dId, name, dtId, cmpCode,
-				subscriptionId);
+		
+		Device device = new Device(session.getAttribute("userLoginInfo").toString(), dId, name, dtId, cmpCode, subscriptionId);
+		device.setState(ArtikUtils.getDeviceState(session, dId));
 
 		deviceService.insertDevice(device);
-		logger.info("[insertDevice] dId : {}, name : {}", dId, name);
+		
+		logger.info("[insertDevice] name : {}, state : {}", name, device.getState());
 
 		return "redirect:/success";
 	}
