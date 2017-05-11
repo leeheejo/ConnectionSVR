@@ -338,6 +338,38 @@ public class ArtikUtils {
 
 		return result;
 	}
+	
+	public static String getDeviceStateString(HttpSession session, String dId) throws Exception {
+
+		logger.info("[getDeviceState]");
+
+		int result = 0;
+		String AccessToken = session.getAttribute("ACCESS_TOKEN").toString();
+		String authorizationHeader = "bearer " + AccessToken;
+
+		URL url = new URL("https://api.artik.cloud/v1.1/messages/last?count=1&sdids=" + dId);
+		HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+		con.setRequestMethod("GET");
+		con.setDoInput(true);
+		con.setDoOutput(true);
+
+		// Header
+		con.setRequestProperty("Authorization", authorizationHeader);
+		con.setRequestProperty("Content-Type", "application/json");
+
+		// Response Code
+		int responseCode = con.getResponseCode();
+		logger.info("[messages] responseCode : {}", responseCode + con.getResponseMessage());
+
+		// Response Data
+		BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+		String responseData = br.readLine();
+		logger.info("[messages] responseData : {}", responseData);
+		br.close();
+
+
+		return responseData;
+	}
 
 	public static void addNewArtikDevice(HttpSession session, String name, String dtId) throws Exception {
 

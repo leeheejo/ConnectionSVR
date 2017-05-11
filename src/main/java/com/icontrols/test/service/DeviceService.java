@@ -26,4 +26,6 @@ public interface DeviceService {
 	public Integer getDeviceStateByDId (String dId, String uId);
 	public void deleteGroupDevice (String gId);
 	public List<Device> getGroupByUId (String uId);
+	public void deleteDeviceFromGroup (String dId, String uId);
+	
 }

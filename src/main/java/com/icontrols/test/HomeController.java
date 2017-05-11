@@ -86,6 +86,46 @@ public class HomeController {
 		return "home";
 	}
 
+	@RequestMapping(value = "deviceDetail")
+	public String deviceDetail(HttpSession session, Model model, @RequestParam(value = "dId") String dId,
+			@RequestParam(value = "state") int state, @RequestParam(value = "name") String name,
+			@RequestParam(value = "cmpCode") String cmpCode) throws Exception {
+		if (thread != null)
+			thread.shutdownNow();
+		logger.info("[deviceDetail]");
+		model.addAttribute("dId", dId);
+		model.addAttribute("state", state);
+		model.addAttribute("name", name);
+		model.addAttribute("cmpCode", cmpCode);
+
+		return "deviceDetail";
+	}
+
+	@RequestMapping(value = "getDeviceState")
+	@ResponseBody
+	public String getDeviceState(HttpSession session, @RequestParam(value = "dId") String dId) throws Exception {
+
+		return ArtikUtils.getDeviceStateString(session, dId);
+	}
+
+	@RequestMapping(value = "getDidsByGId")
+	@ResponseBody
+	public List<Device> getDidsByGId(HttpSession session, Model model, @RequestParam(value = "dId") String dId) throws Exception {
+		List <String> groupDids = deviceService.getDeviceGroupDids(session.getAttribute("userLoginInfo").toString(), dId);
+		List<Device> device = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
+		List<Device> finalDevice = new ArrayList<Device>();
+		for(Device d : device) {
+			for(String s : groupDids){
+				if(d.getdId().equals(s)) {
+					finalDevice.add(d);
+				}
+			}
+		}
+		
+		model.addAttribute("deviceList", finalDevice);
+		return finalDevice;
+	}
+
 	/*
 	 * move to join.jsp
 	 * 
@@ -93,7 +133,7 @@ public class HomeController {
 	 */
 	@RequestMapping("joinPage")
 	public ModelAndView joinPage() {
-		logger.info("[joinPage]");
+		
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("join");
 		return mav;
@@ -147,7 +187,6 @@ public class HomeController {
 		mav.setViewName("success");
 		String uId = session.getAttribute("userLoginInfo").toString();
 		List<Device> deviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
-
 		model.addAttribute("deviceList", deviceList);
 
 		return mav;
@@ -192,6 +231,7 @@ public class HomeController {
 		if (thread != null)
 			thread.shutdownNow();
 		logger.info("[deleteDevice]");
+		
 		if (cmpCode == 1 && deviceService.getSubscriptionCnt(dId) == 1) {
 			logger.info("[deleteDevice] {}", deviceService.getSubscriptionIdByDId(dId));
 			ArtikUtils.deleteSubscription(session, deviceService.getSubscriptionIdByDId(dId));
@@ -200,6 +240,7 @@ public class HomeController {
 			deviceService.deleteGroupDevice(dId);
 		}
 
+		deviceService.deleteDeviceFromGroup(dId, session.getAttribute("userLoginInfo").toString());
 		deviceService.deleteDevice(session.getAttribute("userLoginInfo").toString(), dId);
 
 		return "redirect:/success";
@@ -269,6 +310,56 @@ public class HomeController {
 		}
 
 		// return "";
+	}
+
+	@RequestMapping("/allOff")
+	@ResponseBody
+	public void allOff(HttpSession session) throws Exception {
+		if (thread != null)
+			thread.shutdownNow();
+		List<Device> deviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
+		String uId = session.getAttribute("userLoginInfo").toString();
+		for (Device d : deviceList) {
+			logger.info("{}", d.getName());
+			SendTestLog sendTestLog = null;
+			if (d.getCmpCode() != 4) {
+				if (d.getState() == 1) {
+					if (d.getCmpCode() == 1) {
+						sendTestLog = ArtikUtils.Action(session, d.getdId(), "setOff", "");
+					} else if (d.getCmpCode() == 0) {
+						sendTestLog = IparkUtils.sendAction("setOff", uId, d.getdId(),
+								session.getAttribute("IPARK_ACCESS_TOKEN").toString());
+					}
+					// sendTestLogService.insertSendTestLog(sendTestLog);
+				}
+			}
+			Thread.sleep(3000);
+		}
+	}
+
+	@RequestMapping("/allOn")
+	@ResponseBody
+	public void allOn(HttpSession session) throws Exception {
+		if (thread != null)
+			thread.shutdownNow();
+		List<Device> deviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
+		String uId = session.getAttribute("userLoginInfo").toString();
+		for (Device d : deviceList) {
+			SendTestLog sendTestLog = null;
+			logger.info("{}", d.getName());
+			if (d.getCmpCode() != 4) {
+				if (d.getState() == 0) {
+					if (d.getCmpCode() == 1) {
+						sendTestLog = ArtikUtils.Action(session, d.getdId(), "setOn", "");
+					} else if (d.getCmpCode() == 0) {
+						sendTestLog = IparkUtils.sendAction("setOn", uId, d.getdId(),
+								session.getAttribute("IPARK_ACCESS_TOKEN").toString());
+					}
+					// sendTestLogService.insertSendTestLog(sendTestLog);
+				}
+				Thread.sleep(3000);
+			}
+		}
 	}
 
 	/*
@@ -360,6 +451,7 @@ public class HomeController {
 				for (Device d : groupList) {
 					deviceService.updateGroupState(0, d.getdId());
 					for (String dId : deviceService.getDeviceGroupDids(uId, d.getdId())) {
+						logger.info("{}", deviceService.getDeviceStateByDId(dId, uId));
 						if (deviceService.getDeviceStateByDId(dId, uId) == 1) {
 							deviceService.updateGroupState(1, d.getdId());
 						}
@@ -411,7 +503,7 @@ public class HomeController {
 	@RequestMapping("thread")
 	public String thread(HttpSession session) throws Exception {
 		logger.info("[thread] {}", session.getAttribute("userLoginInfo").toString());
-		if (thread.stop)
+		if (thread != null && thread.stop)
 			thread.call();
 
 		return "redirect:/success";
@@ -438,14 +530,16 @@ public class HomeController {
 			List<Device> newList = new ArrayList<Device>();
 
 			while (!stop) {
+				
 				try {
-					Thread.sleep(1000);
+					Thread.sleep(2000);
 					newList.clear();
 					newList = deviceService.getDeviceById(userId);
 					if (oldList.size() != 0 && newList.size() != 0) {
 						for (int j = 0; j < oldList.size(); j++) {
 							for (int i = 0; i < newList.size(); i++) {
-								if (oldList.get(j).getCmpCode() != 4 && oldList.get(j).getdId().equals(newList.get(i).getdId())) {
+								if (oldList.get(j).getCmpCode() != 4
+										&& oldList.get(j).getdId().equals(newList.get(i).getdId())) {
 									if (oldList.get(j).getState() != newList.get(i).getState()) {
 										logger.info("[DB change]");
 										oldList.clear();

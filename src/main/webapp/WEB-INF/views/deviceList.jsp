@@ -8,7 +8,8 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=EUC-KR"
 	charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
 <link rel="stylesheet"
 	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 <script
@@ -17,7 +18,29 @@
 	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script type="text/javascript"
 	src="https://code.jquery.com/jquery-1.9.1.js"></script>
+<style type="text/css">
+@media screen and (max-width: 400px) {
 
+	img {
+		width: 80%;
+		height: 42px;
+	}
+}
+
+@media screen and (min-width: 401px) and (max-width: 800px) {
+	img {
+		width: 90%;
+		height: 42px;
+	}
+}
+
+@media screen and (min-width: 801px) {
+	img {
+		width: 300px;
+		height: 42px;
+	}
+}
+</style>
 <script type="text/javascript">
 	<c:set var="oauthUrl" value="${oauthUrl}"></c:set>
 		<c:if test="${!empty oauthUrl and empty sessionScope.ACCESS_TOKEN}">
@@ -66,7 +89,7 @@
 							</tr>
 						</c:forEach>
 					</c:when>
-					
+
 					<c:otherwise>
 						<tr align="center">
 							<td colspan="3">
@@ -78,7 +101,7 @@
 							</td>
 						</tr>
 					</c:otherwise>
-					
+
 				</c:choose>
 
 				<!-- 

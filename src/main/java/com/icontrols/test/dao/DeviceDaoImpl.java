@@ -129,4 +129,10 @@ public class DeviceDaoImpl implements DeviceDao {
 		// TODO Auto-generated method stub
 		return sqlSession.selectList(PATH+"getGroupByUId", map);
 	}
+
+	@Override
+	public void deleteDeviceFromGroup(HashMap<String, Object> map) {
+		// TODO Auto-generated method stub
+		sqlSession.delete(PATH+"deleteDeviceFromGroup", map);
+	}
 }

@@ -148,7 +148,7 @@ public class ArtikController {
 			String action = ArtikUtils.getNotification(accessToken, obj.getString("id"));
 			logger.info("{}", action);
 			int state = 0;
-			if (action.equals("setOn")) {
+			if (action.equals("setOn") || action.equals("setColorRGB")) {
 				state = 1;
 			}
 			List<String> groupList = deviceService.getGIdBydId(dId);
@@ -157,15 +157,15 @@ public class ArtikController {
 				for (String s : groupList) {
 					deviceService.updateGroupState(0, s);
 					for (String dIds : deviceService.getDeviceGroupDids(deviceService.getUIdByDId(s), s)) {
-						
+
 						if (state == 1 && deviceService.getDeviceStateByDId(s, deviceService.getUIdByDId(dIds)) != 1) {
 							logger.info("Group {} update", s);
 							deviceService.updateGroupState(state, s);
-						} 
+						}
 					}
 				}
 			}
-			
+
 			deviceService.updateDeviceStateSubscription(state, dId);
 		}
 
@@ -224,65 +224,31 @@ public class ArtikController {
 	 * @return String "redirect:/success"
 	 */
 
-	// @RequestMapping("/sendActionTest")
-	// public String sendActionTest(HttpSession session, @RequestParam(value =
-	// "dId") String dId,
-	// @RequestParam(value = "state") int currentState, @RequestParam(value =
-	// "R", required = false) String R,
-	// @RequestParam(value = "G", required = false) String G,
-	// @RequestParam(value = "B", required = false) String B) throws Exception {
-	//
-	// logger.info("[sendActionTest]");
-	// String dtId = deviceService.getDeviceTypeId(dId,
-	// session.getAttribute("userLoginInfo").toString());
-	// SendTestLog sendTestLog;
-	//
-	// if (!dtId.equals("main_light")) {
-	// if (dtId.equals(ArtikDeviceType.PHILIPS_HUE_COLOR_LAMP)
-	// && (!R.equals("") || !G.equals("") || !B.equals(""))) {
-	// if (R.equals("") || Integer.parseInt(R) > 255)
-	// R = "0";
-	// if (G.equals("") || Integer.parseInt(G) > 255)
-	// G = "0";
-	// if (B.equals("") || Integer.parseInt(B) > 255)
-	// B = "0";
-	// sendTestLog = ArtikUtils.Action(session, dId, "setColorRGB", R + ";" + G
-	// + ";" + B);
-	//
-	// } else if (dtId.equals("main_light")) {
-	// String action = "";
-	// if (currentState == 0) {
-	// action = "setOn";
-	// } else {
-	// action = "setOff";
-	// }
-	// sendTestLog = IparkUtils.sendAction(action,
-	// session.getAttribute("userLoginInfo").toString(), dId);
-	// } else {
-	// String action = "";
-	// if (currentState == 0) {
-	// action = "setOn";
-	// } else {
-	// action = "setOff";
-	// }
-	// sendTestLog = ArtikUtils.Action(session, dId, action, "");
-	// }
-	// } else {
-	// String action = "";
-	// if (currentState == 0) {
-	// action = "setOn";
-	// } else {
-	// action = "setOff";
-	// }
-	// sendTestLog = IparkUtils.sendAction(action,
-	// session.getAttribute("userLoginInfo").toString(), dId);
-	// }
-	//
-	// sendTestLogService.insertSendTestLog(sendTestLog);
-	//
-	// return "redirect:/success";
-	//
-	// }
+	@RequestMapping("/sendActionRGB")
+	public String sendActionRGB(HttpSession session, @RequestParam(value = "dId") String dId,
+			@RequestParam(value = "state") int state, @RequestParam(value = "name") String name,
+			@RequestParam(value = "actionR", required = false) String R,
+			@RequestParam(value = "actionG", required = false) String G,
+			@RequestParam(value = "actionB", required = false) String B) throws Exception {
+
+		logger.info("[sendActionTest]");
+		SendTestLog sendTestLog;
+
+		if (R.equals("") || Integer.parseInt(R) > 255)
+			R = "0";
+		if (G.equals("") || Integer.parseInt(G) > 255)
+			G = "0";
+		if (B.equals("") || Integer.parseInt(B) > 255)
+			B = "0";
+		sendTestLog = ArtikUtils.Action(session, dId, "setColorRGB", R + ";" + G + ";" + B);
+
+		sendTestLogService.insertSendTestLog(sendTestLog);
+
+		Thread.sleep(2000);
+//		return "redirect:/deviceDetail?dId=" + dId + "&name=" + name + "&state=" + state;
+		return "redirect:/success";
+
+	}
 
 	// SEND ACTION ONLY ON/OFF
 
@@ -325,54 +291,8 @@ public class ArtikController {
 		return "redirect:/success";
 	}
 
-	@RequestMapping("/allOff")
-	public String allOff(HttpSession session) throws Exception {
-		List<Device> deviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
-		String uId = session.getAttribute("userLoginInfo").toString();
-		for (Device d : deviceList) {
-			logger.info("{}", d.getName());
-			SendTestLog sendTestLog = null;
-			if (d.getCmpCode() != 4) {
-				if (d.getState() == 1) {
-					if (d.getCmpCode() == 1) {
-						sendTestLog = ArtikUtils.Action(session, d.getdId(), "setOff", "");
-					} else if (d.getCmpCode() == 0) {
-						sendTestLog = IparkUtils.sendAction("setOff", uId, d.getdId(),
-								session.getAttribute("IPARK_ACCESS_TOKEN").toString());
-					} else if (d.getCmpCode() == 2) {
-						sendTestLog = PhilipsHueUtils.sendAction(session, "setOff", d.getdId());
-					}
-					sendTestLogService.insertSendTestLog(sendTestLog);
-				}
-			}
-		}
-		return "redirect:/success";
-	}
 
-	@RequestMapping("/allOn")
-	public String allOn(HttpSession session) throws Exception {
-		List<Device> deviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
-		String uId = session.getAttribute("userLoginInfo").toString();
-		for (Device d : deviceList) {
-			SendTestLog sendTestLog = null;
-			logger.info("{}", d.getName());
-			if (d.getCmpCode() != 4) {
-				if (d.getState() == 0) {
-					if (d.getCmpCode() == 1) {
-						sendTestLog = ArtikUtils.Action(session, d.getdId(), "setOn", "");
-					} else if (d.getCmpCode() == 0) {
-						sendTestLog = IparkUtils.sendAction("setOn", uId, d.getdId(),
-								session.getAttribute("IPARK_ACCESS_TOKEN").toString());
-					} else if (d.getCmpCode() == 2) {
-						sendTestLog = PhilipsHueUtils.sendAction(session, "setOn", d.getdId());
-					}
-					sendTestLogService.insertSendTestLog(sendTestLog);
-				}
-			}
-		}
 
-		return "redirect:/success";
-	}
 
 	@RequestMapping("/colorLoop")
 	public String colorLoop(HttpSession session) throws Exception {

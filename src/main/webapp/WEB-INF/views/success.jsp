@@ -6,7 +6,8 @@
 <%@ page session="true"%>
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
 <link rel="stylesheet"
 	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 <script
@@ -21,7 +22,33 @@
 
 <title>Main Page</title>
 </head>
+<style type="text/css">
+@media screen and (max-width: 400px) {
+
+	img {
+		width: 80%;
+		height: 42px;
+	}
+}
+
+@media screen and (min-width: 401px) and (max-width: 800px) {
+
+	img {
+		width: 90%;
+		height: 42px;
+	}
+}
+
+@media screen and (min-width: 801px) {
+
+	img {
+		width: 300px;
+		height: 42px;
+	}
+}
+</style>
 <script type="text/javascript">
+
 	function numkeyCheck(e) {
 		var keyValue = event.keyCode;
 		if (((keyValue >= 48) && (keyValue <= 57)))
@@ -60,7 +87,41 @@
 		});
 
 	}
+	
+	function allOff() {
 
+		$.ajax({
+			url : "allOff",
+			dataType : "json",
+			type : "get",
+			success : function() {
+				return false;
+			},
+			error : function(request, status, error) {
+				return false;
+			}
+
+		});
+
+	}
+	
+	function allOn() {
+
+		$.ajax({
+			url : "allOn",
+			dataType : "json",
+			type : "get",
+			success : function() {
+				return false;
+			},
+			error : function(request, status, error) {
+				return false;
+			}
+
+		});
+
+	}
+	
 	$(document).ready(function() {
 		$.ajax({
 			url : "thread",
@@ -90,27 +151,25 @@
 		</div>
 		<br>
 		<div class="container">
-			<div class="container" style="width: 100%">
-				<button type="button" class="btn btn-info"
-					onClick="location.href='allOff'" style="width: 49%">외출</button>
-				<button type="button" class="btn btn-info"
-					onClick="location.href='allOn'" style="width: 49%">귀가</button>
+			<div class="container">
+				<button type="button" class="btn btn-info" onclick='allOff()'
+					style="width: 49%">외출</button>
+				<button type="button" class="btn btn-info" onClick='allOn()'
+					style="width: 49%">귀가</button>
 				<!--
 				<button type="button" class="btn btn-info btn-sm "
 					onClick="location.href='colorLoop'">colorLoop</button>
 					 -->
 				<br> <br>
 			</div>
-			<table class="table" id="example" style="width: 100%; margin: auto;"
-				data-toggle="modal">
+			<table class="table" id="example">
 				<thead>
 					<tr>
 						<!-- <th style="width: 1%">code</th>  -->
-						<th style="width: 50%">기기명</th>
+						<th style="width: 80%">기기명</th>
 						<!--  <th>dId</th>  -->
-						<th>상태</th>
-						<th>제어</th>
-						<th>삭제</th>
+						<th style="width: 10%">상태</th>
+						<th style="width: 10%">제어</th>
 					</tr>
 				</thead>
 
@@ -121,7 +180,17 @@
 								onmouseover="javascript:changeTrColor(this, '#FFFFFF', '#F4FFFD')">
 
 								<!-- <td>${row.cmpCode}</td> -->
-								<td name="name">${row.name}</td>
+								<c:set value="${row.cmpCode}" var="cmpCode" />
+								<c:choose>
+									<c:when test="${cmpCode == 1 || cmpCode == 4}">
+										<td
+											onclick="location.href='deviceDetail?dId=${row.dId}&state=${row.state}&name=${row.name}&cmpCode=${row.cmpCode}'">${row.name}</td>
+
+									</c:when>
+									<c:otherwise>
+										<td>${row.name}</td>
+									</c:otherwise>
+								</c:choose>
 
 								<c:set value="${row.state}" var="state" />
 								<c:choose>
@@ -135,55 +204,12 @@
 
 								<td>
 									<button type="button" class="btn btn-success btn-sm" id="send"
-										value="send" onclick='sendAction("${row.dId}",${row.state},${row.cmpCode})'>
+										value="send"
+										onclick='sendAction("${row.dId}",${row.state},${row.cmpCode})'>
 										<span class="glyphicon glyphicon-send"></span>
-									</button> <!-- 										 <c:set
-											value="${row.dtId}" var="dtId" /> 
-											
-										<c:choose>
-											<c:when test="${dtId eq 'dt6f79b9b4aa3b4a80b7b76c2190016c61'}">
-												<table>
-													<tr>
-														<td><input type="text" id="R" name="R"
-															placeHolder="R" style="width: 30px;"
-															onKeyPress="return numkeyCheck(event)" /></td>
-														<td><input type="text" id="G" name="G"
-															placeHolder="G" style="width: 30px;"
-															onKeyPress="return numkeyCheck(event)" /></td>
-														<td><input type="text" id="B" name="B"
-															placeHolder="B" style="width: 30px;"
-															onKeyPress="return numkeyCheck(event)" /></td>
-													</tr>
-												</table>
-											</c:when>
-										</c:choose>
-
- -->
-
-
-
-
+									</button>
 								</td>
 
-								<c:set value="${row.cmpCode}" var="cmpCode" />
-
-								<c:choose>
-									<c:when test="${cmpCode eq '0'}">
-										<td>&nbsp&nbsp</td>
-									</c:when>
-									<c:otherwise>
-										<td>
-											<form action="deleteDevice" method="GET">
-												<input type="hidden" name="dId" value='${row.dId}' /> <input
-													type="hidden" name="cmpCode" value='${row.cmpCode}' />
-												<button type="submit" class="btn btn-danger btn-sm"
-													onClick="location.href='deleteDevice'">
-													<span class="glyphicon glyphicon-trash"></span>
-												</button>
-											</form>
-										</td>
-									</c:otherwise>
-								</c:choose>
 							</tr>
 						</c:forEach>
 					</c:when>

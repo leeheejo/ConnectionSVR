@@ -31,6 +31,7 @@ public class DeviceServiceImpl implements DeviceService {
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		map.put("uId", device.getuId());
 		map.put("dId", device.getdId());
+		map.put("dtId", device.getDtId());
 		map.put("name", device.getName());
 		map.put("cmpCode", device.getCmpCode());
 		map.put("state", device.getState());
@@ -173,7 +174,7 @@ public class DeviceServiceImpl implements DeviceService {
 		// TODO Auto-generated method stub
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		map.put("dId", dId);
-		
+
 		return deviceDao.getUIdsByDId(map);
 	}
 
@@ -190,8 +191,18 @@ public class DeviceServiceImpl implements DeviceService {
 		// TODO Auto-generated method stub
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		map.put("uId", uId);
-		
+
 		return deviceDao.getGroupByUId(map);
+	}
+
+	@Override
+	public void deleteDeviceFromGroup(String dId, String uId) {
+		// TODO Auto-generated method stub
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("dId", dId);
+		map.put("uId", uId);
+
+		deviceDao.deleteDeviceFromGroup(map);
 	}
 
 }

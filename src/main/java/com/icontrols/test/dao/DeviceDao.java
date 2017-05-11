@@ -29,5 +29,6 @@ public interface DeviceDao {
 	public List<String> getGIdBydId (HashMap<String, Object> map);
 	public void deleteGroupDevice (HashMap<String, Object> map);
 	public List<Device> getGroupByUId (HashMap<String, Object> map);
+	public void deleteDeviceFromGroup (HashMap<String, Object> map);
 	
 }

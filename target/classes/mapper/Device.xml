@@ -142,11 +142,18 @@
 		WHERE
 		gId LIKE #{gId};
 	</delete>
+	<delete id="deleteDeviceFromGroup" parameterType="HashMap">
+		delete from
+		device_group
+		WHERE
+		dIds LIKE #{dId} and uId LIKE #{uId};
+	</delete>
 
 	<select id="getGroupByUId" parameterType="HashMap" resultMap="DeviceResult">
 		select uId, dId, name, state, dtId, cmpCode
 		from device
-		where cmpCode = 4 and uId like #{uId};
+		where cmpCode =
+		4 and uId like #{uId};
 	</select>
 
 </mapper>

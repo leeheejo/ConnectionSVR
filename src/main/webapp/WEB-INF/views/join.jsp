@@ -40,7 +40,7 @@
 					<input type="text" name="uEmail" class="form-control"placeholder="Email">
 				</div>
 				<div>
-					<button type="submit" class="btn btn-primary">submit</button>
+					<button type="submit" class="btn btn-primary btn-block">submit</button>
 				</div>
 			</form>
 		</div>
