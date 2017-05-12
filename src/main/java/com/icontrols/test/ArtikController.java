@@ -152,7 +152,7 @@ public class ArtikController {
 				state = 1;
 			}
 			List<String> groupList = deviceService.getGIdBydId(dId);
-
+			logger.info("{}", groupList.toString());
 			if (groupList != null) {
 				for (String s : groupList) {
 					deviceService.updateGroupState(0, s);
@@ -245,7 +245,8 @@ public class ArtikController {
 		sendTestLogService.insertSendTestLog(sendTestLog);
 
 		Thread.sleep(2000);
-//		return "redirect:/deviceDetail?dId=" + dId + "&name=" + name + "&state=" + state;
+		// return "redirect:/deviceDetail?dId=" + dId + "&name=" + name +
+		// "&state=" + state;
 		return "redirect:/success";
 
 	}
@@ -291,9 +292,6 @@ public class ArtikController {
 		return "redirect:/success";
 	}
 
-
-
-
 	@RequestMapping("/colorLoop")
 	public String colorLoop(HttpSession session) throws Exception {
 		logger.info("[colorloop]");
@@ -335,14 +333,18 @@ public class ArtikController {
 
 		logger.info("[insertGroup]");
 		Device device = new Device(session.getAttribute("userLoginInfo").toString(), name, name, 0, "group", 4);
-		deviceService.insertDevice(device);
 
 		String[] groupDIds = dIds.split(";");
+		int flag = 0;
 		for (String s : groupDIds) {
 			DeviceGroup dg = new DeviceGroup(session.getAttribute("userLoginInfo").toString(), s, name);
 			deviceService.insertDeviceGroup(dg);
+			
+			if (deviceService.getDeviceStateByDId(s, session.getAttribute("userLoginInfo").toString()) == 1)
+				flag = 1;
 		}
-
+		if(flag == 1) device.setState(1);
+		deviceService.insertDevice(device);
 		return "redirect:/success";
 	}
 

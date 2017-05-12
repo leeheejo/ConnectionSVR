@@ -24,15 +24,18 @@
 </head>
 <style type="text/css">
 @media screen and (max-width: 400px) {
-
-	img {
+ 	
+ 	img {
 		width: 80%;
 		height: 42px;
+	}
+	
+	.Screen{
+		width:100%
 	}
 }
 
 @media screen and (min-width: 401px) and (max-width: 800px) {
-
 	img {
 		width: 90%;
 		height: 42px;
@@ -40,14 +43,32 @@
 }
 
 @media screen and (min-width: 801px) {
-
 	img {
-		width: 300px;
-		height: 42px;
+		width: 600px;
+		height: 82px;
+	}
+	.Screen{
+		width:600px;
 	}
 }
 </style>
 <script type="text/javascript">
+
+
+$(document).ready(function() {
+	$.ajax({
+		url : "thread",
+		dataType : "text",
+		type : "get",
+		success : function(data) {
+			document.location.reload();
+		},
+		error : function(request, status, error) {
+		}
+
+	});
+
+});
 
 	function numkeyCheck(e) {
 		var keyValue = event.keyCode;
@@ -122,20 +143,6 @@
 
 	}
 	
-	$(document).ready(function() {
-		$.ajax({
-			url : "thread",
-			dataType : "text",
-			type : "get",
-			success : function(data) {
-				document.location.reload();
-			},
-			error : function(request, status, error) {
-			}
-
-		});
-
-	});
 </script>
 
 <body>
@@ -151,7 +158,7 @@
 		</div>
 		<br>
 		<div class="container">
-			<div class="container">
+			<div class="container Screen">
 				<button type="button" class="btn btn-info" onclick='allOff()'
 					style="width: 49%">ø‹√‚</button>
 				<button type="button" class="btn btn-info" onClick='allOn()'
@@ -162,7 +169,7 @@
 					 -->
 				<br> <br>
 			</div>
-			<table class="table" id="example">
+			<table class="table Screen" id="example">
 				<thead>
 					<tr>
 						<!-- <th style="width: 1%">code</th>  -->
@@ -247,6 +254,8 @@
 			</button>
 		</div>
 	</center>
+
+	<!--  <iframe src="iframeTest" style="visibility: hidden; display: none"></iframe>-->
 
 </body>
 </html>

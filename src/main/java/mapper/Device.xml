@@ -19,7 +19,8 @@
 		SELECT uId, dId, name, state, dtId, cmpCode
 		FROM device
 		WHERE uId LIKE
-		#{uId};
+		#{uId}
+		ORDER BY cmpCode;
 	</select>
 
 	<insert id="insertDevice" parameterType="HashMap">

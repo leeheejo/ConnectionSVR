@@ -9,7 +9,8 @@
 <meta http-equiv="Content-Type" content="text/html; charset=EUC-KR"
 	charset="utf-8">
 <meta name="viewport"
-	content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">s
+	content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
+
 <link rel="stylesheet"
 	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 <script
@@ -24,10 +25,15 @@
 </head>
 <style type="text/css">
 @media screen and (max-width: 400px) {
-
 	img {
 		width: 80%;
 		height: 42px;
+	}
+	.Screen {
+		width: 100%
+	}
+	.Font {
+		font-size: 100%;
 	}
 }
 
@@ -40,8 +46,14 @@
 
 @media screen and (min-width: 801px) {
 	img {
-		width: 300px;
-		height: 42px;
+		width: 600px;
+		height: 82px;
+	}
+	.Screen {
+		width: 600px;
+	}
+	.Font {
+		font-size: 18px;
 	}
 }
 </style>
@@ -75,15 +87,15 @@
 			</button>
 		</div>
 		<br>
-		<div class="container">
+		<div class="container Screen">
 			<div class="form-group">
 				<label for="usr">Group Name:</label> <input type="text"
-					class="form-control" id="groupName">
+					class="form-control Screen" id="groupName">
 			</div>
 			<c:choose>
 				<c:when test="${fn:length(deviceList) > 0}">
 					<c:forEach items="${deviceList}" var="row">
-						<div class="checkbox">
+						<div class="checkbox Font">
 							<label><input type="checkbox" value='${row.dId}'
 								name="device">${row.name}</label>
 						</div>
@@ -91,8 +103,10 @@
 				</c:when>
 			</c:choose>
 			<div>
-				<button type="button" class="btn btn-primary" id="clicker"
-					name="clicker">submit</button>
+				<br> <br>
+
+				<button type="button" class="btn btn-primary btn-block Screen"
+					id="clicker" name="clicker">submit</button>
 			</div>
 
 		</div>

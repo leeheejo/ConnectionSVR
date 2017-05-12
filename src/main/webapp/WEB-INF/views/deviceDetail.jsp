@@ -25,10 +25,14 @@
 </head>
 <style type="text/css">
 @media screen and (max-width: 400px) {
-
-	img {
+ 	
+ 	img {
 		width: 80%;
 		height: 42px;
+	}
+	
+	.Screen{
+		width:100%
 	}
 }
 
@@ -41,8 +45,11 @@
 
 @media screen and (min-width: 801px) {
 	img {
-		width: 300px;
-		height: 42px;
+		width: 600px;
+		height: 82px;
+	}
+	.Screen{
+		width:600px;
 	}
 }
 </style>
@@ -178,9 +185,8 @@
 				<span class="glyphicon glyphicon-off"></span>
 			</button>
 		</div>
-
 		<p>
-			<br> <br> <br>
+			<br>
 			<c:set value="${state}" var="state" />
 			<c:choose>
 				<c:when test="${state == 0}">
@@ -196,10 +202,10 @@
 		<div id="hue" style="display: none;" class="container">
 			<br> <br>
 			<h4>Current State</h4>
-			<table>
+			<table class="Screen">
 				<tr>
 					<td>
-						<div class="form-group ">
+						<div class="form-group">
 							<label for="Brightness">Brightness</label> <input type=text
 								id="Brightness" class="form-control" readonly />
 						</div>
@@ -232,7 +238,7 @@
 				<input type="hidden" id="dId" name="dId" value='${dId}' /> <input
 					type="hidden" id="name" name="name" value='${name}' /> <input
 					type="hidden" id="state" name="state" value='${state}' />
-				<table>
+				<table class="Screen">
 					<tr>
 						<td><div class="form-group ">
 								<input type="text" id="actionR" name="actionR" placeHolder="R"
@@ -249,14 +255,14 @@
 							</div></td>
 					</tr>
 				</table>
-				<button type="submit" class="btn btn-primary btn-block">submit</button>
+				<button type="submit" class="btn btn-primary btn-block Screen">submit</button>
 			</form>
 			<br>
 
 			<form action="deleteDevice" method="GET">
 				<input type="hidden" name="dId" value='${dId}' /> <input
 					type="hidden" name="cmpCode" value=1 />
-				<button type="submit" class="btn btn-default btn-block"
+				<button type="submit" class="btn btn-default btn-block Screen"
 					onClick="location.href='deleteDevice'">delete</button>
 			</form>
 
@@ -284,7 +290,7 @@
 			<form action="deleteDevice" method="GET">
 				<input type="hidden" name="dId" value='${dId}' /> <input
 					type="hidden" name="cmpCode" value=1 />
-				<button type="submit" class="btn btn-default btn-block"
+				<button type="submit" class="btn btn-default btn-block Screen"
 					onClick="location.href='deleteDevice'">delete</button>
 			</form>
 
@@ -292,13 +298,13 @@
 		<div id="group" style="display: none" class="container">
 			<br> <br>
 			<h4>Group Component</h4>
-			<textarea id="device" class="form-control"
+			<textarea id="device" class="form-control Screen"
 				style="resize: none; overflow: hidden;" readonly></textarea>
 			<br>
 			<form action="deleteDevice" method="GET">
 				<input type="hidden" name="dId" value='${dId}' /> <input
-					type="hidden" name="cmpCode" value=1 />
-				<button type="submit" class="btn btn-default btn-block"
+					type="hidden" name="cmpCode" value=4 />
+				<button type="submit" class="btn btn-default btn-block Screen"
 					onClick="location.href='deleteDevice'">delete</button>
 			</form>
 

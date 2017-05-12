@@ -68,7 +68,7 @@ public class HomeController {
 	PhilipsHueBridgeService philipsHueBridgeService;
 
 	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
-	InnerThread thread = null;
+	Boolean stop = true;
 
 	/**
 	 * Simply selects the home view to render by returning its name.
@@ -76,13 +76,14 @@ public class HomeController {
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String start(Locale locale, Model model) throws Exception {
 		logger.info("[home]");
+		stop = true;
 		return "home";
 	}
 
 	@RequestMapping(value = "home")
 	public String home(Locale locale, Model model) {
 		logger.info("[home]");
-
+		stop = true;
 		return "home";
 	}
 
@@ -90,8 +91,7 @@ public class HomeController {
 	public String deviceDetail(HttpSession session, Model model, @RequestParam(value = "dId") String dId,
 			@RequestParam(value = "state") int state, @RequestParam(value = "name") String name,
 			@RequestParam(value = "cmpCode") String cmpCode) throws Exception {
-		if (thread != null)
-			thread.shutdownNow();
+		stop = true;
 		logger.info("[deviceDetail]");
 		model.addAttribute("dId", dId);
 		model.addAttribute("state", state);
@@ -104,24 +104,27 @@ public class HomeController {
 	@RequestMapping(value = "getDeviceState")
 	@ResponseBody
 	public String getDeviceState(HttpSession session, @RequestParam(value = "dId") String dId) throws Exception {
-
+		stop = true;
 		return ArtikUtils.getDeviceStateString(session, dId);
 	}
 
 	@RequestMapping(value = "getDidsByGId")
 	@ResponseBody
-	public List<Device> getDidsByGId(HttpSession session, Model model, @RequestParam(value = "dId") String dId) throws Exception {
-		List <String> groupDids = deviceService.getDeviceGroupDids(session.getAttribute("userLoginInfo").toString(), dId);
+	public List<Device> getDidsByGId(HttpSession session, Model model, @RequestParam(value = "dId") String dId)
+			throws Exception {
+		stop = true;
+		List<String> groupDids = deviceService.getDeviceGroupDids(session.getAttribute("userLoginInfo").toString(),
+				dId);
 		List<Device> device = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
 		List<Device> finalDevice = new ArrayList<Device>();
-		for(Device d : device) {
-			for(String s : groupDids){
-				if(d.getdId().equals(s)) {
+		for (Device d : device) {
+			for (String s : groupDids) {
+				if (d.getdId().equals(s)) {
 					finalDevice.add(d);
 				}
 			}
 		}
-		
+
 		model.addAttribute("deviceList", finalDevice);
 		return finalDevice;
 	}
@@ -133,7 +136,7 @@ public class HomeController {
 	 */
 	@RequestMapping("joinPage")
 	public ModelAndView joinPage() {
-		
+		stop = true;
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("join");
 		return mav;
@@ -153,7 +156,7 @@ public class HomeController {
 	@RequestMapping("join")
 	public ModelAndView join(@RequestParam(value = "uId") String uId, @RequestParam(value = "uPwd") String uPwd,
 			@RequestParam(value = "uEmail") String uEmail) throws Exception {
-
+		stop = true;
 		logger.info("[join]");
 
 		ModelAndView mav = new ModelAndView();
@@ -172,6 +175,8 @@ public class HomeController {
 
 	@RequestMapping("deviceList")
 	public ModelAndView deviceList() {
+		
+		stop = true;
 		logger.info("[deviceList]");
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("deviceList");
@@ -180,22 +185,21 @@ public class HomeController {
 
 	@RequestMapping("success")
 	public ModelAndView success(HttpSession session, Model model) throws Exception {
-		if (thread != null)
-			thread.shutdownNow();
+		
+		stop = true;
 		logger.info("[success]");
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("success");
-		String uId = session.getAttribute("userLoginInfo").toString();
 		List<Device> deviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
 		model.addAttribute("deviceList", deviceList);
+		logger.info("{}", deviceList.toString());
 
 		return mav;
 	}
-
+	
 	@RequestMapping("addDevice")
 	public ModelAndView addDevice(Model model) {
-		if (thread != null)
-			thread.shutdownNow();
+		stop = true;
 		logger.info("[addDevice]");
 		ModelAndView mav = new ModelAndView();
 		List<ConnectedCompany> connectedCompnayList = connectedCompanyService.getConnectedCompany();
@@ -211,8 +215,7 @@ public class HomeController {
 
 	@RequestMapping("selectCompany")
 	public String selectCompany(@RequestParam(value = "cmpCode") int cmpCode) {
-		if (thread != null)
-			thread.shutdownNow();
+		stop = true;
 		logger.info("[addDevice]");
 		String s = "";
 
@@ -228,15 +231,15 @@ public class HomeController {
 	@RequestMapping("deleteDevice")
 	public String deleteDevice(HttpSession session, @RequestParam(value = "dId") String dId,
 			@RequestParam(value = "cmpCode") int cmpCode) throws Exception {
-		if (thread != null)
-			thread.shutdownNow();
-		logger.info("[deleteDevice]");
 		
+		stop = true;
+		logger.info("[deleteDevice]");
 		if (cmpCode == 1 && deviceService.getSubscriptionCnt(dId) == 1) {
 			logger.info("[deleteDevice] {}", deviceService.getSubscriptionIdByDId(dId));
 			ArtikUtils.deleteSubscription(session, deviceService.getSubscriptionIdByDId(dId));
 		}
 		if (cmpCode == 4) {
+			logger.info("[groupDelete] {}", dId);
 			deviceService.deleteGroupDevice(dId);
 		}
 
@@ -251,8 +254,6 @@ public class HomeController {
 	public void sendActionTest(HttpSession session, @RequestParam(value = "dId") String dId,
 			@RequestParam(value = "state") int currentState, @RequestParam(value = "cmpCode") int cmpCode)
 			throws Exception {
-		if (thread != null)
-			thread.shutdownNow();
 
 		logger.info("[sendActionTest]");
 
@@ -315,8 +316,7 @@ public class HomeController {
 	@RequestMapping("/allOff")
 	@ResponseBody
 	public void allOff(HttpSession session) throws Exception {
-		if (thread != null)
-			thread.shutdownNow();
+
 		List<Device> deviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
 		String uId = session.getAttribute("userLoginInfo").toString();
 		for (Device d : deviceList) {
@@ -340,8 +340,7 @@ public class HomeController {
 	@RequestMapping("/allOn")
 	@ResponseBody
 	public void allOn(HttpSession session) throws Exception {
-		if (thread != null)
-			thread.shutdownNow();
+
 		List<Device> deviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
 		String uId = session.getAttribute("userLoginInfo").toString();
 		for (Device d : deviceList) {
@@ -375,8 +374,9 @@ public class HomeController {
 	@RequestMapping("login")
 	public String login(@RequestParam(value = "uId") String uId, @RequestParam(value = "uPwd") String uPwd,
 			HttpSession session, Model model) throws Exception {
+		
+		stop = true;
 		logger.info("[login]");
-
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		map.put("uId", uId);
 		map.put("uPwd", uPwd);
@@ -459,8 +459,6 @@ public class HomeController {
 				}
 			}
 
-			thread = new InnerThread(session.getAttribute("userLoginInfo").toString());
-
 			return "redirect:/success";
 
 		} else {
@@ -473,8 +471,7 @@ public class HomeController {
 
 	@RequestMapping("logout")
 	public ModelAndView logout(HttpSession session, Model model) {
-		if (thread != null)
-			thread.shutdownNow();
+		stop = true;
 		ModelAndView mv = new ModelAndView("home", "error_message", "로그인 후 이용바랍니다:D");
 		session.invalidate();
 
@@ -483,8 +480,7 @@ public class HomeController {
 
 	@RequestMapping("createGroup")
 	public ModelAndView createGroup(HttpSession session, Model model) {
-		if (thread != null)
-			thread.shutdownNow();
+		stop = true;
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("createGroup");
 		String uId = session.getAttribute("userLoginInfo").toString();
@@ -502,72 +498,56 @@ public class HomeController {
 
 	@RequestMapping("thread")
 	public String thread(HttpSession session) throws Exception {
-		logger.info("[thread] {}", session.getAttribute("userLoginInfo").toString());
-		if (thread != null && thread.stop)
-			thread.call();
+		stop = true;
+		String userId = session.getAttribute("userLoginInfo").toString();
+		logger.info("{} thread", userId);
+		List<Device> oldList = deviceService.getDeviceById(userId);
+		List<Device> newList = new ArrayList<Device>();
+		stop = false;
+		while (!stop) {
 
-		return "redirect:/success";
-	}
-
-	@Async
-	public class InnerThread implements Callable<Object> {
-		String userId;
-		Boolean stop = false;
-
-		InnerThread(String userId) {
-			this.userId = userId;
-		}
-
-		public void shutdownNow() {
-			// TODO Auto-generated method stub
-			logger.info("thread shutdown");
-			stop = true;
-		}
-
-		@SuppressWarnings("deprecation")
-		public void test() {
-			List<Device> oldList = deviceService.getDeviceById(userId);
-			List<Device> newList = new ArrayList<Device>();
-
-			while (!stop) {
-				
-				try {
-					Thread.sleep(2000);
-					newList.clear();
-					newList = deviceService.getDeviceById(userId);
-					if (oldList.size() != 0 && newList.size() != 0) {
+			try {
+				newList.clear();
+				newList = deviceService.getDeviceById(userId);
+				if (oldList.size() != 0 && newList.size() != 0) { // 두 리스트 다 0이
+																	// 아님
+					if (oldList.size() == newList.size()) {
 						for (int j = 0; j < oldList.size(); j++) {
 							for (int i = 0; i < newList.size(); i++) {
+
 								if (oldList.get(j).getCmpCode() != 4
 										&& oldList.get(j).getdId().equals(newList.get(i).getdId())) {
+									logger.info("{} thread", userId);
+									logger.info(" {}'s old state {} ", oldList.get(j).getName(), oldList.get(j).getState());
+									logger.info(" {}'s new state {}", newList.get(j).getName(), newList.get(j).getState());
+									logger.info(
+											"==============================================================================");
 									if (oldList.get(j).getState() != newList.get(i).getState()) {
 										logger.info("[DB change]");
 										oldList.clear();
 										oldList.addAll(newList);
-										Thread.sleep(1000);
 										stop = true;
+
 									}
 								}
 							}
 						}
+					} else {
+						stop = true;
 					}
 
-				} catch (Exception e) {
-					e.printStackTrace();
+				} else {
+
+					stop = true;
 				}
+
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-
-			return;
+			Thread.sleep(1000);
 		}
 
-		@Override
-		public Object call() throws Exception {
-			// TODO Auto-generated method stub
-			stop = false;
-			test();
-			return stop;
-		}
-
+		return "redirect:/success";
 	}
 
 }
