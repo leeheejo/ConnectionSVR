@@ -175,7 +175,7 @@ public class HomeController {
 
 	@RequestMapping("deviceList")
 	public ModelAndView deviceList() {
-		
+
 		stop = true;
 		logger.info("[deviceList]");
 		ModelAndView mav = new ModelAndView();
@@ -185,7 +185,7 @@ public class HomeController {
 
 	@RequestMapping("success")
 	public ModelAndView success(HttpSession session, Model model) throws Exception {
-		
+
 		stop = true;
 		logger.info("[success]");
 		ModelAndView mav = new ModelAndView();
@@ -196,7 +196,7 @@ public class HomeController {
 
 		return mav;
 	}
-	
+
 	@RequestMapping("addDevice")
 	public ModelAndView addDevice(Model model) {
 		stop = true;
@@ -231,20 +231,32 @@ public class HomeController {
 	@RequestMapping("deleteDevice")
 	public String deleteDevice(HttpSession session, @RequestParam(value = "dId") String dId,
 			@RequestParam(value = "cmpCode") int cmpCode) throws Exception {
-		
+
+		String uId = session.getAttribute("userLoginInfo").toString();
 		stop = true;
 		logger.info("[deleteDevice]");
 		if (cmpCode == 1 && deviceService.getSubscriptionCnt(dId) == 1) {
 			logger.info("[deleteDevice] {}", deviceService.getSubscriptionIdByDId(dId));
 			ArtikUtils.deleteSubscription(session, deviceService.getSubscriptionIdByDId(dId));
 		}
+		
 		if (cmpCode == 4) {
 			logger.info("[groupDelete] {}", dId);
 			deviceService.deleteGroupDevice(dId);
 		}
+		
+		List<String> gIds = deviceService.getGIdBydId(dId);
+		if (gIds != null && gIds.size() != 0) {
+			for (String gId : deviceService.getGIdBydId(dId)) {
+				List<String> dIds = deviceService.getDeviceGroupDids(uId, gId);
+				if (dIds.size() == 1) {
+					deviceService.deleteDevice(uId, gId);
+				}
+			}
+		}
 
-		deviceService.deleteDeviceFromGroup(dId, session.getAttribute("userLoginInfo").toString());
-		deviceService.deleteDevice(session.getAttribute("userLoginInfo").toString(), dId);
+		deviceService.deleteDeviceFromGroup(dId, uId);
+		deviceService.deleteDevice(uId, dId);
 
 		return "redirect:/success";
 	}
@@ -374,7 +386,7 @@ public class HomeController {
 	@RequestMapping("login")
 	public String login(@RequestParam(value = "uId") String uId, @RequestParam(value = "uPwd") String uPwd,
 			HttpSession session, Model model) throws Exception {
-		
+
 		stop = true;
 		logger.info("[login]");
 		HashMap<String, Object> map = new HashMap<String, Object>();
@@ -518,8 +530,10 @@ public class HomeController {
 								if (oldList.get(j).getCmpCode() != 4
 										&& oldList.get(j).getdId().equals(newList.get(i).getdId())) {
 									logger.info("{} thread", userId);
-									logger.info(" {}'s old state {} ", oldList.get(j).getName(), oldList.get(j).getState());
-									logger.info(" {}'s new state {}", newList.get(j).getName(), newList.get(j).getState());
+									logger.info(" {}'s old state {} ", oldList.get(j).getName(),
+											oldList.get(j).getState());
+									logger.info(" {}'s new state {}", newList.get(j).getName(),
+											newList.get(j).getState());
 									logger.info(
 											"==============================================================================");
 									if (oldList.get(j).getState() != newList.get(i).getState()) {
@@ -532,13 +546,7 @@ public class HomeController {
 								}
 							}
 						}
-					} else {
-						stop = true;
 					}
-
-				} else {
-
-					stop = true;
 				}
 
 			} catch (Exception e) {

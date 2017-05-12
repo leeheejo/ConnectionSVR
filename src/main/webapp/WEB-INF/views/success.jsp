@@ -19,25 +19,23 @@
 
 <script
 	src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
-
+<link rel="stylesheet" href="resources/main.css" />
 <title>Main Page</title>
 </head>
 <style type="text/css">
 @media screen and (max-width: 400px) {
- 	
- 	img {
+	img {
 		width: 80%;
 		height: 42px;
 	}
-	
-	.Screen{
-		width:100%
+	.Screen {
+		width: 100%
 	}
 }
 
 @media screen and (min-width: 401px) and (max-width: 800px) {
 	img {
-		width: 90%;
+		width: 100%;
 		height: 42px;
 	}
 }
@@ -47,9 +45,15 @@
 		width: 600px;
 		height: 82px;
 	}
-	.Screen{
-		width:600px;
+	.Screen {
+		width: 600px;
 	}
+}
+
+#footer-content {
+	position: absolute;
+	bottom: 20px;
+	right: 20px;
 }
 </style>
 <script type="text/javascript">
@@ -76,13 +80,6 @@ $(document).ready(function() {
 			return true;
 		else
 			return false;
-	}
-
-	function changeTrColor(trObj, oldColor, newColor) {
-		trObj.style.backgroundColor = newColor;
-		trObj.onmouseout = function() {
-			trObj.style.backgroundColor = oldColor;
-		}
 	}
 
 	function sendAction(dId, state, cmpCode) {
@@ -147,16 +144,13 @@ $(document).ready(function() {
 
 <body>
 	<center>
-		<br>
 		<div class="container" align="center">
-			<img src="<c:url value="/resources/logo.png"/>" height="32"
-				width="78%" alt="" onClick="location.href='success'" />
+			<img src="<c:url value="/resources/logo.png"/>" onClick="location.href='success'" />
 			<button type="button" class="btn btn-default btn-sm "
 				onClick="location.href='logout'">
 				<span class="glyphicon glyphicon-off"></span>
 			</button>
 		</div>
-		<br>
 		<div class="container">
 			<div class="container Screen">
 				<button type="button" class="btn btn-info" onclick='allOff()'
@@ -183,8 +177,7 @@ $(document).ready(function() {
 				<c:choose>
 					<c:when test="${fn:length(deviceList) > 0}">
 						<c:forEach items="${deviceList}" var="row">
-							<tr
-								onmouseover="javascript:changeTrColor(this, '#FFFFFF', '#F4FFFD')">
+							<tr>
 
 								<!-- <td>${row.cmpCode}</td> -->
 								<c:set value="${row.cmpCode}" var="cmpCode" />
@@ -226,34 +219,41 @@ $(document).ready(function() {
 						</tr>
 					</c:otherwise>
 				</c:choose>
+				<tr>
+					<td colspan=3 align="right">
+						<div>
 
-			</table>
-		</div>
-
-		<div class="container" align="right">
-
-			<button type="button" class="btn btn-default btn-md"
-				onClick="location.href='test'" id="subscription" name="subscription">
-				<span class="glyphicon glyphicon-plus"></span>
-			</button>
-			<!--  
+							<button type="button" class="btn btn-default btn-md"
+								onClick="location.href='test'" id="subscription"
+								name="subscription">
+								<span class="glyphicon glyphicon-plus"></span>
+							</button>
+							<!--  
 			<button type="button" class="btn btn-default btn-md"
 				onClick="location.href='success'" id="refresh" name="refresh">
 				<span class="glyphicon glyphicon-refresh"></span>
 			</button>
 			
 			-->
-			<button type="button" class="btn btn-default btn-md"
-				onClick="location.href='createGroup'" id="createGroup"
-				name="createGroup">
-				<span class="glyphicon glyphicon-link"></span>
-			</button>
-			<button type="button" class="btn btn-info btn-md"
-				onClick="location.href='addDevice'">
-				<span class="glyphicon glyphicon-plus"></span>
-			</button>
+							<button type="button" class="btn btn-default btn-md"
+								onClick="location.href='createGroup'" id="createGroup"
+								name="createGroup">
+								<span class="glyphicon glyphicon-link"></span>
+							</button>
+							<button type="button" class="btn btn-info btn-md"
+								onClick="location.href='addDevice'">
+								<span class="glyphicon glyphicon-plus"></span>
+							</button>
+						</div>
+					</td>
+				</tr>
+
+			</table>
 		</div>
+
+
 	</center>
+
 
 	<!--  <iframe src="iframeTest" style="visibility: hidden; display: none"></iframe>-->
 

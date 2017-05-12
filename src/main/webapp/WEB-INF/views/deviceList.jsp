@@ -18,26 +18,32 @@
 	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script type="text/javascript"
 	src="https://code.jquery.com/jquery-1.9.1.js"></script>
+<link rel="stylesheet" href="resources/main.css" />
 <style type="text/css">
 @media screen and (max-width: 400px) {
-
 	img {
 		width: 80%;
 		height: 42px;
+	}
+	.Screen {
+		width: 100%
 	}
 }
 
 @media screen and (min-width: 401px) and (max-width: 800px) {
 	img {
-		width: 90%;
+		width: 100%;
 		height: 42px;
 	}
 }
 
 @media screen and (min-width: 801px) {
 	img {
-		width: 300px;
-		height: 42px;
+		width: 600px;
+		height: 82px;
+	}
+	.Screen {
+		width: 600px;
 	}
 }
 </style>
@@ -56,17 +62,15 @@
 </script>
 <body>
 	<center>
-		<br>
 		<div class="container" align="center">
-			<img src="<c:url value="/resources/logo.png"/>" height="32"
-				width="78%" alt="" onClick="location.href='success'" />
+			<img src="<c:url value="/resources/logo.png"/>" onClick="location.href='success'" />
 			<button type="button" class="btn btn-default btn-sm "
 				onClick="location.href='logout'">
 				<span class="glyphicon glyphicon-off"></span>
 			</button>
 		</div>
 		<br>
-		<div class="container">
+		<div class="container Screen">
 			<table class="table" style="width: 100%" align="center">
 				<thead>
 					<tr>

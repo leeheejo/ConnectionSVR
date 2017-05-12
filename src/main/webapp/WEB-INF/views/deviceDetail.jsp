@@ -16,7 +16,7 @@
 	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script type="text/javascript"
 	src="https:////code.jquery.com/jquery-1.12.4.js"></script>
-
+<link rel="stylesheet" href="resources/main.css" />
 <script
 	src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
 <head>
@@ -25,20 +25,18 @@
 </head>
 <style type="text/css">
 @media screen and (max-width: 400px) {
- 	
- 	img {
+	img {
 		width: 80%;
 		height: 42px;
 	}
-	
-	.Screen{
-		width:100%
+	.Screen {
+		width: 100%
 	}
 }
 
 @media screen and (min-width: 401px) and (max-width: 800px) {
 	img {
-		width: 90%;
+		width: 100%;
 		height: 42px;
 	}
 }
@@ -48,9 +46,14 @@
 		width: 600px;
 		height: 82px;
 	}
-	.Screen{
-		width:600px;
+	.Screen {
+		width: 600px;
 	}
+}
+
+#footer-content {
+	position: absolute;
+	bottom: 20px;
 }
 </style>
 <script type="text/javascript">
@@ -176,7 +179,6 @@
 </script>
 <body>
 	<center>
-		<br>
 		<div class="container" align="center">
 			<img src="<c:url value="/resources/logo.png"/>" height="32"
 				width="78%" alt="" onClick="location.href='success'" />
@@ -186,132 +188,134 @@
 			</button>
 		</div>
 		<p>
-			<br>
-			<c:set value="${state}" var="state" />
-			<c:choose>
-				<c:when test="${state == 0}">
-					<span class="label label-default">OFF</span>
-				</c:when>
-				<c:when test="${state == 1}">
-					<span class="label label-primary">ON</span>
-				</c:when>
-			</c:choose>
-		</p>
-		<h3>${name}</h3>
-
-		<div id="hue" style="display: none;" class="container">
-			<br> <br>
-			<h4>Current State</h4>
-			<table class="Screen">
-				<tr>
-					<td>
-						<div class="form-group">
-							<label for="Brightness">Brightness</label> <input type=text
-								id="Brightness" class="form-control" readonly />
-						</div>
-					</td>
-					<td>
-						<div class="form-group ">
-							<label for="R">Color R</label> <input type=text id="R"
-								class="form-control" readonly />
-						</div>
-					</td>
-					<td>
-						<div class="form-group ">
-							<label for="G">Color G</label> <input type=text id="G"
-								class="form-control" readonly />
-						</div>
-					</td>
-					<td>
-						<div class="form-group ">
-							<label for="B">Color B</label> <input type=text id="B"
-								class="form-control" readonly />
-						</div>
-					</td>
-				</tr>
-			</table>
-
-			<br> <br>
-			<h4>Change Color</h4>
-
-			<form action="sendActionRGB">
-				<input type="hidden" id="dId" name="dId" value='${dId}' /> <input
-					type="hidden" id="name" name="name" value='${name}' /> <input
-					type="hidden" id="state" name="state" value='${state}' />
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<br>
+				<c:set value="${state}" var="state" />
+				<c:choose>
+					<c:when test="${state == 0}">
+						<span class="label label-default">OFF</span>
+					</c:when>
+					<c:when test="${state == 1}">
+						<span class="label label-primary">ON</span>
+					</c:when>
+				</c:choose>
+				</p>
+				<h3>${name}</h3>
+			</div>
+			<div id="hue" style="display: none; height: 100%;" class="container">
+				<br> <br>
+				<h4>Current State</h4>
 				<table class="Screen">
 					<tr>
+						<td>
+							<div class="form-group">
+								<label for="Brightness">Brightness</label> <input type=text
+									id="Brightness" class="form-control" readonly />
+							</div>
+						</td>
+						<td>
+							<div class="form-group ">
+								<label for="R">Color R</label> <input type=text id="R"
+									class="form-control" readonly />
+							</div>
+						</td>
+						<td>
+							<div class="form-group ">
+								<label for="G">Color G</label> <input type=text id="G"
+									class="form-control" readonly />
+							</div>
+						</td>
+						<td>
+							<div class="form-group ">
+								<label for="B">Color B</label> <input type=text id="B"
+									class="form-control" readonly />
+							</div>
+						</td>
+					</tr>
+				</table>
+
+				<br> <br>
+				<h4>Change Color</h4>
+
+				<form action="sendActionRGB">
+					<input type="hidden" id="dId" name="dId" value='${dId}' /> <input
+						type="hidden" id="name" name="name" value='${name}' /> <input
+						type="hidden" id="state" name="state" value='${state}' />
+					<table class="Screen">
+						<tr>
+							<td><div class="form-group ">
+									<input type="text" id="actionR" name="actionR" placeHolder="R"
+										class="form-control" onKeyPress="return numkeyCheck(event)" />
+								</div></td>
+							<td><div class="form-group ">
+									<input type="text" id="actionG" name="actionG" placeHolder="G"
+										class="form-control" onKeyPress="return numkeyCheck(event)" />
+								</div></td>
+							<td><div class="form-group ">
+									<input type="text" actionid="actionB" name="actionB"
+										placeHolder="B" class="form-control"
+										onKeyPress="return numkeyCheck(event)" />
+								</div></td>
+						</tr>
+					</table>
+					<button type="submit" class="btn btn-primary btn-block Screen">submit</button>
+				</form>
+				<br>
+
+				<form action="deleteDevice" method="GET">
+
+					<input type="hidden" name="dId" value='${dId}' /> <input
+						type="hidden" name="cmpCode" value=1 />
+					<button type="submit" class="btn btn-default btn-block Screen"
+						onClick="location.href='deleteDevice'">delete</button>
+
+				</form>
+			</div>
+			<div id="airPurifier" style="display: none" class="container">
+				<br> <br>
+				<h4>Current State</h4>
+				<table>
+					<tr>
 						<td><div class="form-group ">
-								<input type="text" id="actionR" name="actionR" placeHolder="R"
-									class="form-control" onKeyPress="return numkeyCheck(event)" />
+								<label for="Dust">Dust</label> <input type=text id="Dust"
+									class="form-control" readonly />
 							</div></td>
 						<td><div class="form-group ">
-								<input type="text" id="actionG" name="actionG" placeHolder="G"
-									class="form-control" onKeyPress="return numkeyCheck(event)" />
+								<label for="FineDust">FineDust</label> <input type=text
+									id="FineDust" class="form-control" readonly />
 							</div></td>
 						<td><div class="form-group ">
-								<input type="text" actionid="actionB" name="actionB"
-									placeHolder="B" class="form-control"
-									onKeyPress="return numkeyCheck(event)" />
+								<label for="Odor">Odor</label> <input type=text id="Odor"
+									class="form-control" readonly />
 							</div></td>
 					</tr>
 				</table>
-				<button type="submit" class="btn btn-primary btn-block Screen">submit</button>
-			</form>
-			<br>
+				<br>
+				<form action="deleteDevice" method="GET">
+					<input type="hidden" name="dId" value='${dId}' /> <input
+						type="hidden" name="cmpCode" value=1 />
+					<button type="submit" class="btn btn-default btn-block Screen"
+						onClick="location.href='deleteDevice'">delete</button>
+				</form>
 
-			<form action="deleteDevice" method="GET">
-				<input type="hidden" name="dId" value='${dId}' /> <input
-					type="hidden" name="cmpCode" value=1 />
-				<button type="submit" class="btn btn-default btn-block Screen"
-					onClick="location.href='deleteDevice'">delete</button>
-			</form>
+			</div>
+			<div id="group" style="display: none" class="container">
+				<br> <br>
+				<h4>Group Component</h4>
+				<textarea id="device" class="form-control Screen"
+					style="resize: none; overflow: hidden;" readonly></textarea>
+				<br>
+				<form action="deleteDevice" method="GET">
+					<input type="hidden" name="dId" value='${dId}' /> <input
+						type="hidden" name="cmpCode" value=4 />
+					<button type="submit" class="btn btn-default btn-block Screen"
+						onClick="location.href='deleteDevice'">delete</button>
+				</form>
 
-		</div>
-		<div id="airPurifier" style="display: none" class="container">
-			<br> <br>
-			<h4>Current State</h4>
-			<table>
-				<tr>
-					<td><div class="form-group ">
-							<label for="Dust">Dust</label> <input type=text id="Dust"
-								class="form-control" readonly />
-						</div></td>
-					<td><div class="form-group ">
-							<label for="FineDust">FineDust</label> <input type=text
-								id="FineDust" class="form-control" readonly />
-						</div></td>
-					<td><div class="form-group ">
-							<label for="Odor">Odor</label> <input type=text id="Odor"
-								class="form-control" readonly />
-						</div></td>
-				</tr>
-			</table>
-			<br>
-			<form action="deleteDevice" method="GET">
-				<input type="hidden" name="dId" value='${dId}' /> <input
-					type="hidden" name="cmpCode" value=1 />
-				<button type="submit" class="btn btn-default btn-block Screen"
-					onClick="location.href='deleteDevice'">delete</button>
-			</form>
-
-		</div>
-		<div id="group" style="display: none" class="container">
-			<br> <br>
-			<h4>Group Component</h4>
-			<textarea id="device" class="form-control Screen"
-				style="resize: none; overflow: hidden;" readonly></textarea>
-			<br>
-			<form action="deleteDevice" method="GET">
-				<input type="hidden" name="dId" value='${dId}' /> <input
-					type="hidden" name="cmpCode" value=4 />
-				<button type="submit" class="btn btn-default btn-block Screen"
-					onClick="location.href='deleteDevice'">delete</button>
-			</form>
-
-		</div>
-
+			</div>
 	</center>
-
+	</div>
 
 </body>
 </html>

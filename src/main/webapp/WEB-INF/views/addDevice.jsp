@@ -8,69 +8,72 @@
 <meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
 <meta name="viewport"
 	content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-<script type="text/javascript" src="https://code.jquery.com/jquery-1.9.1.js"></script>
-
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+<script
+	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script type="text/javascript"
+	src="https://code.jquery.com/jquery-1.9.1.js"></script>
+<link rel="stylesheet" href="resources/main.css" />
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
 </head>
 <style type="text/css">
 @media screen and (max-width: 400px) {
-
 	img {
 		width: 80%;
 		height: 42px;
 	}
+	.Screen {
+		width: 100%;
+	}
 }
 
 @media screen and (min-width: 401px) and (max-width: 800px) {
-
 	img {
-		width: 90%;
+		width: 100%;
 		height: 42px;
 	}
 }
 
 @media screen and (min-width: 801px) {
-
 	img {
-		width: 300px;
-		height: 42px;
+		width: 600px;
+		height: 82px;
+	}
+	.Screen {
+		width: 600px;
 	}
 }
 </style>
 <body>
-	<br>
 	<center>
 		<div class="container" align="center">
-			<img src="<c:url value="/resources/logo.png"/>" height="32" width="78%" alt="" onClick="location.href='success'"  />
-			<button type="button" class="btn btn-default btn-sm "onClick="location.href='logout'">
+			<img src="<c:url value="/resources/logo.png"/>" height="32"
+				width="78%" alt="" onClick="location.href='success'" />
+			<button type="button" class="btn btn-default btn-sm "
+				onClick="location.href='logout'">
 				<span class="glyphicon glyphicon-off"></span>
 			</button>
 		</div>
 		<br>
-		<div class="container">
-			<div class="input-group">
-				<span class="input-group-addon">
-					<i class="glyphicon glyphicon-search"></i>
-				</span>
-				<input id="search" type="text" class="form-control" name="search" placeholder="Search">
-			</div>
-			<br>
+		<div class="container Screen panel panel-default ">
+			<div class="form-group panel-heading">Server List</div>
 			<table style="width: 100%" align="center">
 				<c:choose>
 					<c:when test="${fn:length(connectedCompanyList) > 0}">
 						<c:forEach items="${connectedCompanyList}" var="row">
-						<form action="selectCompany" method="GET">
-						<input type="hidden" name="cmpCode" value='${row.cmpCode}' /> 
-							<tr align="center">
-								<td align="center">
-									<button class="btn btn-default btn-lg btn-block" type="submit" style="width: 100%">${row.cmpName}</button>
-								</td>
-							</tr>
-						</form>
+							<form action="selectCompany" method="GET">
+								<input type="hidden" name="cmpCode" value='${row.cmpCode}' />
+								<tr align="center">
+									<td align="center">
+										<button class="btn btn-default btn-lg btn-block" type="submit"
+											style="width: 100%">${row.cmpName}</button>
+									</td>
+								</tr>
+							</form>
 						</c:forEach>
 						<!-- 
 						<tr align="center">
@@ -88,6 +91,7 @@
 					</c:otherwise>
 				</c:choose>
 			</table>
+
 		</div>
 	</center>
 </body>

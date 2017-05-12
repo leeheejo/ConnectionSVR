@@ -19,7 +19,7 @@
 	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script type="text/javascript"
 	src="https://code.jquery.com/jquery-1.9.1.js"></script>
-
+<link rel="stylesheet" href="resources/main.css" />
 
 <title>Main Page</title>
 </head>
@@ -39,7 +39,7 @@
 
 @media screen and (min-width: 401px) and (max-width: 800px) {
 	img {
-		width: 90%;
+		width: 100%;
 		height: 42px;
 	}
 }
@@ -77,7 +77,6 @@
 
 <body>
 	<center>
-		<br>
 		<div class="container" align="center">
 			<img src="<c:url value="/resources/logo.png"/>" height="32"
 				width="78%" alt="" onClick="location.href='success'" />
@@ -87,9 +86,9 @@
 			</button>
 		</div>
 		<br>
-		<div class="container Screen">
-			<div class="form-group">
-				<label for="usr">Group Name:</label> <input type="text"
+		<div class="container Screen panel panel-default ">
+			<div class="form-group panel-heading">
+				<label for="usr">Group Name</label> <input type="text"
 					class="form-control Screen" id="groupName">
 			</div>
 			<c:choose>
