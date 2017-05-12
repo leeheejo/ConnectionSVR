@@ -152,12 +152,10 @@ public class ArtikController {
 				state = 1;
 			}
 			List<String> groupList = deviceService.getGIdBydId(dId);
-			logger.info("{}", groupList.toString());
 			if (groupList != null) {
 				for (String s : groupList) {
 					deviceService.updateGroupState(0, s);
 					for (String dIds : deviceService.getDeviceGroupDids(deviceService.getUIdByDId(s), s)) {
-
 						if (state == 1 && deviceService.getDeviceStateByDId(s, deviceService.getUIdByDId(dIds)) != 1) {
 							logger.info("Group {} update", s);
 							deviceService.updateGroupState(state, s);
@@ -168,7 +166,7 @@ public class ArtikController {
 
 			deviceService.updateDeviceStateSubscription(state, dId);
 		}
-
+		Thread.sleep(1000);
 		return "success";
 
 	}

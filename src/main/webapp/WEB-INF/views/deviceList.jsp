@@ -54,7 +54,7 @@
 		</c:if>
 		<c:if test="${!empty oauthUrl and !empty sessionScope.ACCESS_TOKEN}">
 		 $(document).ready(function(){
-			 alert('이미 로그인이 되어 있습니다XD');
+			 alert('로그인이 되었습니다XD');
 			document.forms["call"].submit();
 		 });
 		

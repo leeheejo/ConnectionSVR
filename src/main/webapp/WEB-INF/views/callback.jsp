@@ -6,7 +6,6 @@
 <script type="text/javascript">
 	var doc = window.opener.document;
 	var theForm = doc.getElementById("LoginForm");
+	opener.location.reload();
 	self.close();
-	theForm.submit();
-	
 </script>

@@ -185,14 +185,13 @@ public class HomeController {
 
 	@RequestMapping("success")
 	public ModelAndView success(HttpSession session, Model model) throws Exception {
-
 		stop = true;
 		logger.info("[success]");
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("success");
 		List<Device> deviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
 		model.addAttribute("deviceList", deviceList);
-		logger.info("{}", deviceList.toString());
+		logger.info("[success] {}", deviceList.toString());
 
 		return mav;
 	}
@@ -239,12 +238,12 @@ public class HomeController {
 			logger.info("[deleteDevice] {}", deviceService.getSubscriptionIdByDId(dId));
 			ArtikUtils.deleteSubscription(session, deviceService.getSubscriptionIdByDId(dId));
 		}
-		
+
 		if (cmpCode == 4) {
 			logger.info("[groupDelete] {}", dId);
 			deviceService.deleteGroupDevice(dId);
 		}
-		
+
 		List<String> gIds = deviceService.getGIdBydId(dId);
 		if (gIds != null && gIds.size() != 0) {
 			for (String gId : deviceService.getGIdBydId(dId)) {
@@ -332,7 +331,7 @@ public class HomeController {
 		List<Device> deviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
 		String uId = session.getAttribute("userLoginInfo").toString();
 		for (Device d : deviceList) {
-			logger.info("{}", d.getName());
+			logger.info("all Off {}", d.getName());
 			SendTestLog sendTestLog = null;
 			if (d.getCmpCode() != 4) {
 				if (d.getState() == 1) {
@@ -344,6 +343,7 @@ public class HomeController {
 					}
 					// sendTestLogService.insertSendTestLog(sendTestLog);
 				}
+
 			}
 			Thread.sleep(3000);
 		}
@@ -357,8 +357,8 @@ public class HomeController {
 		String uId = session.getAttribute("userLoginInfo").toString();
 		for (Device d : deviceList) {
 			SendTestLog sendTestLog = null;
-			logger.info("{}", d.getName());
 			if (d.getCmpCode() != 4) {
+				logger.info("allOn {}", d.getName());
 				if (d.getState() == 0) {
 					if (d.getCmpCode() == 1) {
 						sendTestLog = ArtikUtils.Action(session, d.getdId(), "setOn", "");
@@ -368,8 +368,9 @@ public class HomeController {
 					}
 					// sendTestLogService.insertSendTestLog(sendTestLog);
 				}
-				Thread.sleep(3000);
+
 			}
+			Thread.sleep(3000);
 		}
 	}
 
@@ -463,7 +464,7 @@ public class HomeController {
 				for (Device d : groupList) {
 					deviceService.updateGroupState(0, d.getdId());
 					for (String dId : deviceService.getDeviceGroupDids(uId, d.getdId())) {
-						logger.info("{}", deviceService.getDeviceStateByDId(dId, uId));
+						logger.info("[login] {}", deviceService.getDeviceStateByDId(dId, uId));
 						if (deviceService.getDeviceStateByDId(dId, uId) == 1) {
 							deviceService.updateGroupState(1, d.getdId());
 						}

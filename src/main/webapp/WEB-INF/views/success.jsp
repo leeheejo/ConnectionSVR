@@ -145,7 +145,8 @@ $(document).ready(function() {
 <body>
 	<center>
 		<div class="container" align="center">
-			<img src="<c:url value="/resources/logo.png"/>" onClick="location.href='success'" />
+			<img src="<c:url value="/resources/logo.png"/>"
+				onClick="location.href='success'" />
 			<button type="button" class="btn btn-default btn-sm "
 				onClick="location.href='logout'">
 				<span class="glyphicon glyphicon-off"></span>
@@ -222,13 +223,12 @@ $(document).ready(function() {
 				<tr>
 					<td colspan=3 align="right">
 						<div>
-
+							<!-- 
 							<button type="button" class="btn btn-default btn-md"
 								onClick="location.href='test'" id="subscription"
 								name="subscription">
 								<span class="glyphicon glyphicon-plus"></span>
-							</button>
-							<!--  
+							</button> 
 			<button type="button" class="btn btn-default btn-md"
 				onClick="location.href='success'" id="refresh" name="refresh">
 				<span class="glyphicon glyphicon-refresh"></span>
