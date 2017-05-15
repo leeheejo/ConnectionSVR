@@ -80,7 +80,7 @@ div {
 			});
 </script>
 
-<body>
+<body onbeforeunload="success">
 	<center>
 		<div class="container" align="center">
 			<img src="<c:url value="/resources/logo.png"/>" height="32"

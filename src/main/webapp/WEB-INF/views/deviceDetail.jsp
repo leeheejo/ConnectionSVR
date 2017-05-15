@@ -68,7 +68,7 @@ div {
 <script type="text/javascript">
 var wind = 0;
 	$(document).ready(function() {
-			
+						
 						var dId = '${dId}';
 						var allData = {
 							"dId" : dId
@@ -288,7 +288,7 @@ var wind = 0;
 	}
 
 </script>
-<body>
+<body onbeforeunload="success">
 	<center>
 		<div class="container" align="center">
 			<img src="<c:url value="/resources/logo.png"/>" height="32"
