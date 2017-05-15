@@ -131,17 +131,12 @@ public class ArtikController {
 		logger.info("[callback] {}", responseData);
 		JSONObject obj = new JSONObject(responseData);
 
-		if (obj.length() == 3) { // subscription 생성시 validate 로
-									// 넘어가야함
-			// {"aid":"cbd3e38e12344b22a8c76cd3789b0e0e","subscriptionId":"0d3dd7d79f664087a649540d19f11663",
-			// "nonce":"bc051ecea5e44deeb03e53057e4e63a8"}
+		if (obj.length() == 3) {
+
 			ArtikUtils.validateSubscription(obj.getString("subscriptionId"), obj.getString("aid"),
 					obj.getString("nonce"));
 
-		} else { // subscripiton query id
-					// msg 요청해야함
-			// id msg ID
-			// {"id":"5336bf1ef2804dd882c315d32675ab4f","ts":1494137879113,"type":"action","subscriptionId":"0d3dd7d79f664087a649540d19f11663","subscriptionQuery":{"uid":"58e8794672f848f5bf65dfd6267ff9b9","ddid":"f9da7204a9644b99a92ae2da56c48df8"},"startDate":"1494137878872","endDate":"1494137878872","count":1}
+		} else {
 			logger.info("{}", obj.getString("id"));
 			String dId = obj.getJSONObject("subscriptionQuery").getString("ddid");
 			String accessToken = accessTokenService.getAccessTokenById(deviceService.getUIdByDId(dId));

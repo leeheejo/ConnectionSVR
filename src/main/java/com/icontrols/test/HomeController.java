@@ -492,6 +492,54 @@ public class HomeController {
 		return mv;
 	}
 
+	@RequestMapping("refresh")
+	public String refresh(HttpSession session) throws Exception {
+		stop = true;
+		
+		logger.info("[refresh]");
+
+		String uId = session.getAttribute("userLoginInfo").toString();
+		List<Device> deviceList = deviceService.getDeviceById(uId);
+		List<Device> artikDevice = new ArrayList<Device>();
+		List<Device> groupList = new ArrayList<Device>();
+		if (deviceList.size() != 0) {
+			for (Device d : deviceList) {
+				if (d.getCmpCode() == 0) {
+					int state = IparkUtils.getState(d, session.getAttribute("IPARK_ACCESS_TOKEN").toString());
+					if (IparkUtils.stateChangeFlag == 1) {
+						deviceService.updateDeviceState(state, d.getdId(), uId);
+					}
+				} else if (d.getCmpCode() == 1) {
+					artikDevice.add(d);
+				} else if (d.getCmpCode() == 4) {
+					groupList.add(d);
+				}
+			}
+
+			if (session.getAttribute("ACCESS_TOKEN") != null && artikDevice.size() != 0) {
+				List<Device> result = ArtikUtils.getDeviceState(session, artikDevice);
+				if (ArtikUtils.stateChangeFlag == 1) {
+					for (Device d : result) {
+						deviceService.updateDeviceState(d.getState(), d.getdId(), uId);
+					}
+				}
+			}
+		}
+
+		if (groupList != null && groupList.size() != 0) {
+			for (Device d : groupList) {
+				deviceService.updateGroupState(0, d.getdId());
+				for (String dId : deviceService.getDeviceGroupDids(uId, d.getdId())) {
+					if (deviceService.getDeviceStateByDId(dId, uId) == 1) {
+						deviceService.updateGroupState(1, d.getdId());
+					}
+				}
+			}
+		}
+
+		return "redirect:/success";
+	}
+
 	@RequestMapping("createGroup")
 	public ModelAndView createGroup(HttpSession session, Model model) {
 		stop = true;
@@ -512,7 +560,7 @@ public class HomeController {
 
 	@RequestMapping("thread")
 	public String thread(HttpSession session) throws Exception {
-		
+
 		stop = true;
 		String userId = session.getAttribute("userLoginInfo").toString();
 		logger.info("{} thread", userId);

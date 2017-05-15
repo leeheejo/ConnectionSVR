@@ -233,13 +233,13 @@ $(document).ready(function() {
 								onClick="location.href='test'" id="subscription"
 								name="subscription">
 								<span class="glyphicon glyphicon-plus"></span>
-							</button> 
-			<button type="button" class="btn btn-default btn-md"
-				onClick="location.href='success'" id="refresh" name="refresh">
-				<span class="glyphicon glyphicon-refresh"></span>
-			</button>
-			
-			-->
+							</button> -->
+							<button type="button" class="btn btn-default btn-md"
+								onClick="location.href='refresh'" id="refresh" name="refresh">
+								<span class="glyphicon glyphicon-refresh"></span>
+							</button>
+
+
 							<button type="button" class="btn btn-default btn-md"
 								onClick="location.href='createGroup'" id="createGroup"
 								name="createGroup">
@@ -258,9 +258,6 @@ $(document).ready(function() {
 
 
 	</center>
-
-
-	<!--  <iframe src="iframeTest" style="visibility: hidden; display: none"></iframe>-->
 
 </body>
 </html>
