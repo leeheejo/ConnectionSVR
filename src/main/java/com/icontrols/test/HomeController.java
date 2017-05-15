@@ -308,7 +308,6 @@ public class HomeController {
 				} else if (deviceType == 0) {
 					sendTestLog = IparkUtils.sendAction(action, uId, s,
 							session.getAttribute("IPARK_ACCESS_TOKEN").toString());
-
 					if (sendTestLog.getIparkState().equals("on")) {
 						deviceService.updateDeviceState(1, s, uId);
 					} else if (sendTestLog.getIparkState().equals("off")) {
@@ -318,7 +317,7 @@ public class HomeController {
 
 					sendTestLog = PhilipsHueUtils.sendAction(session, action, s);
 				}
-
+				Thread.sleep(5000);
 			}
 
 		}

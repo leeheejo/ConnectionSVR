@@ -27,7 +27,7 @@
 		height: 42px;
 	}
 	.Screen {
-		width: 100%;
+		width: 90%;
 	}
 }
 
@@ -46,6 +46,11 @@
 	.Screen {
 		width: 600px;
 	}
+}
+
+div {
+	padding: 3px;
+	margin: 3px;
 }
 </style>
 <body>

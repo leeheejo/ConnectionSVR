@@ -33,7 +33,7 @@
 		height: 42px;
 	}
 	.Screen {
-		width: 100%
+		width: 90%
 	}
 }
 
@@ -54,9 +54,9 @@
 	}
 }
 
-#footer-content {
-	position: absolute;
-	bottom: 20px;
+div {
+	padding: 3px;
+	margin: 3px;
 }
 </style>
 <script type="text/javascript">
@@ -246,8 +246,7 @@
 				<span class="glyphicon glyphicon-off"></span>
 			</button>
 		</div>
-		<p>
-		<div class="panel panel-default">
+		<div class="panel panel-default Screen">
 			<div class="panel-heading">
 				<br>
 				<c:set value="${state}" var="state" />
@@ -259,13 +258,12 @@
 						<span class="label label-primary">ON</span>
 					</c:when>
 				</c:choose>
-				</p>
 				<h3>${name}</h3>
 			</div>
-			<div id="hue" style="display: none; height: 100%;" class="container">
+			<div id="hue" style="display: none;" class="panel-body">
 				<br> <br>
 				<h4>Current State</h4>
-				<table class="Screen">
+				<table>
 					<tr>
 						<td>
 							<div class="form-group">
@@ -296,7 +294,7 @@
 
 				<br> <br>
 				<h4>Change Color</h4>
-				<table class="Screen">
+				<table>
 					<tr>
 						<td align="center">
 							<div class="radio">
@@ -310,7 +308,7 @@
 						</td>
 					<tr>
 				</table>
-				<button type="button" class="btn btn-primary btn-block Screen"
+				<button type="button" class="btn btn-primary btn-block"
 					onclick="colorChange('${dId}','${name}','${state}')">submit</button>
 
 				<br>
@@ -319,12 +317,13 @@
 
 					<input type="hidden" name="dId" value='${dId}' /> <input
 						type="hidden" name="cmpCode" value=1 />
-					<button type="submit" class="btn btn-default btn-block Screen"
+					<button type="submit" class="btn btn-default btn-block"
 						onClick="location.href='deleteDevice'">delete</button>
 
 				</form>
 			</div>
-			<div id="airPurifier" style="display: none" class="container">
+
+			<div id="airPurifier" style="display: none" class="panel-body">
 				<br> <br>
 				<h4>Current State</h4>
 				<table>
@@ -347,12 +346,13 @@
 				<form action="deleteDevice" method="GET">
 					<input type="hidden" name="dId" value='${dId}' /> <input
 						type="hidden" name="cmpCode" value=1 />
-					<button type="submit" class="btn btn-default btn-block Screen"
+					<button type="submit" class="btn btn-default btn-block"
 						onClick="location.href='deleteDevice'">delete</button>
 				</form>
 
 			</div>
-			<div id="group" style="display: none" class="container">
+
+			<div id="group" style="display: none" class="panel-body">
 				<br> <br>
 				<h4>Group Component</h4>
 				<textarea id="device" class="form-control Screen"
@@ -366,8 +366,7 @@
 				</form>
 
 			</div>
+		</div>
 	</center>
-	</div>
-
 </body>
 </html>

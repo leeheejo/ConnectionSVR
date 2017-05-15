@@ -49,12 +49,6 @@
 		width: 600px;
 	}
 }
-
-#footer-content {
-	position: absolute;
-	bottom: 20px;
-	right: 20px;
-}
 </style>
 <script type="text/javascript">
 
@@ -167,10 +161,11 @@ $(document).ready(function() {
 				<thead>
 					<tr>
 						<!-- <th style="width: 1%">code</th>  -->
-						<th style="width: 80%">기기명</th>
+
+						<th style="width: 80%">device</th>
 						<!--  <th>dId</th>  -->
-						<th style="width: 10%">상태</th>
-						<th style="width: 10%">제어</th>
+						<th style="width: 10%">state</th>
+						<th style="width: 10%">on/off</th>
 					</tr>
 				</thead>
 
@@ -178,6 +173,7 @@ $(document).ready(function() {
 					<c:when test="${fn:length(deviceList) > 0}">
 						<c:forEach items="${deviceList}" var="row">
 							<tr>
+
 
 								<!-- <td>${row.cmpCode}</td> -->
 								<c:set value="${row.cmpCode}" var="cmpCode" />
@@ -193,12 +189,17 @@ $(document).ready(function() {
 								</c:choose>
 
 								<c:set value="${row.state}" var="state" />
+
 								<c:choose>
 									<c:when test="${state == 0}">
-										<td><span class="label label-default">OFF</span></td>
+										<td><h4>
+												<span class="label label-default">OFF</span>
+											</h4></td>
 									</c:when>
 									<c:when test="${state == 1}">
-										<td><span class="label label-primary">ON</span></td>
+										<td><h4>
+												<span class="label label-primary">ON</span>
+											</h4></td>
 									</c:when>
 								</c:choose>
 

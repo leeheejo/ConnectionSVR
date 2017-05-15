@@ -30,7 +30,7 @@
 		height: 42px;
 	}
 	.Screen {
-		width: 100%
+		width: 90%
 	}
 	.Font {
 		font-size: 100%;
@@ -55,6 +55,11 @@
 	.Font {
 		font-size: 18px;
 	}
+}
+
+div {
+	padding: 3px;
+	margin: 3px;
 }
 </style>
 <script type="text/javascript">
@@ -86,26 +91,27 @@
 			</button>
 		</div>
 		<br>
-		<div class="container Screen panel panel-default ">
+		<div class="Screen panel panel-default ">
 			<div class="form-group panel-heading">
 				<label for="usr">Group Name</label> <input type="text"
-					class="form-control Screen" id="groupName">
+					class="form-control" id="groupName">
 			</div>
-			<c:choose>
-				<c:when test="${fn:length(deviceList) > 0}">
-					<c:forEach items="${deviceList}" var="row">
-						<div class="checkbox Font">
-							<label><input type="checkbox" value='${row.dId}'
-								name="device">${row.name}</label>
-						</div>
-					</c:forEach>
-				</c:when>
-			</c:choose>
-			<div>
+			<div class="panel-body">
+				<c:choose>
+					<c:when test="${fn:length(deviceList) > 0}">
+						<c:forEach items="${deviceList}" var="row">
+							<div class="checkbox Font">
+								<label><input type="checkbox" value='${row.dId}'
+									name="device">${row.name}</label>
+							</div>
+						</c:forEach>
+					</c:when>
+				</c:choose>
+
 				<br> <br>
 
-				<button type="button" class="btn btn-primary btn-block Screen"
-					id="clicker" name="clicker">submit</button>
+				<button type="button" class="btn btn-primary btn-block" id="clicker"
+					name="clicker">submit</button>
 			</div>
 
 		</div>
