@@ -12,10 +12,13 @@
 	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
-<script
-	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script type="text/javascript"
 	src="https:////code.jquery.com/jquery-1.12.4.js"></script>
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.8.0/bootstrap-slider.min.js"
+	integrity="sha256-Gdq5BxoczjhbEJLjrYKQ4fvBGx/EQrTWjDM2UrdTot0="
+	crossorigin="anonymous"></script>
+
 <link rel="stylesheet" href="resources/main.css" />
 <script
 	src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
@@ -57,6 +60,7 @@
 }
 </style>
 <script type="text/javascript">
+
 	$(document).ready(function() {
 			
 					
@@ -129,9 +133,34 @@
 
 								});
 						}
-
+						var red = document.getElementById("red");
+						var ctx = red.getContext("2d");
+						ctx.beginPath();
+						ctx.arc(20,10,8,0,2*Math.PI);
+						ctx.fillStyle = "red";
+						ctx.fill();
+						ctx.stroke();
+						
+						var blue = document.getElementById("blue");
+						var ctx = blue.getContext("2d");
+						ctx.beginPath();
+						ctx.arc(20,10,8,0,2*Math.PI);
+						ctx.fillStyle = "blue";
+						ctx.fill();
+						ctx.stroke();
+						
+						var green = document.getElementById("green");
+						var ctx = green.getContext("2d");
+						ctx.beginPath();
+						ctx.arc(20,10,8,0,2*Math.PI);
+						ctx.fillStyle = "green";
+						ctx.fill();
+						ctx.stroke();
+						
 					});
 
+
+	
 	function divchange(flag) {
 
 		if (flag == 0) {
@@ -174,6 +203,36 @@
 		});
 		document.getElementById("device").rows = rows;
 		$('#device').val(devices);
+	}
+	
+	function colorChange(dId, name, state){
+		var color = $("input[type='radio'][name='optradio']:checked").val();
+		var R = 0;
+		var G = 0;
+		var B = 0;
+		if(color == 1) {
+			R = 50;
+		} else if(color == 2) {
+			B = 50;
+		}else if(color==3){
+			G = 50;
+		}
+		
+		$
+		.ajax({
+			url : "sendActionRGB",
+			dataType : "text",
+			type : "get",
+			data : {"dId" : dId, "name" : name, "state" : state, "actionR" : R, "actionG" :G, "actionB":B},
+			success : function(data) {
+
+				location.href ="success";
+			},
+			error : function(request, status, error) {
+			}
+
+		});
+
 	}
 
 </script>
@@ -237,30 +296,23 @@
 
 				<br> <br>
 				<h4>Change Color</h4>
+				<table class="Screen">
+					<tr>
+						<td align="center">
+							<div class="radio">
+								<label><input type="radio" name="optradio" value=1>
+									<canvas id="red" width="45" height="45"> </canvas></label> <label><input
+									type="radio" name="optradio" value=2> <canvas id="blue"
+										width="45" height="45"> </canvas></label> <label><input
+									type="radio" name="optradio" value=3> <canvas
+										id="green" width="45" height="45" value=3> </canvas></label>
+							</div>
+						</td>
+					<tr>
+				</table>
+				<button type="button" class="btn btn-primary btn-block Screen"
+					onclick="colorChange('${dId}','${name}','${state}')">submit</button>
 
-				<form action="sendActionRGB">
-					<input type="hidden" id="dId" name="dId" value='${dId}' /> <input
-						type="hidden" id="name" name="name" value='${name}' /> <input
-						type="hidden" id="state" name="state" value='${state}' />
-					<table class="Screen">
-						<tr>
-							<td><div class="form-group ">
-									<input type="text" id="actionR" name="actionR" placeHolder="R"
-										class="form-control" onKeyPress="return numkeyCheck(event)" />
-								</div></td>
-							<td><div class="form-group ">
-									<input type="text" id="actionG" name="actionG" placeHolder="G"
-										class="form-control" onKeyPress="return numkeyCheck(event)" />
-								</div></td>
-							<td><div class="form-group ">
-									<input type="text" actionid="actionB" name="actionB"
-										placeHolder="B" class="form-control"
-										onKeyPress="return numkeyCheck(event)" />
-								</div></td>
-						</tr>
-					</table>
-					<button type="submit" class="btn btn-primary btn-block Screen">submit</button>
-				</form>
 				<br>
 
 				<form action="deleteDevice" method="GET">

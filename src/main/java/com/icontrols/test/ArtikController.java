@@ -223,6 +223,7 @@ public class ArtikController {
 	 */
 
 	@RequestMapping("/sendActionRGB")
+	@ResponseBody
 	public String sendActionRGB(HttpSession session, @RequestParam(value = "dId") String dId,
 			@RequestParam(value = "state") int state, @RequestParam(value = "name") String name,
 			@RequestParam(value = "actionR", required = false) String R,
@@ -241,12 +242,9 @@ public class ArtikController {
 		sendTestLog = ArtikUtils.Action(session, dId, "setColorRGB", R + ";" + G + ";" + B);
 
 		sendTestLogService.insertSendTestLog(sendTestLog);
-
-		Thread.sleep(2000);
 		// return "redirect:/deviceDetail?dId=" + dId + "&name=" + name +
 		// "&state=" + state;
-		return "redirect:/success";
-
+		return "hi";
 	}
 
 	// SEND ACTION ONLY ON/OFF
