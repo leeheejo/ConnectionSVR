@@ -239,12 +239,28 @@ public class ArtikController {
 			G = "0";
 		if (B.equals("") || Integer.parseInt(B) > 255)
 			B = "0";
-		sendTestLog = ArtikUtils.Action(session, dId, "setColorRGB", R + ";" + G + ";" + B);
+		sendTestLog = ArtikUtils.Action(session, dId, "setColorRGB", R + ";" + G + ";" + B,0);
 
 		sendTestLogService.insertSendTestLog(sendTestLog);
 		// return "redirect:/deviceDetail?dId=" + dId + "&name=" + name +
 		// "&state=" + state;
-		return "hi";
+		return " ";
+	}
+	
+	@RequestMapping("/sendActionWind")
+	@ResponseBody
+	public String sendActionWind(HttpSession session, @RequestParam(value = "dId") String dId,
+			@RequestParam(value = "state") int state, @RequestParam(value = "name") String name,
+			@RequestParam(value = "wind", required = false) int wind) throws Exception {
+		logger.info("[sendActionTest]");
+		logger.info("[sendActionTest] {}", dId);
+		SendTestLog sendTestLog;
+
+		sendTestLog = ArtikUtils.Action(session, dId, "setWind"," ", wind);
+
+		sendTestLogService.insertSendTestLog(sendTestLog);
+
+		return " ";
 	}
 
 	// SEND ACTION ONLY ON/OFF
@@ -295,7 +311,7 @@ public class ArtikController {
 		for (Device d : deviceList) {
 			if (d.getDtId().equals(ArtikDeviceType.PHILIPS_HUE_COLOR_LAMP)) {
 				logger.info("{}", d.getName());
-				ArtikUtils.Action(session, d.getdId(), "setEffect", "");
+				ArtikUtils.Action(session, d.getdId(), "setEffect", "", 0);
 				Thread.sleep(2000);
 			}
 		}

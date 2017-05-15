@@ -280,7 +280,7 @@ public class HomeController {
 		}
 
 		if (cmpCode == 1) {
-			sendTestLog = ArtikUtils.Action(session, dId, action, "");
+			sendTestLog = ArtikUtils.Action(session, dId, action, "", 0);
 		} else if (cmpCode == 0) {
 			sendTestLog = IparkUtils.sendAction(action, uId, dId,
 					session.getAttribute("IPARK_ACCESS_TOKEN").toString());
@@ -304,7 +304,7 @@ public class HomeController {
 				logger.info("{} : {}", deviceType, s);
 
 				if (deviceType == 1) {
-					sendTestLog = ArtikUtils.Action(session, s, action, "");
+					sendTestLog = ArtikUtils.Action(session, s, action, "", 0);
 				} else if (deviceType == 0) {
 					sendTestLog = IparkUtils.sendAction(action, uId, s,
 							session.getAttribute("IPARK_ACCESS_TOKEN").toString());
@@ -337,7 +337,7 @@ public class HomeController {
 			if (d.getCmpCode() != 4) {
 				if (d.getState() == 1) {
 					if (d.getCmpCode() == 1) {
-						sendTestLog = ArtikUtils.Action(session, d.getdId(), "setOff", "");
+						sendTestLog = ArtikUtils.Action(session, d.getdId(), "setOff", "", 0);
 					} else if (d.getCmpCode() == 0) {
 						sendTestLog = IparkUtils.sendAction("setOff", uId, d.getdId(),
 								session.getAttribute("IPARK_ACCESS_TOKEN").toString());
@@ -362,7 +362,7 @@ public class HomeController {
 				logger.info("allOn {}", d.getName());
 				if (d.getState() == 0) {
 					if (d.getCmpCode() == 1) {
-						sendTestLog = ArtikUtils.Action(session, d.getdId(), "setOn", "");
+						sendTestLog = ArtikUtils.Action(session, d.getdId(), "setOn", "", 0);
 					} else if (d.getCmpCode() == 0) {
 						sendTestLog = IparkUtils.sendAction("setOn", uId, d.getdId(),
 								session.getAttribute("IPARK_ACCESS_TOKEN").toString());

@@ -158,7 +158,8 @@ public class ArtikUtils {
 	 * @return void
 	 */
 
-	public static SendTestLog Action(HttpSession session, String dId, String action, String rgb) throws Exception {
+	public static SendTestLog Action(HttpSession session, String dId, String action, String rgb, int windLevel)
+			throws Exception {
 		logger.info("[ACTION]");
 
 		URL url = new URL("https://api.artik.cloud/v1.1/messages");
@@ -199,6 +200,12 @@ public class ArtikUtils {
 			param = "{ \"data\": {\"actions\": [{\"name\": \"setEffect\",\"parameters\": { \"effect\": \"colorloop\"}}]},\"ddid\": \""
 					+ dId + "\",\"ts\": " + System.currentTimeMillis() + ",\"type\": \"action\"}";
 
+		} else if (action.equals("setWind")) {
+			logger.info("[Action] setWind");
+			param = "{\"ddid\": \"" + dId + "\",\"ts\":" + System.currentTimeMillis()
+					+ ",\"type\": \"action\",\"data\": {\"actions\": [{\"name\": \"setWind\",\"parameters\": {\"speedLevel\":"
+					+ windLevel + "}}]}}";
+			logger.info("[Action] {}", param);
 		}
 		logger.info("[Action] {}", param);
 		OutputStream os = con.getOutputStream();
@@ -338,7 +345,7 @@ public class ArtikUtils {
 
 		return result;
 	}
-	
+
 	public static String getDeviceStateString(HttpSession session, String dId) throws Exception {
 
 		logger.info("[getDeviceState]");
@@ -366,7 +373,6 @@ public class ArtikUtils {
 		String responseData = br.readLine();
 		logger.info("[messages] responseData : {}", responseData);
 		br.close();
-
 
 		return responseData;
 	}

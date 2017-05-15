@@ -12,6 +12,12 @@
 	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script
+	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script type="text/javascript"
 	src="https:////code.jquery.com/jquery-1.12.4.js"></script>
 <script
@@ -60,10 +66,9 @@ div {
 }
 </style>
 <script type="text/javascript">
-
+var wind = 0;
 	$(document).ready(function() {
 			
-					
 						var dId = '${dId}';
 						var allData = {
 							"dId" : dId
@@ -157,6 +162,12 @@ div {
 						ctx.fill();
 						ctx.stroke();
 						
+						
+						$(".dropdown-menu li a").click(function(){
+							  $(this).parents(".dropdown").find('.btn').html($(this).text() + ' <span class="caret"></span>');
+							  $(this).parents(".dropdown").find('.btn').val($(this).data('value'));
+							  wind = $(this).data('value');
+							});
 					});
 
 
@@ -226,6 +237,23 @@ div {
 			data : {"dId" : dId, "name" : name, "state" : state, "actionR" : R, "actionG" :G, "actionB":B},
 			success : function(data) {
 
+				location.href ="success";
+			},
+			error : function(request, status, error) {
+			}
+
+		});
+
+	}
+	
+	function windChange(dId, name, state){
+		$
+		.ajax({
+			url : "sendActionWind",
+			dataType : "text",
+			type : "get",
+			data : {"dId" : dId, "name" : name, "state" : state, "wind" : wind},
+			success : function(data) {
 				location.href ="success";
 			},
 			error : function(request, status, error) {
@@ -342,6 +370,26 @@ div {
 							</div></td>
 					</tr>
 				</table>
+
+				<div class="container">
+					<br> <br>
+					<h4>Change Wind</h4>
+					<div class="dropdown">
+						<button class="btn btn-default dropdown-toggle" type="button"
+							data-toggle="dropdown">
+							ÀÚµ¿ <span class="caret"></span>
+						</button>
+						<ul id ="wind" class="dropdown-menu">
+							<li><a href="#" data-value=0>ÀÚµ¿</a></li>
+							<li><a href="#" data-value=1>ÃëÄ§</a></li>
+							<li><a href="#" data-value=2>¹ÌÇ³</a></li>
+							<li><a href="#" data-value=3>¾àÇ³</a></li>
+							<li><a href="#" data-value=4>°­Ç³</a></li>
+						</ul>
+					</div>
+				</div>
+				<button type="button" class="btn btn-primary btn-block"
+					onclick="windChange('${dId}','${name}','${state}', )">submit</button>
 				<br>
 				<form action="deleteDevice" method="GET">
 					<input type="hidden" name="dId" value='${dId}' /> <input
