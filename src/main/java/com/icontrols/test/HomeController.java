@@ -14,6 +14,7 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.codec.binary.Base64;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.icontrols.test.domain.AccessToken;
 import com.icontrols.test.domain.ConnectedCompany;
 import com.icontrols.test.domain.Device;
@@ -345,7 +347,7 @@ public class HomeController {
 				}
 
 			}
-			Thread.sleep(3000);
+			Thread.sleep(5000);
 		}
 	}
 
@@ -370,7 +372,7 @@ public class HomeController {
 				}
 
 			}
-			Thread.sleep(3000);
+			Thread.sleep(5000);
 		}
 	}
 
@@ -511,6 +513,7 @@ public class HomeController {
 
 	@RequestMapping("thread")
 	public String thread(HttpSession session) throws Exception {
+		
 		stop = true;
 		String userId = session.getAttribute("userLoginInfo").toString();
 		logger.info("{} thread", userId);
