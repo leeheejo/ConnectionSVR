@@ -167,10 +167,10 @@ $(document).ready(function() {
 					<tr>
 						<!-- <th style="width: 1%">code</th>  -->
 
-						<th style="width: 80%">device</th>
+						<th style="width: 80%">기기</th>
 						<!--  <th>dId</th>  -->
-						<th style="width: 10%">state</th>
-						<th style="width: 10%">on/off</th>
+						<th style="width: 10%">상태</th>
+						<th style="width: 10%">전원</th>
 					</tr>
 				</thead>
 

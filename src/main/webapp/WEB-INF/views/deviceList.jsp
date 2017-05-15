@@ -75,7 +75,7 @@
 			<table class="table" style="width: 100%" align="center">
 				<thead>
 					<tr>
-						<th>기기명</th>
+						<th>기기</th>
 						<th style="width: 10%"></th>
 					</tr>
 				</thead>

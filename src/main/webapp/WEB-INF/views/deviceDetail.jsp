@@ -192,6 +192,15 @@ var wind = 0;
 
 	}
 	function airPurifier(Dust, FineDust, Odor, speedLevel) {
+		if(Dust == 0) {
+			Dust = '-';
+		}
+		if(FineDust == 0) {
+			FineDust = '-';
+		}
+		if(Odor == 0) {
+			Odor = '-';
+		}
 		$("#Dust").val(Dust);
 		$("#FineDust").val(FineDust);
 		$("#Odor").val(Odor);
@@ -305,30 +314,30 @@ var wind = 0;
 			</div>
 			<div id="hue" style="display: none;" class="panel-body">
 				<br>
-				<h4>Current State</h4>
+				<h4>현재 상태</h4>
 				<table>
 					<tr>
 						<td>
 							<div class="form-group">
-								<label for="Brightness">Brightness</label> <input type=text
+								<label for="Brightness">밝기</label> <input type=text
 									id="Brightness" class="form-control" readonly />
 							</div>
 						</td>
 						<td>
 							<div class="form-group ">
-								<label for="R">R</label> <input type=text id="R"
+								<label for="R">빨강</label> <input type=text id="R"
 									class="form-control" readonly />
 							</div>
 						</td>
 						<td>
 							<div class="form-group ">
-								<label for="G">G</label> <input type=text id="G"
+								<label for="G">초록</label> <input type=text id="G"
 									class="form-control" readonly />
 							</div>
 						</td>
 						<td>
 							<div class="form-group ">
-								<label for="B">B</label> <input type=text id="B"
+								<label for="B">파랑</label> <input type=text id="B"
 									class="form-control" readonly />
 							</div>
 						</td>
@@ -336,7 +345,7 @@ var wind = 0;
 				</table>
 
 				<br>
-				<h4>Change Color</h4>
+				<h4>색상 변경</h4>
 				<table>
 					<tr>
 						<td align="center">
@@ -352,7 +361,7 @@ var wind = 0;
 					<tr>
 				</table>
 				<button type="button" class="btn btn-primary btn-block"
-					onclick="colorChange('${dId}','${name}','${state}')">submit</button>
+					onclick="colorChange('${dId}','${name}','${state}')">상태 변경</button>
 
 				<br> <br>
 				<form action="deleteDevice" method="GET">
@@ -360,75 +369,79 @@ var wind = 0;
 					<input type="hidden" name="dId" value='${dId}' /> <input
 						type="hidden" name="cmpCode" value=1 />
 					<button type="submit" class="btn btn-default btn-block"
-						onClick="location.href='deleteDevice'">delete</button>
+						onClick="location.href='deleteDevice'">기기 삭제</button>
 
 				</form>
 			</div>
 
 			<div id="airPurifier" style="display: none" class="panel-body">
 
-				<h4>Current State</h4>
+				<h4>현재상태</h4>
 				<table>
 					<tr>
 						<td><div class="form-group ">
-								<label for="Wind">Wind</label> <input type=text id="Wind"
-									class="form-control" readonly />
+								<label for="Wind" style="font-size: xx-small">풍량</label> <input
+									type=text id="Wind" class="form-control" readonly
+									style="font-size: x-small" />
 							</div></td>
 						<td><div class="form-group ">
-								<label for="Dust">Dust</label> <input type=text id="Dust"
-									class="form-control" readonly />
+								<label for="Dust" style="font-size: xx-small">미세먼지</label> <input
+									type=text id="Dust" class="form-control" readonly
+									style="font-size: x-small" />
 							</div></td>
 						<td><div class="form-group ">
-								<label for="FineDust">FineDust</label> <input type=text
-									id="FineDust" class="form-control" readonly />
+								<label for="FineDust" style="font-size: xx-small">초미세먼지</label>
+								<input type=text id="FineDust" class="form-control" readonly
+									style="font-size: x-small" />
 							</div></td>
 						<td><div class="form-group ">
-								<label for="Odor">Odor</label> <input type=text id="Odor"
-									class="form-control" readonly />
+								<label for="Odor" style="font-size: xx-small">가스</label> <input
+									type=text id="Odor" class="form-control" readonly
+									style="font-size: x-small" />
 							</div></td>
 					</tr>
 				</table>
 
 				<div class="container">
 					<br>
-					<h4>Change Wind</h4>
+					<h4>풍량 변경</h4>
 					<div class="dropdown">
 						<button class="btn btn-default dropdown-toggle" type="button"
-							data-toggle="dropdown">
-							바람 세기<span class="caret"></span>
+							data-toggle="dropdown" style="font-size: small">
+							풍량 선택<span class="caret"></span>
 						</button>
 						<ul id="wind" class="dropdown-menu">
-							<li><a href="#" data-value=0>자동</a></li>
-							<li><a href="#" data-value=1>취침</a></li>
-							<li><a href="#" data-value=2>미풍</a></li>
-							<li><a href="#" data-value=3>약풍</a></li>
-							<li><a href="#" data-value=4>강풍</a></li>
+							<li><a href="#" data-value=0 style="font-size: small">자동</a></li>
+							<li><a href="#" data-value=1 style="font-size: small">취침</a></li>
+							<li><a href="#" data-value=2 style="font-size: small">미풍</a></li>
+							<li><a href="#" data-value=3 style="font-size: small">약풍</a></li>
+							<li><a href="#" data-value=4 style="font-size: small">강풍</a></li>
 						</ul>
 					</div>
 				</div>
 				<button type="button" class="btn btn-primary btn-block"
-					onclick="windChange('${dId}','${name}','${state}', )">submit</button>
+					onclick="windChange('${dId}','${name}','${state}', )">상태
+					변경</button>
 				<br> <br>
 				<form action="deleteDevice" method="GET">
 					<input type="hidden" name="dId" value='${dId}' /> <input
 						type="hidden" name="cmpCode" value=1 />
 					<button type="submit" class="btn btn-default btn-block"
-						onClick="location.href='deleteDevice'">delete</button>
+						onClick="location.href='deleteDevice'">기기 삭제</button>
 				</form>
 
 			</div>
 
 			<div id="group" style="display: none" class="panel-body">
-				<h4>Group Component</h4>
+				<h4>기기 구성</h4>
 				<textarea id="device" class="form-control Screen"
 					style="resize: none; overflow: hidden;" readonly></textarea>
-				<br>
-				<br>
+				<br> <br>
 				<form action="deleteDevice" method="GET">
 					<input type="hidden" name="dId" value='${dId}' /> <input
 						type="hidden" name="cmpCode" value=4 />
 					<button type="submit" class="btn btn-default btn-block Screen"
-						onClick="location.href='deleteDevice'">delete</button>
+						onClick="location.href='deleteDevice'">기기 삭제</button>
 				</form>
 
 			</div>

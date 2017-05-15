@@ -65,7 +65,7 @@ div {
 		</div>
 		<br>
 		<div class="container Screen panel panel-default ">
-			<div class="form-group panel-heading">Server List</div>
+			<div class="form-group panel-heading">서버 목록</div>
 			<table style="width: 100%" align="center">
 				<c:choose>
 					<c:when test="${fn:length(connectedCompanyList) > 0}">
