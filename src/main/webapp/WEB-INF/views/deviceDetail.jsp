@@ -124,12 +124,14 @@ var wind = 0;
 
 										} else if (device.sdtid == "dt9ceaf54e65b241ddade6064a5cf7f71e") {
 											var sensors = deviceData.sensors;
+											var wind = deviceData.Wind;
+											var speedLevel = wind.speedLevel;
 											var Dust = sensors.Dust[0];
 											var FineDust = sensors.FineDust[0];
 											var Odor = sensors.Odor[0];
 											console.log(deviceData);
 											divchange(1);
-											airPurifier(Dust, FineDust, Odor);
+											airPurifier(Dust, FineDust, Odor, speedLevel);
 										}
 
 									},
@@ -189,10 +191,23 @@ var wind = 0;
 		}
 
 	}
-	function airPurifier(Dust, FineDust, Odor) {
+	function airPurifier(Dust, FineDust, Odor, speedLevel) {
 		$("#Dust").val(Dust);
 		$("#FineDust").val(FineDust);
 		$("#Odor").val(Odor);
+		var windLevel;
+		if(speedLevel == 0) {
+			windLevel='자동';
+		} else if(speedLevel == 1){
+			windLevel='취침';
+		}else if(speedLevel == 2){
+			windLevel='미풍';
+		}else if(speedLevel == 3){
+			windLevel='약풍';
+		}else if(speedLevel == 4){
+			windLevel='강풍';
+		}
+		$("#Wind").val(windLevel);
 	}
 	function hue(Brightness, R, G, B) {
 		$("#Brightness").val(Brightness);
@@ -289,7 +304,7 @@ var wind = 0;
 				<h3>${name}</h3>
 			</div>
 			<div id="hue" style="display: none;" class="panel-body">
-				<br> <br>
+				<br>
 				<h4>Current State</h4>
 				<table>
 					<tr>
@@ -301,37 +316,37 @@ var wind = 0;
 						</td>
 						<td>
 							<div class="form-group ">
-								<label for="R">Color R</label> <input type=text id="R"
+								<label for="R">R</label> <input type=text id="R"
 									class="form-control" readonly />
 							</div>
 						</td>
 						<td>
 							<div class="form-group ">
-								<label for="G">Color G</label> <input type=text id="G"
+								<label for="G">G</label> <input type=text id="G"
 									class="form-control" readonly />
 							</div>
 						</td>
 						<td>
 							<div class="form-group ">
-								<label for="B">Color B</label> <input type=text id="B"
+								<label for="B">B</label> <input type=text id="B"
 									class="form-control" readonly />
 							</div>
 						</td>
 					</tr>
 				</table>
 
-				<br> <br>
+				<br>
 				<h4>Change Color</h4>
 				<table>
 					<tr>
 						<td align="center">
 							<div class="radio">
 								<label><input type="radio" name="optradio" value=1>
-									<canvas id="red" width="45" height="45"> </canvas></label> <label><input
+									<canvas id="red" width="40" height="40"> </canvas></label> <label><input
 									type="radio" name="optradio" value=2> <canvas id="blue"
-										width="45" height="45"> </canvas></label> <label><input
+										width="40" height="40"> </canvas></label> <label><input
 									type="radio" name="optradio" value=3> <canvas
-										id="green" width="45" height="45" value=3> </canvas></label>
+										id="green" width="40" height="40" value=3> </canvas></label>
 							</div>
 						</td>
 					<tr>
@@ -339,8 +354,7 @@ var wind = 0;
 				<button type="button" class="btn btn-primary btn-block"
 					onclick="colorChange('${dId}','${name}','${state}')">submit</button>
 
-				<br>
-
+				<br> <br>
 				<form action="deleteDevice" method="GET">
 
 					<input type="hidden" name="dId" value='${dId}' /> <input
@@ -352,10 +366,14 @@ var wind = 0;
 			</div>
 
 			<div id="airPurifier" style="display: none" class="panel-body">
-				<br> <br>
+
 				<h4>Current State</h4>
 				<table>
 					<tr>
+						<td><div class="form-group ">
+								<label for="Wind">Wind</label> <input type=text id="Wind"
+									class="form-control" readonly />
+							</div></td>
 						<td><div class="form-group ">
 								<label for="Dust">Dust</label> <input type=text id="Dust"
 									class="form-control" readonly />
@@ -372,14 +390,14 @@ var wind = 0;
 				</table>
 
 				<div class="container">
-					<br> <br>
+					<br>
 					<h4>Change Wind</h4>
 					<div class="dropdown">
 						<button class="btn btn-default dropdown-toggle" type="button"
 							data-toggle="dropdown">
-							자동 <span class="caret"></span>
+							바람 세기<span class="caret"></span>
 						</button>
-						<ul id ="wind" class="dropdown-menu">
+						<ul id="wind" class="dropdown-menu">
 							<li><a href="#" data-value=0>자동</a></li>
 							<li><a href="#" data-value=1>취침</a></li>
 							<li><a href="#" data-value=2>미풍</a></li>
@@ -390,7 +408,7 @@ var wind = 0;
 				</div>
 				<button type="button" class="btn btn-primary btn-block"
 					onclick="windChange('${dId}','${name}','${state}', )">submit</button>
-				<br>
+				<br> <br>
 				<form action="deleteDevice" method="GET">
 					<input type="hidden" name="dId" value='${dId}' /> <input
 						type="hidden" name="cmpCode" value=1 />
@@ -401,10 +419,10 @@ var wind = 0;
 			</div>
 
 			<div id="group" style="display: none" class="panel-body">
-				<br> <br>
 				<h4>Group Component</h4>
 				<textarea id="device" class="form-control Screen"
 					style="resize: none; overflow: hidden;" readonly></textarea>
+				<br>
 				<br>
 				<form action="deleteDevice" method="GET">
 					<input type="hidden" name="dId" value='${dId}' /> <input

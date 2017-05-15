@@ -37,7 +37,7 @@
 		width: 100%;
 	}
 	img {
-		width: 90%;
+		width: 100%;
 		height: 42px;
 	}
 }
@@ -63,36 +63,43 @@
 }
 </style>
 <body>
-<br><br><br><br><br><br>
-	<center>
-		<div class="container">
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+
+	<div class="container ">
+		<center>
 			<div>
 				<img src="<c:url value="/resources/logo.png"/>" alt="" />
 			</div>
 			<br>
-			<div class="container">
-				<form id="LoginForm" name="LoginForm" method="post" action="login">
-					<div class="form-group">
-						<input type="text" class="form-control" id="uId" name="uId"
-							placeholder="ID" />
-					</div>
-					<div class="form-group">
-						<input type="password" class="form-control" id="uPwd" name="uPwd"
-							placeholder="Password" />
-					</div>
-					<br>
-					<div>
-						<input type="button" class="btn btn-primary"
-							class="btn btn-primary" class="btn btn-default" onclick="erchk()"
-							value="LOGIN" style="width: 49%"> <input type="button"
-							class="btn btn-default" value="JOIN"
-							onClick="location.href='joinPage'" style="width: 49%" />
-					</div>
 
-				</form>
-			</div>
-		</div>
-	</center>
+			<form id="LoginForm" name="LoginForm" method="post" action="login">
+				<div class="form-group">
+					<input type="text" class="form-control" id="uId" name="uId"
+						placeholder="ID" />
+				</div>
+				<div class="form-group">
+					<input type="password" class="form-control" id="uPwd" name="uPwd"
+						placeholder="Password" />
+				</div>
+				<br>
+				<div>
+					<input type="button" class="btn btn-primary"
+						class="btn btn-primary" class="btn btn-default" onclick="erchk()"
+						value="LOGIN" style="width: 49%"> <input type="button"
+						class="btn btn-default" value="JOIN"
+						onClick="location.href='joinPage'" style="width: 49%" />
+				</div>
+
+			</form>
+		</center>
+	</div>
+
+
 </body>
 
 </html>

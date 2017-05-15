@@ -111,7 +111,7 @@ div {
 				<br> <br>
 
 				<button type="button" class="btn btn-primary btn-block" id="clicker"
-					name="clicker">submit</button>
+					name="clicker">create</button>
 			</div>
 
 		</div>

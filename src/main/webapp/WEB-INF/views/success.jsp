@@ -75,8 +75,13 @@ $(document).ready(function() {
 			return false;
 	}
 
-	function sendAction(dId, state, cmpCode) {
-
+	function sendAction(name, dId, state, cmpCode) {
+		if(state == 0) {
+			alert (name+"\n Power On");
+		} else{
+			alert (name+"\n Power Off");
+		}
+		
 		var allData = {
 			"dId" : dId,
 			"state" : state,
@@ -192,23 +197,23 @@ $(document).ready(function() {
 
 								<c:choose>
 									<c:when test="${state == 0}">
-										<td><h4>
+										<td><h5>
 												<span class="label label-default">OFF</span>
-											</h4></td>
+											</h5></td>
 									</c:when>
 									<c:when test="${state == 1}">
-										<td><h4>
+										<td><h5>
 												<span class="label label-primary">ON</span>
-											</h4></td>
+											</h5></td>
 									</c:when>
 								</c:choose>
 
 								<td>
-									<button type="button" class="btn btn-success btn-sm" id="send"
-										value="send"
-										onclick='sendAction("${row.dId}",${row.state},${row.cmpCode})'>
-										<span class="glyphicon glyphicon-send"></span>
-									</button>
+									<h4>
+										<span class="label label-success"
+											onclick='sendAction("${row.name}","${row.dId}",${row.state},${row.cmpCode})'>Power</span>
+									</h4>
+
 								</td>
 
 							</tr>

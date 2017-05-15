@@ -63,7 +63,8 @@
 <body>
 	<center>
 		<div class="container" align="center">
-			<img src="<c:url value="/resources/logo.png"/>" onClick="location.href='success'" />
+			<img src="<c:url value="/resources/logo.png"/>"
+				onClick="location.href='success'" />
 			<button type="button" class="btn btn-default btn-sm "
 				onClick="location.href='logout'">
 				<span class="glyphicon glyphicon-off"></span>
@@ -96,13 +97,9 @@
 
 					<c:otherwise>
 						<tr align="center">
-							<td colspan="3">
-								<div class="container" align="center">
-									<small>기기 목록 가져오는중...</small>
-									<form action="getArtikDeviceList" id="call" name="call">
-									</form>
-								</div>
-							</td>
+							<td colspan="2"><small>기기 목록 가져오는중...</small>
+								<form action="getArtikDeviceList" id="call" name="call">
+								</form></td>
 						</tr>
 					</c:otherwise>
 

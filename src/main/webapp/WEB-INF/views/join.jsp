@@ -22,7 +22,7 @@
 		width: 100%;
 	}
 	img {
-		width: 90%;
+		width: 100%;
 		height: 42px;
 	}
 }

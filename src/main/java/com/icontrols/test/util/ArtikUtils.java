@@ -204,7 +204,7 @@ public class ArtikUtils {
 			logger.info("[Action] setWind");
 			param = "{\"ddid\": \"" + dId + "\",\"ts\":" + System.currentTimeMillis()
 					+ ",\"type\": \"action\",\"data\": {\"actions\": [{\"name\": \"setWind\",\"parameters\": {\"speedLevel\":"
-					+ windLevel + "}}]}}";
+					+ windLevel + "}},{\"name\": \"setOn\",\"parameters\": {}}]}}";
 			logger.info("[Action] {}", param);
 		}
 		logger.info("[Action] {}", param);

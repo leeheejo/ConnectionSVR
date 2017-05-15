@@ -148,7 +148,7 @@ public class ArtikController {
 			String action = ArtikUtils.getNotification(accessToken, obj.getString("id"));
 			logger.info("{}", action);
 			int state = 0;
-			if (action.equals("setOn") || action.equals("setColorRGB")) {
+			if (action.equals("setOn") || action.equals("setColorRGB") || action.equals("setWind")) {
 				state = 1;
 			}
 			List<String> groupList = deviceService.getGIdBydId(dId);
@@ -239,14 +239,14 @@ public class ArtikController {
 			G = "0";
 		if (B.equals("") || Integer.parseInt(B) > 255)
 			B = "0";
-		sendTestLog = ArtikUtils.Action(session, dId, "setColorRGB", R + ";" + G + ";" + B,0);
+		sendTestLog = ArtikUtils.Action(session, dId, "setColorRGB", R + ";" + G + ";" + B, 0);
 
 		sendTestLogService.insertSendTestLog(sendTestLog);
 		// return "redirect:/deviceDetail?dId=" + dId + "&name=" + name +
 		// "&state=" + state;
 		return " ";
 	}
-	
+
 	@RequestMapping("/sendActionWind")
 	@ResponseBody
 	public String sendActionWind(HttpSession session, @RequestParam(value = "dId") String dId,
@@ -256,7 +256,7 @@ public class ArtikController {
 		logger.info("[sendActionTest] {}", dId);
 		SendTestLog sendTestLog;
 
-		sendTestLog = ArtikUtils.Action(session, dId, "setWind"," ", wind);
+		sendTestLog = ArtikUtils.Action(session, dId, "setWind", " ", wind);
 
 		sendTestLogService.insertSendTestLog(sendTestLog);
 
@@ -351,11 +351,12 @@ public class ArtikController {
 		for (String s : groupDIds) {
 			DeviceGroup dg = new DeviceGroup(session.getAttribute("userLoginInfo").toString(), s, name);
 			deviceService.insertDeviceGroup(dg);
-			
+
 			if (deviceService.getDeviceStateByDId(s, session.getAttribute("userLoginInfo").toString()) == 1)
 				flag = 1;
 		}
-		if(flag == 1) device.setState(1);
+		if (flag == 1)
+			device.setState(1);
 		deviceService.insertDevice(device);
 		return "redirect:/success";
 	}
