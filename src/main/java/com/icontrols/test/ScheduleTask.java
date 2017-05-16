@@ -26,33 +26,33 @@ public class ScheduleTask {
 
 	@Autowired
 	IparkAccessTokenService iparkAccessTokenService;
-
-	@Scheduled(cron = "0 53 15 * * ?") // 매일 오후3시에 AccessToken Validate 검사
-	public void scheduleRun() throws Exception {
-		logger.info("Token Check Scheduler START");
-
-		List<AccessToken> accessTokenList = accessTokenService.getAllAccessToken();
-		for (AccessToken at : accessTokenList) {
-			logger.info(" {} 's old token {}", at.getuId(), at.getAccess_token());
-			// System.currentTimeMillis()+86500
-			if (Long.parseLong(at.getIssuedTime()) + Long.parseLong(at.getExpires_in()) > System.currentTimeMillis()+86500) {
-				AccessToken accessToken = ArtikUtils.refreshAccessToken(at.getRefresh_token());
-				accessToken.setuId(at.getuId());
-				accessTokenService.updateAccessToken(accessToken);
-				logger.info(" {} 's new token {}", at.getuId(), accessToken.getAccess_token());
-			}
-		}
-
-		List<IparkAccessToken> iparkAccessTokenList = iparkAccessTokenService.getAllIparkAccessToken();
-		for (IparkAccessToken iat : iparkAccessTokenList) {
-			logger.info(" {} 's old token {}", iat.getuId(), iat.getAccessToken());
-			if (Long.parseLong(iat.getIssuedTime()) + Long.parseLong(iat.getExpiresIn()) > System.currentTimeMillis()+86500) {
-				IparkAccessToken iparkAccessToken = IparkUtils.getIparkAccessToken(iat.getuId());
-				iparkAccessToken.setuId(iat.getuId());
-				iparkAccessTokenService.updateIparkAccessToken(iparkAccessToken);
-				logger.info(" {} 's new token {}", iat.getuId(), iparkAccessToken.getAccessToken());
-			}
-		}
-	}
+//
+//	@Scheduled(cron = "0 0 15 * * ?") // 매일 오후3시에 AccessToken Validate 검사
+//	public void scheduleRun() throws Exception {
+//		logger.info("Token Check Scheduler START");
+//
+//		List<AccessToken> accessTokenList = accessTokenService.getAllAccessToken();
+//		for (AccessToken at : accessTokenList) {
+//			logger.info(" {} 's old token {}", at.getuId(), at.getAccess_token());
+//			// System.currentTimeMillis()+86500
+//			if (Long.parseLong(at.getIssuedTime()) + Long.parseLong(at.getExpires_in()) > System.currentTimeMillis()+86500) {
+//				AccessToken accessToken = ArtikUtils.refreshAccessToken(at.getRefresh_token());
+//				accessToken.setuId(at.getuId());
+//				accessTokenService.updateAccessToken(accessToken);
+//				logger.info(" {} 's new token {}", at.getuId(), accessToken.getAccess_token());
+//			}
+//		}
+//
+//		List<IparkAccessToken> iparkAccessTokenList = iparkAccessTokenService.getAllIparkAccessToken();
+//		for (IparkAccessToken iat : iparkAccessTokenList) {
+//			logger.info(" {} 's old token {}", iat.getuId(), iat.getAccessToken());
+//			if (Long.parseLong(iat.getIssuedTime()) + Long.parseLong(iat.getExpiresIn()) > System.currentTimeMillis()+86500) {
+//				IparkAccessToken iparkAccessToken = IparkUtils.getIparkAccessToken(iat.getuId());
+//				iparkAccessToken.setuId(iat.getuId());
+//				iparkAccessTokenService.updateIparkAccessToken(iparkAccessToken);
+//				logger.info(" {} 's new token {}", iat.getuId(), iparkAccessToken.getAccessToken());
+//			}
+//		}
+//	}
 
 }

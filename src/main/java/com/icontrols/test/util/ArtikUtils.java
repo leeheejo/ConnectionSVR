@@ -477,7 +477,7 @@ public class ArtikUtils {
 		con.setRequestProperty("Content-Type", "application/json");
 
 		// Param
-		String param = "{\"messageType\":\"action\", \"uid\":\"" + uId + "\",\"ddid\":\"" + ddId
+		String param = "{\"messageType\":\"message\", \"uid\":\"" + uId + "\",\"sdid\":\"" + ddId
 				+ "\",\"description\":\"" + ddId
 				+ "\", \"subscriptionType\": \"httpCallback\",\"callbackUrl\":\"https://icontrols-dev.com/connectionSVR/callback\"}";
 
@@ -593,7 +593,7 @@ public class ArtikUtils {
 
 		logger.info("[getNotification] {} ", notificationId);
 		// HttpPost Ελ½Ε
-		URL url = new URL("https://api.artik.cloud/v1.1/notifications/" + notificationId + "/messages");
+		URL url = new URL("https://api.artik.cloud/v1.1/notifications/" + notificationId + "/messages?count=1");
 		HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
 		con.setRequestMethod("GET");
 		con.setDoInput(true);
@@ -617,10 +617,16 @@ public class ArtikUtils {
 		JSONObject obj = new JSONObject(responseData);
 		logger.info("{}", obj);
 		JSONObject data = obj.getJSONArray("data").getJSONObject(0);
-		logger.info("{}", data);
-		JSONObject actions = data.getJSONObject("data").getJSONArray("actions").getJSONObject(0);
-		logger.info("{}", actions);
-		String action = actions.getString("name");
+		String dtId = data.getString("sdtid");
+		logger.info("{}", dtId);
+		String action = "";
+		if (dtId.equals("dt9ceaf54e65b241ddade6064a5cf7f71e")) { // air purifier
+			action = data.getJSONObject("data").getJSONObject("Operation").getString("power");
+			logger.info("{}", action);
+		} else if (dtId.equals("dt6f79b9b4aa3b4a80b7b76c2190016c61")) {
+			action = data.getJSONObject("data").getString("state");
+			logger.info("{}", action);
+		}
 
 		return action;
 	}

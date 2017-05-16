@@ -228,12 +228,12 @@ $(document).ready(function() {
 				<tr>
 					<td colspan=3 align="right">
 						<div>
-							<!-- 
+							
 							<button type="button" class="btn btn-default btn-md"
 								onClick="location.href='test'" id="subscription"
 								name="subscription">
 								<span class="glyphicon glyphicon-plus"></span>
-							</button> -->
+							</button> 
 							<button type="button" class="btn btn-default btn-md"
 								onClick="location.href='refresh'" id="refresh" name="refresh">
 								<span class="glyphicon glyphicon-refresh"></span>

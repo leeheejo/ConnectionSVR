@@ -138,12 +138,14 @@ public class ArtikController {
 
 		} else {
 			logger.info("{}", obj.getString("id"));
-			String dId = obj.getJSONObject("subscriptionQuery").getString("ddid");
+			String dId = obj.getJSONObject("subscriptionQuery").getString("sdid");
 			String accessToken = accessTokenService.getAccessTokenById(deviceService.getUIdByDId(dId));
+			logger.info("{}", accessToken);
+			logger.info("{}", obj.getString("id"));
 			String action = ArtikUtils.getNotification(accessToken, obj.getString("id"));
 			logger.info("{}", action);
 			int state = 0;
-			if (action.equals("setOn") || action.equals("setColorRGB") || action.equals("setWind")) {
+			if (action.equals("on") || action.equals("On")) {
 				state = 1;
 			}
 			List<String> groupList = deviceService.getGIdBydId(dId);

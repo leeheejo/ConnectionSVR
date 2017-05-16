@@ -152,7 +152,7 @@ public class ArtikTestUtils {
 		logger.info("[getNotification]");
 		// HttpPost Ελ½Ε
 		URL url = new URL(
-				"https://api.artik.cloud/v1.1/notifications/"+notificationId+"/messages");
+				"https://api.artik.cloud/v1.1/notifications/"+notificationId+"/messages?count=1");
 		HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
 		con.setRequestMethod("GET");
 		con.setDoInput(true);
