@@ -80,14 +80,6 @@ div {
 								</tr>
 							</form>
 						</c:forEach>
-						<!-- 
-						<tr align="center">
-							<td align="center">
-								<button class="btn btn-default btn-lg btn-block"
-									onClick="location.href='philipsHueLogin'" style="width: 100%">Phillips Hue</button>
-							</td>
-						</tr>
-						 -->
 					</c:when>
 					<c:otherwise>
 						<tr>

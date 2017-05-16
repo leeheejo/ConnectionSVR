@@ -69,7 +69,6 @@
 	<br>
 	<br>
 	<br>
-
 	<div class="container ">
 		<center>
 			<div>
@@ -94,13 +93,9 @@
 						class="btn btn-default" value="JOIN"
 						onClick="location.href='joinPage'" style="width: 49%" />
 				</div>
-
 			</form>
 		</center>
 	</div>
-
-
 </body>
-
 </html>
 

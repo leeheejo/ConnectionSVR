@@ -1,26 +1,13 @@
 package com.icontrols.test;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.Callable;
-
-import javax.net.ssl.HttpsURLConnection;
 import javax.servlet.http.HttpSession;
-
-import org.apache.commons.codec.binary.Base64;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
@@ -30,8 +17,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
-
-import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.icontrols.test.domain.AccessToken;
 import com.icontrols.test.domain.ConnectedCompany;
 import com.icontrols.test.domain.Device;
@@ -42,13 +27,10 @@ import com.icontrols.test.service.ArtikUserProfileService;
 import com.icontrols.test.service.ConnectedCompanyService;
 import com.icontrols.test.service.DeviceService;
 import com.icontrols.test.service.IparkAccessTokenService;
-import com.icontrols.test.service.PhilipsHueBridgeService;
 import com.icontrols.test.service.SendTestLogService;
 import com.icontrols.test.service.UserService;
 import com.icontrols.test.util.ArtikUtils;
 import com.icontrols.test.util.IparkUtils;
-import com.icontrols.test.util.NetworkInfo;
-import com.icontrols.test.util.PhilipsHueUtils;
 
 /**
  * Handles requests for the application home page.
@@ -70,7 +52,7 @@ public class HomeController {
 	@Autowired
 	IparkAccessTokenService iparkAccessTokenService;
 	@Autowired
-	PhilipsHueBridgeService philipsHueBridgeService;
+	SendTestLogService sendTestLogService;
 
 	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
 	Boolean stop = true;
@@ -180,7 +162,6 @@ public class HomeController {
 
 	@RequestMapping("deviceList")
 	public ModelAndView deviceList() {
-
 		stop = true;
 		logger.info("[deviceList]");
 		ModelAndView mav = new ModelAndView();
@@ -293,10 +274,6 @@ public class HomeController {
 			} else if (sendTestLog.getIparkState().equals("off")) {
 				deviceService.updateDeviceState(0, dId, uId);
 			}
-		} else if (cmpCode == 2) {
-
-			sendTestLog = PhilipsHueUtils.sendAction(session, action, dId);
-
 		} else if (cmpCode == 4) {
 
 			List<String> groupDIds = deviceService.getDeviceGroupDids(uId, dId);
@@ -316,16 +293,11 @@ public class HomeController {
 					} else if (sendTestLog.getIparkState().equals("off")) {
 						deviceService.updateDeviceState(0, s, uId);
 					}
-				} else if (deviceType == 2) {
-
-					sendTestLog = PhilipsHueUtils.sendAction(session, action, s);
 				}
-				Thread.sleep(5000);
 			}
 
 		}
 
-		// return "";
 	}
 
 	@RequestMapping("/allOff")
@@ -345,11 +317,10 @@ public class HomeController {
 						sendTestLog = IparkUtils.sendAction("setOff", uId, d.getdId(),
 								session.getAttribute("IPARK_ACCESS_TOKEN").toString());
 					}
-					// sendTestLogService.insertSendTestLog(sendTestLog);
+					sendTestLogService.insertSendTestLog(sendTestLog);
 				}
-
+				Thread.sleep(2000);
 			}
-			Thread.sleep(5000);
 		}
 	}
 
@@ -370,11 +341,10 @@ public class HomeController {
 						sendTestLog = IparkUtils.sendAction("setOn", uId, d.getdId(),
 								session.getAttribute("IPARK_ACCESS_TOKEN").toString());
 					}
-					// sendTestLogService.insertSendTestLog(sendTestLog);
+					sendTestLogService.insertSendTestLog(sendTestLog);
 				}
-
+				Thread.sleep(2000);
 			}
-			Thread.sleep(5000);
 		}
 	}
 
@@ -416,19 +386,7 @@ public class HomeController {
 						artikUserProfileService.getUserIdById(session.getAttribute("userLoginInfo").toString()));
 				logger.info("[login] get ACCESS_TOKEN : {}", accessTokenService.getAccessTokenById(uId));
 			}
-			//
-			// if (philipsHueBridgeService
-			// .getPhilipsHueBridgeById(session.getAttribute("userLoginInfo").toString())
-			// != null) {
-			// session.setAttribute("PHILIPS_HUE_BRIDGE_IP",
-			// philipsHueBridgeService
-			// .getPhilipsHueBridgeById(session.getAttribute("userLoginInfo").toString()));
-			// session.setAttribute("PHILIPS_HUE_USERNAME",
-			// philipsHueBridgeService
-			// .getPhilipsHueUsernameById(session.getAttribute("userLoginInfo").toString()));
-			// }
-			// logger.info("[login] get IPARK_ACCESS_TOKEN : {}",
-			// session.getAttribute("PHILIPS_HUE_BRIDGE_IP"));
+
 			session.setAttribute("IPARK_ACCESS_TOKEN", iparkAccessTokenService.getIparkAccessTokenById(uId));
 
 			logger.info("[login] get IPARK_ACCESS_TOKEN : {}", iparkAccessTokenService.getIparkAccessTokenById(uId));
@@ -491,7 +449,6 @@ public class HomeController {
 		stop = true;
 		ModelAndView mv = new ModelAndView("home", "error_message", "로그인 후 이용바랍니다:D");
 		session.invalidate();
-
 		return mv;
 	}
 
@@ -575,8 +532,8 @@ public class HomeController {
 			try {
 				newList.clear();
 				newList = deviceService.getDeviceById(userId);
-				if (oldList.size() != 0 && newList.size() != 0) { // 두 리스트 다 0이
-																	// 아님
+				if (oldList.size() != 0 && newList.size() != 0) {
+
 					if (oldList.size() == newList.size()) {
 						for (int j = 0; j < oldList.size(); j++) {
 							for (int i = 0; i < newList.size(); i++) {
@@ -606,20 +563,20 @@ public class HomeController {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			Thread.sleep(1000);
+			Thread.sleep(500);
 		}
 
 		return "redirect:/success";
 	}
 
-	@Scheduled(cron = "0 12 8 * * ?") // 매일 오후3시에 AccessToken Validate 검사
+	@Scheduled(cron = "0 0 11 * * ?") // 매일 오후3시에 AccessToken Validate 검사
 	public void scheduleRun() throws Exception {
 		logger.info("Token Check Scheduler START");
 
 		List<AccessToken> accessTokenList = accessTokenService.getAllAccessToken();
 		for (AccessToken at : accessTokenList) {
 			logger.info(" {} 's old token {}", at.getuId(), at.getAccess_token());
-			// System.currentTimeMillis()+86500
+
 			if (Long.parseLong(at.getIssuedTime()) + Long.parseLong(at.getExpires_in()) > System.currentTimeMillis()
 					+ 86500) {
 				AccessToken accessToken = ArtikUtils.refreshAccessToken(at.getRefresh_token());

@@ -48,7 +48,12 @@
 }
 </style>
 <body>
-<br><br><br><br><br><br>
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
 	<center>
 		<div class="container" id="center">
 			<div>
@@ -57,7 +62,6 @@
 			</div>
 			<br>
 			<form name="JoinForm" method="post" action="join" style="width: 100%">
-				<!-- <form method="get"> -->
 				<div class="form-group">
 					<input type="text" name="uId" class="form-control" placeholder="ID">
 				</div>

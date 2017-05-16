@@ -76,12 +76,14 @@ $(document).ready(function() {
 	}
 
 	function sendAction(name, dId, state, cmpCode) {
+		var s;
 		if(state == 0) {
-			alert (name+"\n Power On");
+			s = '의 전원을 켭니다.';
 		} else{
-			alert (name+"\n Power Off");
+			s = '의 전원을 끕니다.';
 		}
-		
+		if(confirm(name+s)) {
+
 		var allData = {
 			"dId" : dId,
 			"state" : state,
@@ -101,11 +103,12 @@ $(document).ready(function() {
 			}
 
 		});
+		}
 
 	}
 	
 	function allOff() {
-
+		if(confirm('모든 기기의 전원을 끕니다.')){
 		$.ajax({
 			url : "allOff",
 			dataType : "json",
@@ -118,12 +121,12 @@ $(document).ready(function() {
 			}
 
 		});
-
+		}
 	}
 	
 	function allOn() {
-
-		$.ajax({
+		if(confirm('모든 기기의 전원을 켭니다.'))
+		{		$.ajax({
 			url : "allOn",
 			dataType : "json",
 			type : "get",
@@ -135,7 +138,7 @@ $(document).ready(function() {
 			}
 
 		});
-
+		}
 	}
 	
 </script>
@@ -165,10 +168,7 @@ $(document).ready(function() {
 			<table class="table Screen" id="example">
 				<thead>
 					<tr>
-						<!-- <th style="width: 1%">code</th>  -->
-
 						<th style="width: 80%">기기</th>
-						<!--  <th>dId</th>  -->
 						<th style="width: 10%">상태</th>
 						<th style="width: 10%">전원</th>
 					</tr>
@@ -178,23 +178,17 @@ $(document).ready(function() {
 					<c:when test="${fn:length(deviceList) > 0}">
 						<c:forEach items="${deviceList}" var="row">
 							<tr>
-
-
-								<!-- <td>${row.cmpCode}</td> -->
 								<c:set value="${row.cmpCode}" var="cmpCode" />
 								<c:choose>
 									<c:when test="${cmpCode == 1 || cmpCode == 4}">
 										<td
 											onclick="location.href='deviceDetail?dId=${row.dId}&state=${row.state}&name=${row.name}&cmpCode=${row.cmpCode}'">${row.name}</td>
-
 									</c:when>
 									<c:otherwise>
 										<td>${row.name}</td>
 									</c:otherwise>
 								</c:choose>
-
 								<c:set value="${row.state}" var="state" />
-
 								<c:choose>
 									<c:when test="${state == 0}">
 										<td><h5>
@@ -207,7 +201,6 @@ $(document).ready(function() {
 											</h5></td>
 									</c:when>
 								</c:choose>
-
 								<td>
 									<h4>
 										<span class="label label-success"
@@ -215,7 +208,6 @@ $(document).ready(function() {
 									</h4>
 
 								</td>
-
 							</tr>
 						</c:forEach>
 					</c:when>
@@ -228,18 +220,17 @@ $(document).ready(function() {
 				<tr>
 					<td colspan=3 align="right">
 						<div>
-							
+							<!--  
 							<button type="button" class="btn btn-default btn-md"
 								onClick="location.href='test'" id="subscription"
 								name="subscription">
 								<span class="glyphicon glyphicon-plus"></span>
 							</button> 
+							-->
 							<button type="button" class="btn btn-default btn-md"
 								onClick="location.href='refresh'" id="refresh" name="refresh">
 								<span class="glyphicon glyphicon-refresh"></span>
 							</button>
-
-
 							<button type="button" class="btn btn-default btn-md"
 								onClick="location.href='createGroup'" id="createGroup"
 								name="createGroup">
@@ -255,8 +246,6 @@ $(document).ready(function() {
 
 			</table>
 		</div>
-
-
 	</center>
 
 </body>

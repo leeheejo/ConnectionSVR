@@ -105,52 +105,7 @@
 
 				</c:choose>
 
-				<!-- 
-				<tr align="right">
-					<td colspan="3">
-						<button type="button" class="btn btn-info " data-toggle="modal"
-							data-target="#myModal">
-							<span class="glyphicon glyphicon-plus"></span>
-						</button>
-					</td>
-				</tr>
-				-->
 			</table>
-
-			<!-- Modal -->
-			<div class="modal fade" id="myModal" role="dialog">
-				<div class="modal-dialog modal-sm">
-
-					<!-- Modal content-->
-					<div class="modal-content">
-						<div class="modal-header">
-							<button type="button" class="close" data-dismiss="modal">&times;</button>
-							<h4 class="modal-title">새 기기 추가</h4>
-						</div>
-
-						<form name="addNewDevice" method="post" action="addNewDevice">
-							<div class="modal-body">
-								<!-- <form method="get"> -->
-								<div class="form-group">
-									<input type="text" name="dtId" class="form-control"
-										placeholder="dtId" value="dt82c0c882f8d547f9988065b2a850062a">
-								</div>
-								<br>
-								<div class="form-group">
-									<input type="text" name="name" class="form-control"
-										placeholder="name">
-								</div>
-								<br>
-							</div>
-							<div class="modal-footer">
-								<button type="submit" class="btn btn-primary">submit</button>
-								<button type="button" class="btn btn-default"
-									data-dismiss="modal">Close</button>
-							</div>
-						</form>
-					</div>
-				</div>
-			</div>
 		</div>
 	</center>
 </body>

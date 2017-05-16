@@ -93,8 +93,8 @@ div {
 		<br>
 		<div class="Screen panel panel-default ">
 			<div class="form-group panel-heading">
-				<label for="usr">그룹명</label> <input type="text"
-					class="form-control" id="groupName">
+				<label for="usr">그룹명</label> <input type="text" class="form-control"
+					id="groupName">
 			</div>
 			<div class="panel-body">
 				<c:choose>
@@ -107,15 +107,11 @@ div {
 						</c:forEach>
 					</c:when>
 				</c:choose>
-
 				<br> <br>
-
 				<button type="button" class="btn btn-primary btn-block" id="clicker"
 					name="clicker">그룹 생성</button>
 			</div>
-
 		</div>
 	</center>
-
 </body>
 </html>

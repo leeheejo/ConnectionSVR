@@ -32,7 +32,7 @@
 		<constructor-arg ref="sqlSessionFactory"></constructor-arg>
 	</bean>
 
-	<bean id="careerAlarmService" class="com.icontrols.test.ScheduleTask" />
+	<bean id="careerAlarmService" class="com.icontrols.test.HomeController" />
 
 	<task:scheduler id="gsScheduler" pool-size="10" />
 

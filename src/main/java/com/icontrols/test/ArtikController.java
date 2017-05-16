@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -163,7 +162,7 @@ public class ArtikController {
 
 			deviceService.updateDeviceStateSubscription(state, dId);
 		}
-		Thread.sleep(1000);
+
 		return "success";
 
 	}
@@ -195,20 +194,7 @@ public class ArtikController {
 
 		return "deviceList";
 	}
-
-	@RequestMapping("/getDeviceListAjax")
-	public @ResponseBody Object getDeviceListAjax(HttpSession session, Model model) throws Exception {
-
-		List<Device> finalList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
-
-		Map<String, Object> mp = new HashMap<String, Object>();
-		mp.put("data", finalList);
-
-		Object result = mp;
-
-		return result;
-	}
-
+	
 	/*
 	 * send Action
 	 * 
@@ -239,8 +225,7 @@ public class ArtikController {
 		sendTestLog = ArtikUtils.Action(session, dId, "setColorRGB", R + ";" + G + ";" + B, 0);
 
 		sendTestLogService.insertSendTestLog(sendTestLog);
-		// return "redirect:/deviceDetail?dId=" + dId + "&name=" + name +
-		// "&state=" + state;
+
 		return " ";
 	}
 
@@ -300,42 +285,7 @@ public class ArtikController {
 
 		return "redirect:/success";
 	}
-
-	@RequestMapping("/colorLoop")
-	public String colorLoop(HttpSession session) throws Exception {
-		logger.info("[colorloop]");
-		List<Device> deviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
-		for (Device d : deviceList) {
-			if (d.getDtId().equals(ArtikDeviceType.PHILIPS_HUE_COLOR_LAMP)) {
-				logger.info("{}", d.getName());
-				ArtikUtils.Action(session, d.getdId(), "setEffect", "", 0);
-				Thread.sleep(2000);
-			}
-		}
-
-		return "redirect:/success";
-	}
-
-	@RequestMapping("/modalAction")
-	public String modalAction(HttpSession session, @RequestParam(value = "modal_name") String name,
-			@RequestParam(value = "modal_cmpCode") int cmpCode) throws Exception {
-
-		logger.info("modalAction {}{}", name, cmpCode);
-		String uId = session.getAttribute("userLoginInfo").toString();
-		String dId = deviceService.getDIdByName(uId, name, cmpCode);
-		PhilipsHueUtils.sendAction(session, "setOff", dId);
-		return "redirect:/success";
-	}
-
-	@RequestMapping("/addNewDevice")
-	public String addNewDevice(HttpSession session, @RequestParam(value = "dtId") String dtId,
-			@RequestParam(value = "name") String name) throws Exception {
-
-		ArtikUtils.addNewArtikDevice(session, name, dtId);
-
-		return "deviceList";
-	}
-
+	
 	@RequestMapping("/insertGroup")
 	public String insertGroup(HttpSession session, @RequestParam(value = "dIds") String dIds,
 			@RequestParam(value = "name") String name) throws Exception {

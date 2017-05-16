@@ -319,31 +319,34 @@ var wind = 0;
 					<tr>
 						<td>
 							<div class="form-group">
-								<label for="Brightness" style="font-size: small">밝기</label> <input type=text
-									id="Brightness" class="form-control" readonly style="font-size: x-small" />
+								<label for="Brightness" style="font-size: small">밝기</label> <input
+									type=text id="Brightness" class="form-control" readonly
+									style="font-size: x-small" />
 							</div>
 						</td>
 						<td>
 							<div class="form-group ">
-								<label for="R" style="font-size: small">빨강</label> <input type=text id="R"
-									class="form-control" readonly style="font-size: x-small"/>
+								<label for="R" style="font-size: small">빨강</label> <input
+									type=text id="R" class="form-control" readonly
+									style="font-size: x-small" />
 							</div>
 						</td>
 						<td>
 							<div class="form-group ">
-								<label for="G" style="font-size: small">초록</label> <input type=text id="G"
-									class="form-control" readonly style="font-size: x-small"/>
+								<label for="G" style="font-size: small">초록</label> <input
+									type=text id="G" class="form-control" readonly
+									style="font-size: x-small" />
 							</div>
 						</td>
 						<td>
 							<div class="form-group ">
-								<label for="B" style="font-size: small">파랑</label> <input type=text id="B"
-									class="form-control" readonly style="font-size: x-small"/>
+								<label for="B" style="font-size: small">파랑</label> <input
+									type=text id="B" class="form-control" readonly
+									style="font-size: x-small" />
 							</div>
 						</td>
 					</tr>
 				</table>
-
 				<br>
 				<h4>색상 변경</h4>
 				<table>
@@ -362,27 +365,23 @@ var wind = 0;
 				</table>
 				<button type="button" class="btn btn-primary btn-block"
 					onclick="colorChange('${dId}','${name}','${state}')">상태 변경</button>
-
-				<br> <br>
+				<br>
 				<form action="deleteDevice" method="GET">
 
 					<input type="hidden" name="dId" value='${dId}' /> <input
 						type="hidden" name="cmpCode" value=1 />
 					<button type="submit" class="btn btn-default btn-block"
 						onClick="location.href='deleteDevice'">기기 삭제</button>
-
 				</form>
 			</div>
-
 			<div id="airPurifier" style="display: none" class="panel-body">
-
 				<h4>현재 상태</h4>
 				<table>
 					<tr>
-						<td ><div class="form-group">
+						<td><div class="form-group">
 								<label for="Wind" style="font-size: small">풍량</label> <input
 									type=text id="Wind" class="form-control" readonly
-									style="font-size: x-small" width=""/>
+									style="font-size: x-small" width="" />
 							</div></td>
 						<td width="25%"><div class="form-group ">
 								<label for="Dust" style="font-size: small">미세먼지</label> <input
@@ -390,19 +389,18 @@ var wind = 0;
 									style="font-size: x-small" />
 							</div></td>
 						<td width="25%"><div class="form-group ">
-								<label for="FineDust" style="font-size: small">초미세먼지</label>
-								<input type=text id="FineDust" class="form-control" readonly
+								<label for="FineDust" style="font-size: small">초미세먼지</label> <input
+									type=text id="FineDust" class="form-control" readonly
 									style="font-size: x-small" />
 							</div></td>
-						<td  width="25%"><div class="form-group ">
+						<td width="25%"><div class="form-group ">
 								<label for="Odor" style="font-size: small">가스</label> <input
 									type=text id="Odor" class="form-control" readonly
 									style="font-size: x-small" />
 							</div></td>
 					</tr>
 				</table>
-
-				<div align = "center">
+				<div align="center">
 					<br>
 					<h4>풍량 변경</h4>
 					<div class="dropdown">
@@ -429,9 +427,7 @@ var wind = 0;
 					<button type="submit" class="btn btn-default btn-block"
 						onClick="location.href='deleteDevice'">기기 삭제</button>
 				</form>
-
 			</div>
-
 			<div id="group" style="display: none" class="panel-body">
 				<h4>기기 구성</h4>
 				<textarea id="device" class="form-control"
@@ -443,7 +439,6 @@ var wind = 0;
 					<button type="submit" class="btn btn-default btn-block"
 						onClick="location.href='deleteDevice'">그룹 삭제</button>
 				</form>
-
 			</div>
 		</div>
 	</center>

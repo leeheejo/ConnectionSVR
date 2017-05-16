@@ -31,17 +31,17 @@ public class IparkUtils {
 	public static int stateChangeFlag;
 
 	public static IparkAccessToken getIparkAccessToken(String uId) throws Exception {
-		
+
 		logger.info("[getIparkInfo]");
 		IparkAccessToken iparkAccessToken = new IparkAccessToken();
-		
+
 		String accessToken = "";
-		String expiresIn ="";
+		String expiresIn = "";
 		// httpGET 통신
 		URL url = new URL(NetworkInfo.IPARK_URL + "/author");
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
 		con.setRequestMethod("GET");
-		
+
 		con.setRequestProperty("id", uId);
 		// response Code
 		int responseCode = con.getResponseCode();
@@ -56,28 +56,29 @@ public class IparkUtils {
 
 		JSONObject obj = new JSONObject(responseData);
 		accessToken = obj.getString("accessToken");
-		expiresIn = obj.getInt("expires_in")+"";
-		
+		expiresIn = obj.getInt("expires_in") + "";
+
 		iparkAccessToken.setuId(uId);
 		iparkAccessToken.setAccessToken(accessToken);
 		iparkAccessToken.setExpiresIn(expiresIn);
-	
+
 		return iparkAccessToken;
 	}
-	
+
 	public static Device getIparkInfo(String accessToken, String uId) throws Exception {
-		
+
 		logger.info("[getIparkInfo]");
-		
+
 		String dId = "";
 		String name = "";
 		String dtId = "";
+		int state = 0;
 
 		// httpGET 통신
 		URL url = new URL(NetworkInfo.IPARK_URL + "/join");
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
 		con.setRequestMethod("GET");
-		
+
 		con.setRequestProperty("accessToken", accessToken);
 		// response Code
 		int responseCode = con.getResponseCode();
@@ -94,19 +95,23 @@ public class IparkUtils {
 		dId = obj.getString("dId");
 		dtId = obj.getString("dtId");
 		name = obj.getString("name");
-		Device device = new Device(uId, dId, name, dtId);
+		if (obj.getString("state").equals("on")) {
+			state = 1;
+		}
+		
+		Device device = new Device(uId, dId, name, state, dtId);
 
 		return device;
 	}
 
 	public static SendTestLog sendAction(String action, String uId, String dId, String accessToken) throws Exception {
-		
+
 		logger.info("[sendAction]");
 		// httpGET 통신
 		URL url = new URL(NetworkInfo.IPARK_URL + "/control?dId=" + dId + "&action=" + action);
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
 		con.setRequestMethod("GET");
-		
+
 		con.setRequestProperty("accessToken", accessToken);
 		// response Code
 		int responseCode = con.getResponseCode();
@@ -118,22 +123,22 @@ public class IparkUtils {
 		br.close();
 
 		logger.info("[sendAction] responseData : {}", responseData);
-		
+
 		JSONObject obj = new JSONObject(responseData);
 		String iparkState = obj.getString("state");
-		
+
 		// Insert sendTestLog
 		SendTestLog sendTestLog = new SendTestLog(uId, 0, dId, action, responseCode + "",
 				new Date(System.currentTimeMillis()));
 		sendTestLog.setIparkState(iparkState);
-		
+
 		return sendTestLog;
 	}
 
 	public static int getState(Device d, String accessToken) throws Exception {
-		
+
 		logger.info("[getState]");
-		
+		logger.info("[getState]{}", d.toString());
 		stateChangeFlag = 0;
 		int result = 0;
 		// httpGET 통신
@@ -143,7 +148,7 @@ public class IparkUtils {
 
 		// HEADER
 		con.setRequestProperty("accessToken", accessToken);
-//		con.setRequestProperty("id", "hi");
+		// con.setRequestProperty("id", "hi");
 
 		// response Code
 		int responseCode = con.getResponseCode();
@@ -162,7 +167,7 @@ public class IparkUtils {
 			result = 1;
 		} else if (state.equals("off")) {
 			result = 0;
-		} 
+		}
 
 		if (d.getState() != result) {
 			stateChangeFlag = 1;
