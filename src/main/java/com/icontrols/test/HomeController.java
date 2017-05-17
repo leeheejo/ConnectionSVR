@@ -175,8 +175,33 @@ public class HomeController {
 		logger.info("[success]");
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("success");
-		List<Device> deviceList = deviceService.getDeviceById(session.getAttribute("userLoginInfo").toString());
-		model.addAttribute("deviceList", deviceList);
+		String uId = session.getAttribute("userLoginInfo").toString();
+		List<Device> deviceList = deviceService.getDeviceById(uId);
+		List<Device> groupList = new ArrayList<Device>();
+		for (Device d : deviceList) {
+			if (d.getCmpCode() == 4) {
+				groupList.add(d);
+			}
+		}
+		for (Device group : groupList) {
+			List<String> groupMembers = deviceService.getDeviceGroupDids(uId, group.getdId());
+			int stateCnt = 0;
+			for (String dId : groupMembers) {
+				int deviceState = deviceService.getDeviceStateByDId(dId, uId);
+				if (deviceState != 0) {
+					stateCnt++;
+				}
+			}
+			if (stateCnt == 0) {
+				deviceService.updateDeviceState(0, group.getdId(), uId);
+			} else {
+				deviceService.updateDeviceState(1, group.getdId(), uId);
+			}
+		}
+		
+		
+		List<Device> finalList = deviceService.getDeviceById(uId);
+		model.addAttribute("deviceList", finalList);
 		logger.info("[success] {}", deviceList.toString());
 
 		return mav;
@@ -268,12 +293,38 @@ public class HomeController {
 		} else if (cmpCode == 0) {
 			sendTestLog = IparkUtils.sendAction(action, uId, dId,
 					session.getAttribute("IPARK_ACCESS_TOKEN").toString());
-
+			int state = 0;
 			if (sendTestLog.getIparkState().equals("on")) {
-				deviceService.updateDeviceState(1, dId, uId);
+				state = 1;
 			} else if (sendTestLog.getIparkState().equals("off")) {
-				deviceService.updateDeviceState(0, dId, uId);
+				state = 0;
 			}
+			// List<String> groupList = deviceService.getGIdBydId(dId);
+			// if (groupList != null) {
+			// for (String s : groupList) {
+			// logger.info("{}", s);
+			// deviceService.updateGroupState(0, s);
+			// int oNCnt = 0;
+			// for (String dIds :
+			// deviceService.getDeviceGroupDids(deviceService.getUIdByDId(s),
+			// s)) {
+			// logger.info("{}", dIds);
+			// if (deviceService.getDeviceStateByDId(dIds, uId) == 0) {
+			// oNCnt++;
+			// }
+			// }
+			// logger.info("{}", oNCnt);
+			// if (state == 0 && oNCnt == 1) {
+			// logger.info("setOff{}", s);
+			// deviceService.updateGroupState(state, s);
+			// } else {
+			// deviceService.updateGroupState(1, s);
+			// }
+			// }
+			// }
+
+			deviceService.updateDeviceState(state, dId, uId);
+
 		} else if (cmpCode == 4) {
 
 			List<String> groupDIds = deviceService.getDeviceGroupDids(uId, dId);
@@ -288,14 +339,41 @@ public class HomeController {
 				} else if (deviceType == 0) {
 					sendTestLog = IparkUtils.sendAction(action, uId, s,
 							session.getAttribute("IPARK_ACCESS_TOKEN").toString());
+
+					int state = 0;
 					if (sendTestLog.getIparkState().equals("on")) {
-						deviceService.updateDeviceState(1, s, uId);
+						state = 1;
 					} else if (sendTestLog.getIparkState().equals("off")) {
-						deviceService.updateDeviceState(0, s, uId);
+						state = 0;
 					}
+					//
+					// List<String> groupList = deviceService.getGIdBydId(s);
+					// if (groupList != null) {
+					// for (String gId : groupList) {
+					// logger.info("{}", gId);
+					// deviceService.updateGroupState(0, gId);
+					// int oNCnt = 0;
+					// for (String dIds :
+					// deviceService.getDeviceGroupDids(deviceService.getUIdByDId(gId),
+					// gId)) {
+					// logger.info("{}", dIds);
+					// if (deviceService.getDeviceStateByDId(dIds, uId) == 0) {
+					// oNCnt++;
+					// }
+					// }
+					// logger.info("{}", oNCnt);
+					// if (state == 0 && oNCnt == 1) {
+					// logger.info("setOff{}", gId);
+					// deviceService.updateGroupState(state, gId);
+					// } else {
+					// deviceService.updateGroupState(1, gId);
+					// }
+					// }
+					// }
+
+					deviceService.updateDeviceState(state, s, uId);
 				}
 			}
-
 		}
 
 	}
@@ -540,13 +618,15 @@ public class HomeController {
 
 								if (oldList.get(j).getCmpCode() != 4
 										&& oldList.get(j).getdId().equals(newList.get(i).getdId())) {
-									logger.info("{} thread", userId);
-									logger.info(" {}'s old state {} ", oldList.get(j).getName(),
-											oldList.get(j).getState());
-									logger.info(" {}'s new state {}", newList.get(j).getName(),
-											newList.get(j).getState());
-									logger.info(
-											"==============================================================================");
+									// logger.info("{} thread", userId);
+									// logger.info(" {}'s old state {} ",
+									// oldList.get(j).getName(),
+									// oldList.get(j).getState());
+									// logger.info(" {}'s new state {}",
+									// newList.get(j).getName(),
+									// newList.get(j).getState());
+									// logger.info(
+									// "==============================================================================");
 									if (oldList.get(j).getState() != newList.get(i).getState()) {
 										logger.info("[DB change]");
 										oldList.clear();

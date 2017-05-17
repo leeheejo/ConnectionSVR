@@ -147,19 +147,7 @@ public class ArtikController {
 			if (action.equals("on") || action.equals("On")) {
 				state = 1;
 			}
-			List<String> groupList = deviceService.getGIdBydId(dId);
-			if (groupList != null) {
-				for (String s : groupList) {
-					deviceService.updateGroupState(0, s);
-					for (String dIds : deviceService.getDeviceGroupDids(deviceService.getUIdByDId(s), s)) {
-						if (state == 1 && deviceService.getDeviceStateByDId(s, deviceService.getUIdByDId(dIds)) != 1) {
-							logger.info("Group {} update", s);
-							deviceService.updateGroupState(state, s);
-						}
-					}
-				}
-			}
-
+			
 			deviceService.updateDeviceStateSubscription(state, dId);
 		}
 
