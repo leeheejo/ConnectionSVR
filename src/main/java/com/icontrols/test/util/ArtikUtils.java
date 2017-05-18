@@ -589,11 +589,11 @@ public class ArtikUtils {
 		br.close();
 	}
 
-	public static String getNotification(String accessToken, String notificationId) throws Exception {
+	public static String getNotification(String accessToken, String notificationId, int total) throws Exception {
 
 		logger.info("[getNotification] {} ", notificationId);
 		// HttpPost Ελ½Ε
-		URL url = new URL("https://api.artik.cloud/v1.1/notifications/" + notificationId + "/messages?count=1");
+		URL url = new URL("https://api.artik.cloud/v1.1/notifications/" + notificationId + "/messages?count="+total+"&order=desc");
 		HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
 		con.setRequestMethod("GET");
 		con.setDoInput(true);

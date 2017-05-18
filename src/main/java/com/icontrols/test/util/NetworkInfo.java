@@ -30,5 +30,5 @@ public class NetworkInfo {
 	public static String ARTIK_CLIENT_SECRET = "fafe61a1191940989a86d9e69e1e3d66";
 
 	/* IPARK SVR URL */
-	public static String IPARK_URL = "http://192.168.0.8:8080/test";
+	public static String IPARK_URL = "http://61.33.215.251:8080/test";
 }

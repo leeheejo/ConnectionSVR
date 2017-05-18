@@ -20,7 +20,7 @@
 		FROM device
 		WHERE uId LIKE
 		#{uId}
-		ORDER BY cmpCode;
+		ORDER BY cmpCode, name asc;
 	</select>
 
 	<insert id="insertDevice" parameterType="HashMap">

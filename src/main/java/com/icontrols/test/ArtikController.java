@@ -141,7 +141,7 @@ public class ArtikController {
 			String accessToken = accessTokenService.getAccessTokenById(deviceService.getUIdByDId(dId));
 			logger.info("{}", accessToken);
 			logger.info("{}", obj.getString("id"));
-			String action = ArtikUtils.getNotification(accessToken, obj.getString("id"));
+			String action = ArtikUtils.getNotification(accessToken, obj.getString("id"), obj.getInt("count"));
 			logger.info("{}", action);
 			int state = 0;
 			if (action.equals("on") || action.equals("On")) {

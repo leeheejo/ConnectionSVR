@@ -202,7 +202,6 @@ public class HomeController {
 		
 		List<Device> finalList = deviceService.getDeviceById(uId);
 		model.addAttribute("deviceList", finalList);
-		logger.info("[success] {}", deviceList.toString());
 
 		return mav;
 	}
@@ -346,33 +345,9 @@ public class HomeController {
 					} else if (sendTestLog.getIparkState().equals("off")) {
 						state = 0;
 					}
-					//
-					// List<String> groupList = deviceService.getGIdBydId(s);
-					// if (groupList != null) {
-					// for (String gId : groupList) {
-					// logger.info("{}", gId);
-					// deviceService.updateGroupState(0, gId);
-					// int oNCnt = 0;
-					// for (String dIds :
-					// deviceService.getDeviceGroupDids(deviceService.getUIdByDId(gId),
-					// gId)) {
-					// logger.info("{}", dIds);
-					// if (deviceService.getDeviceStateByDId(dIds, uId) == 0) {
-					// oNCnt++;
-					// }
-					// }
-					// logger.info("{}", oNCnt);
-					// if (state == 0 && oNCnt == 1) {
-					// logger.info("setOff{}", gId);
-					// deviceService.updateGroupState(state, gId);
-					// } else {
-					// deviceService.updateGroupState(1, gId);
-					// }
-					// }
-					// }
-
 					deviceService.updateDeviceState(state, s, uId);
 				}
+				Thread.sleep(2000);
 			}
 		}
 
@@ -394,6 +369,11 @@ public class HomeController {
 					} else if (d.getCmpCode() == 0) {
 						sendTestLog = IparkUtils.sendAction("setOff", uId, d.getdId(),
 								session.getAttribute("IPARK_ACCESS_TOKEN").toString());
+						int action = 0;
+						if(sendTestLog.getIparkState().equals("on")){
+							action = 1;
+						}
+						deviceService.updateDeviceState(action, d.getdId(), uId);
 					}
 					sendTestLogService.insertSendTestLog(sendTestLog);
 				}
@@ -415,9 +395,15 @@ public class HomeController {
 				if (d.getState() == 0) {
 					if (d.getCmpCode() == 1) {
 						sendTestLog = ArtikUtils.Action(session, d.getdId(), "setOn", "", 0);
+						
 					} else if (d.getCmpCode() == 0) {
 						sendTestLog = IparkUtils.sendAction("setOn", uId, d.getdId(),
 								session.getAttribute("IPARK_ACCESS_TOKEN").toString());
+						int action = 0;
+						if(sendTestLog.getIparkState().equals("on")){
+							action = 1;
+						}
+						deviceService.updateDeviceState(action, d.getdId(), uId);
 					}
 					sendTestLogService.insertSendTestLog(sendTestLog);
 				}
