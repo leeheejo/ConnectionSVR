@@ -141,6 +141,10 @@ $(document).ready(function() {
 		}
 	}
 	
+	function detail(dId, name,state,cmpCode) {
+		location.href="deviceDetail?dId="+encodeURI(encodeURIComponent(dId))+"&state="+state+"&name="+encodeURI(encodeURIComponent(name))+"&cmpCode="+cmpCode;
+	}
+	
 </script>
 
 <body>
@@ -182,7 +186,7 @@ $(document).ready(function() {
 								<c:choose>
 									<c:when test="${cmpCode == 1 || cmpCode == 4}">
 										<td
-											onclick="location.href='deviceDetail?dId=${row.dId}&state=${row.state}&name=${row.name}&cmpCode=${row.cmpCode}'">${row.name}</td>
+											onclick='detail("${row.dId}", "${row.name}",${row.state},${row.cmpCode})'>${row.name}</td>
 									</c:when>
 									<c:otherwise>
 										<td>${row.name}</td>
@@ -220,13 +224,14 @@ $(document).ready(function() {
 				<tr>
 					<td colspan=3 align="right">
 						<div>
+							<!-- 
 
 							<button type="button" class="btn btn-default btn-md"
 								onClick="location.href='test'" id="subscription"
 								name="subscription">
 								<span class="glyphicon glyphicon-plus"></span>
 							</button>
-
+ -->
 							<button type="button" class="btn btn-default btn-md"
 								onClick="location.href='refresh'" id="refresh" name="refresh">
 								<span class="glyphicon glyphicon-refresh"></span>

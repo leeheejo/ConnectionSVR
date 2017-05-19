@@ -1,5 +1,6 @@
 package com.icontrols.test;
 
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -79,10 +80,11 @@ public class HomeController {
 			@RequestParam(value = "state") int state, @RequestParam(value = "name") String name,
 			@RequestParam(value = "cmpCode") String cmpCode) throws Exception {
 		stop = true;
+		logger.info("{}", name);
 		logger.info("[deviceDetail]");
-		model.addAttribute("dId", dId);
+		model.addAttribute("dId",  URLDecoder.decode(dId,"UTF-8"));
 		model.addAttribute("state", state);
-		model.addAttribute("name", name);
+		model.addAttribute("name", URLDecoder.decode(name,"UTF-8"));
 		model.addAttribute("cmpCode", cmpCode);
 
 		return "deviceDetail";
@@ -212,11 +214,7 @@ public class HomeController {
 		logger.info("[addDevice]");
 		ModelAndView mav = new ModelAndView();
 		List<ConnectedCompany> connectedCompnayList = connectedCompanyService.getConnectedCompany();
-		// ´ÜÁö SVR
-		connectedCompnayList.remove(0);
-		// Philips Hue SVR - TEST VER
-		connectedCompnayList.remove(0);
-
+		
 		model.addAttribute("connectedCompanyList", connectedCompnayList);
 		mav.setViewName("addDevice");
 		return mav;
@@ -250,7 +248,7 @@ public class HomeController {
 		}
 
 		if (cmpCode == 4) {
-			logger.info("[groupDelete] {}", dId);
+			dId = URLDecoder.decode(dId,"UTF-8");
 			deviceService.deleteGroupDevice(dId);
 		}
 

@@ -286,6 +286,10 @@ var wind = 0;
 		});
 
 	}
+	
+	function deleteDevice(dId,cmpCode) {
+		location.href="deleteDevice?dId="+encodeURI(encodeURIComponent(dId))+"&cmpCode="+cmpCode;
+	}
 
 </script>
 <body onbeforeunload="success">
@@ -433,12 +437,9 @@ var wind = 0;
 				<textarea id="device" class="form-control"
 					style="resize: none; overflow: hidden;" readonly></textarea>
 				<br> <br>
-				<form action="deleteDevice" method="GET">
-					<input type="hidden" name="dId" value='${dId}' /> <input
-						type="hidden" name="cmpCode" value=4 />
-					<button type="submit" class="btn btn-default btn-block"
-						onClick="location.href='deleteDevice'">그룹 삭제</button>
-				</form>
+
+				<button type="button" class="btn btn-default btn-block"
+					onClick='deleteDevice("${dId}",4)'>그룹 삭제</button>
 			</div>
 		</div>
 	</center>
