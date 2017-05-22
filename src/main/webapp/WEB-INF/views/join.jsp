@@ -51,32 +51,27 @@
 	<br>
 	<br>
 	<br>
-	<br>
-	<br>
-	<br>
 	<center>
 		<div class="container" id="center">
 			<div>
 				<img src="<c:url value="/resources/logo.png"/>" height="42"
 					width="90%" alt="" />
 			</div>
-			<br>
 			<form name="JoinForm" method="post" action="join" style="width: 100%">
 				<div class="form-group">
 					<input type="text" name="uId" class="form-control" placeholder="ID">
 				</div>
-				<br>
 				<div class="form-group">
 					<input type="password" name="uPwd" class="form-control"
 						placeholder="Password">
 				</div>
-				<br>
 				<div class="form-group">
 					<input type="text" name="uEmail" class="form-control"
 						placeholder="Email">
 				</div>
+				<br>
 				<div>
-					<button type="submit" class="btn btn-primary btn-block">submit</button>
+					<button type="submit" class="btn btn-primary btn-block">회원가입</button>
 				</div>
 			</form>
 		</div>
